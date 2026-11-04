@@ -4,6 +4,7 @@
 //! SQLite numbers use Rust's round-trippable display representation. Missing or invalid
 //! dates and phones are unparsed; missing species and sex carry no warning.
 
+pub use crate::model::{Sex, Species};
 pub use chrono::NaiveDate as Date;
 
 /// The SQLite storage classes used by legacy fields.
@@ -39,22 +40,6 @@ pub enum Warning {
     /// Reserved for values that have more than one plausible interpretation.
     Ambiguous,
     Adjusted,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Species {
-    Cat,
-    Dog,
-    Bird,
-    Rabbit,
-    Other,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Sex {
-    Male,
-    Female,
-    Unknown,
 }
 
 /// Parse documented legacy calendar dates without guessing two-digit years or timestamps.
