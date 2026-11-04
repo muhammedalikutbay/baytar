@@ -6,7 +6,7 @@ export const update = (id: number, patch: AppointmentPatch) => call('appointment
 export const softDelete = (id: number) => call('appointment_delete', { id });
 export const restore = (id: number) => call('appointment_restore', { id });
 export const setStatus = (id: number, status: AppointmentStatus) => call('appointment_set_status', { id, status });
-export const createSeries = (base: NewAppointment, count: number, everyDays: number) => call('appointment_create_series', { base, count, everyDays });
+export const createSeries = (base: NewAppointment, count: number, everyDays: number, everyMonths?: number) => call('appointment_create_series', { base, count, everyDays, everyMonths });
 export const between = (from: string, to: string) => call('appointments_between', { from, to });
 export const today = (today: string) => call('appointments_today', { today });
 export const planVaccine = (input: import('./types').PlanVaccination) => call('vaccines_plan', { input });

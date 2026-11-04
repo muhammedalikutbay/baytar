@@ -1,12 +1,12 @@
 <script lang="ts">
   import { Wallet } from '@lucide/svelte';
-  import { Card, Badge, Button, Checkbox, Dialog } from '$lib/components/ui';
+  import { Card, Badge, Button, Checkbox } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { formatMoney } from '$lib/format';
   import * as billing from '$lib/api/billing';
   import type { StatementEntry } from '$lib/api/types';
   import PaymentDialog from './PaymentDialog.svelte';
-  import ChargeForm from './ChargeForm.svelte';
+  import ChargeDialog from './ChargeDialog.svelte';
   import Statement from './Statement.svelte';
   let { ownerId, archived=false, revision=0 }: {ownerId:number;archived?:boolean;revision?:number}=$props();
   let entries=$state<StatementEntry[]>([]);
@@ -37,7 +37,4 @@
   {/if}
 </Card>
 {#if collect}<PaymentDialog bind:open={collect} {ownerId} {balance} onsaved={()=>refresh++} />{/if}
-<Dialog bind:open={charge} title={tr.billingAddCharge} description={tr.billingChargeDescription}>
-  {#if charge}<ChargeForm {ownerId} onsaved={()=>{charge=false;refresh++;}} oncancel={()=>charge=false} />{/if}
-  {#snippet footer()}{/snippet}
-</Dialog>
+<ChargeDialog bind:open={charge} {ownerId} onsaved={()=>refresh++} />

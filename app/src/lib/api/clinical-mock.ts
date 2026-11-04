@@ -1,3 +1,4 @@
+import { seriesDates } from '$lib/components/agenda/calendar';
 import type { Audit, ApiError, Owner, Patient, Visit, NewVisit, VisitPatch, VaccineType, NewVaccineType, VaccineTypePatch, Vaccination, NewVaccination, VaccinationPatch, Medication, NewMedication, MedicationPatch, PrescriptionItem, NewPrescription, PrescriptionPatch, Appointment, NewAppointment, AppointmentPatch, LatestWeight, DueVaccination, CalendarAppointment, CommandMap } from './types';
 interface Context { patientGet(id: number): Patient; ownerGet(id: number): Owner; fail(kind: ApiError["kind"], message: string, field?: string): never; fold(value: string): string; now(): string }
 export function createClinicalMock(ctx: Context) {
@@ -45,7 +46,7 @@ function visitsList(patientId: number) { return visits.filter(v => !v.deletedAt 
 function vaccinationsList(patientId: number) { return vaccinations.filter(v => !v.deletedAt && v.patientId === patientId).sort((a,b) => b.givenOn.localeCompare(a.givenOn) || b.id-a.id); }
 function prescriptionsList(visitId: number) { return prescriptions.filter(v => !v.deletedAt && v.visitId === visitId); }
 function vaccine_typesList() { return vaccine_types.filter(v => !v.deletedAt).sort((a,b) => Number(b.isActive)-Number(a.isActive) || a.name.localeCompare(b.name) || a.id-b.id); }
-function medicationsList() { return medications.filter(v => !v.deletedAt).sort((a,b) => {const x=ctx.fold(a.name), y=ctx.fold(b.name); return (x<y?-1:x>y?1:0)||a.id-b.id;}); }
+function medicationsList(includeDeleted = false) { return medications.filter(v => includeDeleted || !v.deletedAt).sort((a,b) => {const x=ctx.fold(a.name), y=ctx.fold(b.name); return (x<y?-1:x>y?1:0)||a.id-b.id;}); }
 const handlers: Record<string, (args: unknown) => unknown> = {
 'visit_get': (args) => { const { id } = args as CommandMap["visit_get"]["args"]; return visitsGet(id); },
 'visit_create': (args) => { const { input } = args as CommandMap["visit_create"]["args"]; return visitsCreate(input); },
@@ -74,7 +75,7 @@ const handlers: Record<string, (args: unknown) => unknown> = {
 'medication_update': (args) => { const { id, patch } = args as CommandMap["medication_update"]["args"]; return medicationsUpdate(id, patch); },
 'medication_delete': (args) => { const { id } = args as CommandMap["medication_delete"]["args"]; return deleted(medicationsGet(id), true); },
 'medication_restore': (args) => { const { id } = args as CommandMap["medication_restore"]["args"]; return deleted(medicationsGet(id), false); },
-'medications_list': (args) => { void args; return medicationsList(); },
+'medications_list': (args) => { const { includeDeleted } = args as CommandMap['medications_list']['args']; return medicationsList(includeDeleted); },
 'medications_search': (args) => { const { query } = args as CommandMap["medications_search"]["args"]; return medicationsList().filter(m => ctx.fold(m.name).includes(ctx.fold(query)) || ctx.fold(m.activeIngredient ?? "").includes(ctx.fold(query))); },
 'prescription_get': (args) => { const { id } = args as CommandMap["prescription_get"]["args"]; return prescriptionsGet(id); },
 'prescription_create': (args) => { const { input } = args as CommandMap["prescription_create"]["args"]; return prescriptionsCreate(input); },
@@ -88,7 +89,7 @@ const handlers: Record<string, (args: unknown) => unknown> = {
 'appointment_delete': (args) => { const { id } = args as CommandMap["appointment_delete"]["args"]; return deleted(appointmentsGet(id), true); },
 'appointment_restore': (args) => { const { id } = args as CommandMap["appointment_restore"]["args"]; return deleted(appointmentsGet(id), false); },
 'appointment_set_status': (args) => { const { id, status } = args as CommandMap["appointment_set_status"]["args"]; return appointmentsUpdate(id, { status }); },
-'appointment_create_series': (args) => { const { base, count, everyDays } = args as CommandMap["appointment_create_series"]["args"]; return createSeries(base, count, everyDays); },
+'appointment_create_series': (args) => { const { base, count, everyDays, everyMonths } = args as CommandMap["appointment_create_series"]["args"]; return createSeries(base, count, everyDays, everyMonths); },
 'appointments_between': (args) => { const { from, to } = args as CommandMap["appointments_between"]["args"]; return between(from, to); },
 'appointments_today': (args) => { const { today } = args as CommandMap["appointments_today"]["args"]; return between(today, today); },
 };
@@ -159,10 +160,12 @@ function between(from: string, to: string): CalendarAppointment[] {
     return { appointment: a, patientName: p?.name ?? null, ownerName: ownerId === undefined ? null : ctx.ownerGet(ownerId).fullName };
   });
 }
-function createSeries(base: NewAppointment, count: number, everyDays: number) {
+function createSeries(base: NewAppointment, count: number, everyDays: number, everyMonths?: number) {
   if (!Number.isInteger(count) || count < 1 || count > 52) ctx.fail('invalid', 'Must be between 1 and 52.', 'count');
   integer('everyDays', everyDays); date('startsOn', base.startsOn);
-  const dates = Array.from({ length: count }, (_, index) => addDays(base.startsOn, index*everyDays, 'everyDays'));
+  if (everyMonths !== undefined && everyMonths !== 1 && everyMonths !== 12) ctx.fail('invalid', 'Expected 1 or 12.', 'everyMonths');
+  const dates = seriesDates(base.startsOn, count, everyDays, everyMonths);
+  dates.forEach(value => date('startsOn', value));
   const seriesId = crypto.randomUUID().replaceAll('-', '');
   // Validate all inputs before changing the store.
   const size = appointments.length;

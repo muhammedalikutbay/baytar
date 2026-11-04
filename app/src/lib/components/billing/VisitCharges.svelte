@@ -1,12 +1,12 @@
 <script lang="ts">
   import { Receipt } from '@lucide/svelte';
-  import { Button, Card, Dialog } from '$lib/components/ui';
+  import { Button, Card } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { formatMoney } from '$lib/format';
   import * as billing from '$lib/api/billing';
   import * as patients from '$lib/api/patients';
   import type { Charge, StatementEntry } from '$lib/api/types';
-  import ChargeForm from './ChargeForm.svelte';
+  import ChargeDialog from './ChargeDialog.svelte';
   import PaymentDialog from './PaymentDialog.svelte';
   import Statement from './Statement.svelte';
   let { visitId, patientId, date }: {visitId:number;patientId:number;date:string}=$props();
@@ -32,8 +32,5 @@
     <Statement {entries} running={false} onsaved={()=>refresh++} />
   {/if}
 </Card>
-<Dialog bind:open={add} title={tr.billingAddCharge} description={tr.billingChargeDescription}>
-  {#if add && ownerId!==null}<ChargeForm {ownerId} {patientId} {visitId} chargedOn={date} onsaved={()=>{add=false;refresh++;}} oncancel={()=>add=false} />{/if}
-  {#snippet footer()}{/snippet}
-</Dialog>
+{#if ownerId !== null}<ChargeDialog bind:open={add} ownerId={ownerId} {patientId} {visitId} chargedOn={date} onsaved={()=>refresh++} />{/if}
 {#if collect && ownerId!==null}<PaymentDialog bind:open={collect} {ownerId} {balance} defaultAmount={total} onsaved={()=>refresh++} />{/if}

@@ -480,8 +480,11 @@ fn medication_restore(state: State<'_, AppDatabase>, id: i64) -> Result<Medicati
     state.with(|conn| medications::restore(conn, id))
 }
 #[tauri::command]
-fn medications_list(state: State<'_, AppDatabase>) -> Result<Vec<Medication>, CommandError> {
-    state.with(medications::list)
+fn medications_list(
+    state: State<'_, AppDatabase>,
+    include_deleted: Option<bool>,
+) -> Result<Vec<Medication>, CommandError> {
+    state.with(|conn| medications::list_with_deleted(conn, include_deleted.unwrap_or(false)))
 }
 #[tauri::command]
 fn medications_search(
@@ -577,8 +580,11 @@ fn appointment_create_series(
     base: NewAppointment,
     count: u32,
     every_days: i64,
+    every_months: Option<u32>,
 ) -> Result<Vec<Appointment>, CommandError> {
-    state.with(|conn| appointments::create_series(conn, base, count, every_days))
+    state.with(|conn| {
+        appointments::create_series_with_months(conn, base, count, every_days, every_months)
+    })
 }
 #[tauri::command]
 fn appointments_between(

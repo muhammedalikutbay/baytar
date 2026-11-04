@@ -5,5 +5,5 @@ export const create = (input: NewMedication) => call('medication_create', { inpu
 export const update = (id: number, patch: MedicationPatch) => call('medication_update', { id, patch });
 export const softDelete = (id: number) => call('medication_delete', { id });
 export const restore = (id: number) => call('medication_restore', { id });
-export const list = () => call('medications_list', {});
+export const list = (includeDeleted = false) => call('medications_list', { includeDeleted });
 export const search = (query: string) => call('medications_search', { query });

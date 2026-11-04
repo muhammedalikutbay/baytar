@@ -1,12 +1,13 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { Card, Select, Button, NumberInput } from '$lib/components/ui';
+  import { Card, Combobox, Checkbox, Button, NumberInput } from '$lib/components/ui';
+  import RecordPicker from '$lib/components/pickers/RecordPicker.svelte';
   import { tr } from '$lib/i18n/tr';
   import { formatDate, formatNumber, formatUnits, parseDecimal } from '$lib/format';
   import * as medicationApi from '$lib/api/medications';
   import { latestWeight } from '$lib/api/visits';
   import { calculate } from '$lib/api/dose';
-  import type { DoseInput, DoseRange, DoseResult, LatestWeight, Medication } from '$lib/api/types';
+  import type { DoseInput, DoseRange, DoseResult, LatestWeight, Medication, RecordSelection } from '$lib/api/types';
 
   // Supply patientId from a visit; medications may be supplied by the host or loaded here.
   let { patientId, medications: supplied, initialMedicationId, initialWeightKg, onapply }: {
@@ -14,6 +15,9 @@
     onapply?: (dose: { mg: number; ml: number | null; units: number | null; unit: string }) => void;
   } = $props();
   let loaded = $state<Medication[]>([]);
+  let patient = $state<RecordSelection | null>(null);
+  const effectivePatientId = $derived(patientId ?? patient?.patient?.id);
+  let confirmed = $state(false);
   let loadError = $state(false);
   let reload = $state(0);
   let weightReload = $state(0);
@@ -47,7 +51,7 @@
     strength = String(medication?.strengthMgPerUnit ?? '').replace('.', ',');
   });
   $effect(() => {
-    const id = patientId; weightReload;
+    const id = effectivePatientId; weightReload;
     let cancelled = false;
     weight = initialWeightKg == null ? '' : String(initialWeightKg).replace('.', ','); recorded = null; weightError = false; weightLoading = id !== undefined && initialWeightKg == null;
     if (id !== undefined && initialWeightKg == null) {
@@ -79,8 +83,12 @@
     return e;
   });
   $effect(() => {
+    selectedId; minimum; maximum; weight; concentration; strength; effectivePatientId;
+    confirmed = false;
+  });
+  $effect(() => {
     const value = input; const invalid = Object.keys(errors).length > 0;
-    const ready = weight.trim() && minimum.trim() && !invalid && !weightLoading;
+    const ready = confirmed && weight.trim() && minimum.trim() && !invalid && !weightLoading;
     retry; let cancelled = false;
     result = null; calculationError = false; calculating = Boolean(ready);
     if (ready) {
@@ -105,28 +113,32 @@
   <div class="grid gap-4">
     <h2 class="type-section">{tr.doseTitle}</h2>
     <p class="text-fg-muted">{tr.doseDisclaimer}</p>
-    <Select label={tr.doseMedication} bind:value={selectedId} options={[{ value: '', label: tr.doseManual }, ...catalog.map(m => ({ value: String(m.id), label: m.name }))]} />
+    <Combobox label={tr.doseMedication} bind:value={selectedId} placeholder={tr.doseManual} items={catalog.map(m => ({ value: String(m.id), label: m.name, hint: m.activeIngredient ?? undefined }))} />
+    {#if patientId === undefined}<fieldset class="grid gap-2"><legend class="mb-2 text-sm font-medium">{tr.dosePatient}</legend><RecordPicker bind:selected={patient} /></fieldset>{/if}
     {#if loadError}<div><p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" size="sm" onclick={() => reload++}>{tr.retry}</Button></div>{/if}
     <NumberInput label={tr.doseWeight} bind:value={() => parseDecimal(weight), n => weight = n === null ? '' : String(n)} disabled={weightLoading} error={errors.weight} hint={recorded ? `${tr.doseWeightDate}: ${formatDate(recorded.visitOn)} · ${formatNumber(recorded.weightKg)} kg` : undefined} min={Number.MIN_VALUE} max={1500} unit={'kg'} />
     {#if weightLoading}<p role="status" class="text-fg-muted">{tr.loading}</p>
     {:else if weightError}<div><p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" size="sm" onclick={() => weightReload++}>{tr.retry}</Button></div>
-    {:else if patientId !== undefined && !recorded}<p class="type-caption text-fg-muted">{tr.doseNoWeight}</p>{/if}
+    {:else if effectivePatientId !== undefined && !recorded}<p class="type-caption text-fg-muted">{tr.doseNoWeight}</p>{/if}
     <div class="grid gap-4 sm:grid-cols-2">
       <NumberInput label={tr.doseMinimum} bind:value={() => parseDecimal(minimum), n => minimum = n === null ? '' : String(n)} error={errors.minimum} min={Number.MIN_VALUE} unit={'mg/kg'} />
       <NumberInput label={tr.doseMaximum} bind:value={() => parseDecimal(maximum), n => maximum = n === null ? '' : String(n)} error={errors.maximum} min={Number.MIN_VALUE} unit={'mg/kg'} />
       <NumberInput label={tr.medicationConcentration} bind:value={() => parseDecimal(concentration), n => concentration = n === null ? '' : String(n)} error={errors.concentration} min={Number.MIN_VALUE} unit={'mg/ml'} />
       <NumberInput label={tr.medicationStrength} bind:value={() => parseDecimal(strength), n => strength = n === null ? '' : String(n)} error={errors.strength} min={Number.MIN_VALUE} unit={'mg'} />
     </div>
-    <div role="status" aria-live="polite" aria-atomic="true" class="border-t border-border pt-4 tabular-nums">
+    <Checkbox label={tr.doseConfirmRange} bind:checked={confirmed} />
+    <div role="status" aria-live="polite" aria-atomic="true" class="rounded-lg border border-border-control bg-surface-muted p-6 tabular-nums">
       {#if calculating}<p class="text-fg-muted">{tr.loading}</p>
       {:else if calculationError}<p class="text-danger">{tr.doseError}</p><Button variant="secondary" size="sm" onclick={() => retry++}>{tr.retry}</Button>
       {:else if result}
-        <p class="type-title">{range(result.mg)} mg{#if result.ml}{' → '}{range(result.ml)} ml{/if}{#if result.units}{' → '}{range(result.units, true)} {unit}{/if}</p>
+        <p class="type-caption mb-2 text-fg-muted">{tr.dosePerDose}</p>
+        <p class="type-page">{range(result.mg)} mg{#if result.ml}{' → '}{range(result.ml)} ml{/if}{#if result.units}{' → '}{range(result.units, true)} {unit}{/if}</p>
+        <p class="mt-3 text-sm text-fg-muted">{tr.doseUsedRange}: {formatNumber(input.mgPerKgMin)}{input.mgPerKgMax === null ? '' : '–' + formatNumber(input.mgPerKgMax)} mg/kg</p>
+        <p class="type-caption mt-2 text-fg-muted">{tr.doseRounded}</p>
         {#each result.warnings as warning}<p class="mt-2 text-highlight">{warning === 'verySmallVolume' ? tr.doseSmallVolume : tr.doseImpracticalUnits}</p>{/each}
         {#if roundsToZero}<p class="mt-2 text-highlight">{tr.doseTinyRounded}</p>{/if}
       {:else}<p class="text-fg-muted">{tr.dosePrompt}</p>{/if}
     </div>
-    <p class="type-caption text-fg-muted">{tr.doseRounded}</p>
     {#if onapply}<Button disabled={!result || calculating} onclick={applyDose}>{tr.doseApply}</Button>{/if}
     {#if result}<details class="type-caption text-fg-muted"><summary class="cursor-pointer">{tr.doseExact}</summary><p class="mt-2 break-all tabular-nums">{exact(result.mg)} mg{#if result.ml}{' → '}{exact(result.ml)} ml{/if}{#if result.units}{' → '}{exact(result.units)} {unit}{/if}</p></details>{/if}
   </div>

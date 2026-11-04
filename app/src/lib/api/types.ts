@@ -294,7 +294,7 @@ export interface CommandMap {
   medication_update: { args: { id: number; patch: MedicationPatch }; result: Medication };
   medication_delete: { args: { id: number }; result: Medication };
   medication_restore: { args: { id: number }; result: Medication };
-  medications_list: { args: Record<string, never>; result: Medication[] };
+  medications_list: { args: { includeDeleted?: boolean }; result: Medication[] };
   medications_search: { args: { query: string }; result: Medication[] };
   prescription_get: { args: { id: number }; result: PrescriptionItem };
   prescription_create: { args: { input: NewPrescription }; result: PrescriptionItem };
@@ -308,7 +308,7 @@ export interface CommandMap {
   appointment_delete: { args: { id: number }; result: Appointment };
   appointment_restore: { args: { id: number }; result: Appointment };
   appointment_set_status: { args: { id: number; status: AppointmentStatus }; result: Appointment };
-  appointment_create_series: { args: { base: NewAppointment; count: number; everyDays: number }; result: Appointment[] };
+  appointment_create_series: { args: { base: NewAppointment; count: number; everyDays: number; everyMonths?: number }; result: Appointment[] };
   appointments_between: { args: { from: string; to: string }; result: CalendarAppointment[] };
   appointments_today: { args: { today: string }; result: CalendarAppointment[] };
 }

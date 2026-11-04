@@ -4,7 +4,7 @@
   import { formatDate, formatMoney } from '$lib/format';
   import * as billing from '$lib/api/billing';
   import type { StatementEntry, Charge, Payment } from '$lib/api/types';
-  import ChargeForm from './ChargeForm.svelte';
+  import ChargeDialog from './ChargeDialog.svelte';
   import PaymentDialog from './PaymentDialog.svelte';
   import { paymentLabels } from './options';
   let { entries, running = true, onsaved }: { entries:StatementEntry[]; running?:boolean; onsaved:()=>void }=$props();
@@ -57,8 +57,5 @@
   {#if error}<p role="alert" class="text-danger">{error}</p>{/if}
   {#snippet footer()}<Button variant="secondary" disabled={busy} onclick={()=>confirm=false}>{tr.cancel}</Button><Button variant="danger" disabled={busy} onclick={()=>deleting && change(deleting)}>{tr.delete}</Button>{/snippet}
 </Dialog>
-<Dialog bind:open={editCharge} title={tr.billingEditCharge} description={tr.billingChargeDescription}>
-  {#if editCharge && editingCharge}<ChargeForm ownerId={editingCharge.ownerId} charge={editingCharge} onsaved={()=>{editCharge=false;onsaved();}} oncancel={()=>editCharge=false} />{/if}
-  {#snippet footer()}{/snippet}
-</Dialog>
+{#if editingCharge}<ChargeDialog bind:open={editCharge} ownerId={editingCharge.ownerId} charge={editingCharge} onsaved={onsaved} />{/if}
 {#if editPayment && editingPayment}<PaymentDialog bind:open={editPayment} ownerId={editingPayment.ownerId} {balance} payment={editingPayment} onsaved={onsaved} />{/if}

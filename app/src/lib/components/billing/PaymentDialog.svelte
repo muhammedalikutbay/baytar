@@ -6,6 +6,7 @@
   import { todayDate, formatMoney } from '$lib/format';
   import { validateForm } from '$lib/validation';
   import * as billing from '$lib/api/billing';
+  import { get as getOwner } from '$lib/api/owners';
   import type { Payment, PaymentMethod } from '$lib/api/types';
   import { methodOptions } from './options';
   let { open = $bindable(false), ownerId, balance, defaultAmount, payment, onsaved }: {
@@ -18,6 +19,13 @@
   let notes = $state(initial?.notes ?? '');
   let busy = $state(false);
   let error = $state('');
+  let ownerName = $state('');
+  $effect(() => {
+    const id = ownerId; let cancelled = false;
+    getOwner(id).then(owner => { if (!cancelled) ownerName = owner.fullName; })
+      .catch(() => { if (!cancelled) error = tr.loadError; });
+    return () => { cancelled = true; };
+  });
   async function save(event: SubmitEvent) {
     event.preventDefault();
     if (busy || !validateForm(event.currentTarget as HTMLFormElement)) return;
@@ -30,7 +38,7 @@
     } catch {error = tr.saveError;} finally {busy = false;}
   }
 </script>
-<Dialog bind:open title={tr.billingCollect} description={tr.billingPaymentDescription}>
+<Dialog bind:open title={tr.billingCollect + ' — ' + (ownerName || tr.loading) + ' · ' + tr.billingBalance + ': ' + formatMoney(balance)} description={tr.billingPaymentDescription}>
   <form onsubmit={save} class="grid gap-4">
   <RequiredNote />
     <fieldset disabled={busy} class="grid min-w-0 gap-4">

@@ -1,14 +1,15 @@
 <script lang="ts">
-  import { ClipboardList, List, Hourglass, Search, StickyNote, Repeat } from '@lucide/svelte';
+  import { ClipboardList, Hourglass, StickyNote, Repeat } from '@lucide/svelte';
   import { validateForm, parseDecimal } from '$lib/validation';
   import { untrack, tick } from 'svelte';
   import { Button, Checkbox, Input, Select, Textarea, DateInput, NumberInput, RequiredNote, TimeInput } from '$lib/components/ui';
+  import RecordPicker from '$lib/components/pickers/RecordPicker.svelte';
   import * as appointments from '$lib/api/appointments';
-  import { search } from '$lib/api/search';
   import { detail } from '$lib/api/owners';
   import { get as getPatient } from '$lib/api/patients';
-  import type { Appointment, ApiError, Patient, Owner, NewAppointment, AppointmentKind } from '$lib/api/types';
-  import { addDateDays, formatDate, localDate, parseDate } from '$lib/format';
+  import type { Appointment, ApiError, Patient, Owner, NewAppointment, AppointmentKind, RecordSelection } from '$lib/api/types';
+  import { formatDate, localDate, parseDate } from '$lib/format';
+  import { seriesDates } from './calendar';
   import { tr } from '$lib/i18n/tr';
   import { kindLabels } from './appointments';
   let { appointment, patient, owner, date = localDate(), onsaved, oncancel }: {
@@ -16,86 +17,68 @@
   } = $props();
   const initial = untrack(() => ({ appointment, patient, owner, date }));
   let title = $state(initial.appointment?.title ?? '');
-  let kind = $state<string>(initial.appointment?.kind ?? 'visit');
+  let titleEdited = $state(!!initial.appointment);
+  let kind = $state<string>(initial.appointment?.kind === 'visit' && initial.appointment.title.startsWith(tr.appointmentControl) ? 'control' : initial.appointment?.kind ?? 'visit');
   let startsOn = $state(initial.appointment?.startsOn ?? initial.date);
   let startsTime = $state(initial.appointment?.startsTime ?? '');
-  let duration = $state(String(initial.appointment?.durationMin ?? ''));
+  let duration = $state(String(initial.appointment?.durationMin ?? 30));
+  let customDuration = $state(!!initial.appointment?.durationMin && ![15, 30, 45, 60].includes(initial.appointment.durationMin));
   let notes = $state(initial.appointment?.notes ?? '');
-  let selectedPatient = $state(initial.patient ?? null);
-  let selectedOwner = $state(initial.owner ?? null);
-  let patientId = $state(initial.appointment?.patientId ?? initial.patient?.id ?? null);
-  let ownerId = $state(initial.appointment?.ownerId ?? initial.owner?.id ?? initial.patient?.ownerId ?? null);
-  let query = $state('');
-  let options = $state<{ patient: Patient; owner: Owner }[]>([]);
-  let searchLoading = $state(false);
-  let searchFailed = $state(false);
-  let contextLoading = $state(false);
-  let contextFailed = $state(false);
-  let repeat = $state(false);
-  let count = $state('2');
-  let interval = $state('7');
-  let saving = $state(false);
-  let errors = $state<Record<string, string>>({});
+  let selected = $state<RecordSelection | null>(initial.patient && initial.owner ? { patient: initial.patient, owner: initial.owner } : null);
+  let clinicTask = $state(!!initial.appointment && initial.appointment.patientId === null);
+  let contextLoading = $state(false), contextFailed = $state(false), contextRetry = $state(0);
+  let repeat = $state('none'), count = $state('2'), interval = $state('7');
+  let saving = $state(false), errors = $state<Record<string, string>>({});
   let form = $state<HTMLFormElement>();
+  const kinds = { ...kindLabels, control: tr.appointmentControl };
+  const kindOptions = ['visit', 'vaccine', 'control', 'reminder', 'other'] as const;
   const positiveInteger = (value: string) => /^\d+$/.test(value) && Number.isSafeInteger(Number(value)) && Number(value) > 0;
+  const everyDays = $derived(repeat === 'weekly' ? 7 : repeat === 'days' ? +interval : 1);
+  const everyMonths = $derived(repeat === 'monthly' ? 1 : repeat === 'yearly' ? 12 : undefined);
+  const autoTitle = $derived(kinds[kind as keyof typeof kinds] + (selected?.patient && !clinicTask ? ' — ' + selected.patient.name : ''));
+  $effect(() => { if (!titleEdited) title = autoTitle; });
   const preview = $derived.by(() => {
-    if (!repeat || !parseDate(startsOn) || !positiveInteger(count) || +count > 52 || !positiveInteger(interval)) return [];
-    const dates = Array.from({ length: +count }, (_, index) => addDateDays(startsOn, index * +interval));
+    if (repeat === 'none' || !parseDate(startsOn) || !positiveInteger(count) || +count > 52 || !Number.isSafeInteger(everyDays) || everyDays < 1) return [];
+    const dates = seriesDates(startsOn, +count, everyDays, everyMonths);
     return dates.every(Boolean) ? dates : [];
   });
   $effect(() => {
-    const existing = initial.appointment;
-    if (!existing) return;
+    const id = initial.appointment?.patientId ?? initial.patient?.id;
+    contextRetry;
+    if (id == null || (initial.patient && initial.owner && !initial.appointment)) return;
     let cancelled = false;
-    contextLoading = true;
+    contextLoading = true; contextFailed = false;
     (async () => {
       try {
-        const pet = existing.patientId === null ? null : await getPatient(existing.patientId);
-        const id = existing.ownerId ?? pet?.ownerId;
-        const person = id == null ? null : (await detail(id)).owner;
-        if (!cancelled) { selectedPatient = pet; selectedOwner = person; }
+        const pet = await getPatient(id);
+        const person = (await detail(pet.ownerId)).owner;
+        if (!cancelled) selected = { patient: pet, owner: person };
       } catch { if (!cancelled) contextFailed = true; }
       finally { if (!cancelled) contextLoading = false; }
     })();
     return () => { cancelled = true; };
   });
-  $effect(() => {
-    const text = query.trim();
-    let cancelled = false;
-    options = []; searchFailed = false;
-    if (!text) { searchLoading = false; return; }
-    searchLoading = true;
-    const timer = setTimeout(async () => {
-      try {
-        const hits = await search(text, 10);
-        const full = await Promise.all(hits.map(hit => detail(hit.owner.id)));
-        if (!cancelled) options = full.flatMap((hit, index) => {
-          const matchingPatients = hits[index].patients;
-          return (matchingPatients.length ? matchingPatients : hit.patients).map(patient => ({ patient, owner: hit.owner }));
-        });
-      } catch { if (!cancelled) searchFailed = true; }
-      finally { if (!cancelled) searchLoading = false; }
-    }, 200);
-    return () => { cancelled = true; clearTimeout(timer); };
-  });
   async function submit(event: SubmitEvent) {
     event.preventDefault();
-    if (!validateForm(event.currentTarget as HTMLFormElement)) return;
-    if (saving || contextLoading) return;
+    if (!validateForm(event.currentTarget as HTMLFormElement) || saving || contextLoading || contextFailed) return;
     errors = {};
-    if (!title.trim()) errors.title = tr.requiredField;
+    if (!clinicTask && !selected?.patient) errors.patientId = tr.requiredField;
+    if (clinicTask && !title.trim()) errors.title = tr.requiredField;
     if (!parseDate(startsOn) || startsOn < '0001-01-01') errors.startsOn = tr.appointmentDateInvalid;
-    if (startsTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(startsTime)) errors.startsTime = tr.invalidField;
     if (duration && (!positiveInteger(duration) || +duration > 2147483647)) errors.durationMin = tr.appointmentNumberInvalid;
-    if (repeat && (!positiveInteger(count) || +count > 52)) errors.count = tr.appointmentRepeatHint;
-    if (repeat && (!positiveInteger(interval) || +interval > 2147483647 || !preview.length)) errors.everyDays = tr.appointmentNumberInvalid;
-    if (Object.keys(errors).length) { await tick(); form?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(); return; }
+    if (repeat !== 'none' && (!positiveInteger(count) || +count < 2 || +count > 52)) errors.count = tr.appointmentRepeatHint;
+    if (repeat !== 'none' && (!positiveInteger(String(everyDays)) || everyDays > 2147483647 || !preview.length)) errors.everyDays = tr.appointmentNumberInvalid;
+    if (Object.keys(errors).length) { await tick(); form?.querySelector<HTMLElement>('[aria-invalid="true"], [role="alert"]')?.focus(); return; }
     saving = true;
-    const input: NewAppointment = { title: title.trim(), kind: kind as AppointmentKind, startsOn, startsTime: startsTime || null,
-      durationMin: duration ? +duration : null, notes: notes.trim() || null, patientId, ownerId };
+    let savedTitle = title.trim() || autoTitle;
+    if (kind === 'control' && !savedTitle.startsWith(tr.appointmentControl)) savedTitle = tr.appointmentControl + ' — ' + savedTitle;
+    const input: NewAppointment = { title: savedTitle, kind: kind === 'control' ? 'visit' : kind as AppointmentKind, startsOn, startsTime: startsTime || null,
+      durationMin: duration ? +duration : null, notes: notes.trim() || null,
+      patientId: clinicTask ? null : selected?.patient?.id ?? null,
+      ownerId: clinicTask ? initial.appointment?.ownerId ?? null : selected?.owner.id ?? null };
     try {
       if (initial.appointment) await appointments.update(initial.appointment.id, input);
-      else if (repeat) await appointments.createSeries(input, +count, +interval);
+      else if (repeat !== 'none') await appointments.createSeries(input, +count, everyDays, everyMonths);
       else await appointments.create(input);
       onsaved();
     } catch (error) {
@@ -106,29 +89,35 @@
 </script>
 <form bind:this={form} onsubmit={submit} novalidate class="grid gap-4">
   <RequiredNote />
-  <Input icon={ClipboardList} label={tr.appointmentTitle} bind:value={title} required error={errors.title} />
-  <Select icon={List} label={tr.appointmentKind} bind:value={kind} options={Object.entries(kindLabels).map(([value, label]) => ({ value, label }))} />
-  <DateInput label={tr.appointmentDate} min="0001-01-01" max="9999-12-31" bind:value={startsOn} required error={errors.startsOn} />
-  <div class="grid grid-cols-2 gap-4"><TimeInput label={tr.appointmentTime} optional bind:value={startsTime} hint={tr.appointmentTimeHint} error={errors.startsTime} /><NumberInput icon={Hourglass} label={tr.appointmentDuration} bind:value={() => parseDecimal(duration), n => duration = n === null ? '' : String(n)} error={errors.durationMin} min={1} max={2147483647} step={1} unit={tr.inputMinuteUnit} /></div>
-  <fieldset class="grid min-w-0 gap-2"><legend class="text-sm font-medium text-fg mb-2">{tr.appointmentPatient}</legend>
-    {#if contextLoading}<p role="status">{tr.loading}</p>{/if}
-    {#if contextFailed}<p role="alert" class="text-danger">{tr.loadError}</p>{/if}
-    {#if selectedPatient || selectedOwner}<p class="break-words">{selectedPatient?.name}{selectedPatient && selectedOwner ? ' · ' : ''}{selectedOwner?.fullName}</p>
-      <Button variant="ghost" size="sm" disabled={saving || contextLoading} onclick={() => { selectedPatient = null; selectedOwner = null; patientId = null; ownerId = null; }}>{tr.appointmentClearPatient}</Button>
-    {:else}<p class="type-caption text-fg-muted">{tr.appointmentNoPatient}</p>{/if}
-    <Input icon={Search} label={tr.appointmentSearch} type="search" bind:value={query} autocomplete="off" disabled={saving || contextLoading} />
-    {#if query.trim()}<div class="max-h-48 overflow-y-auto rounded-md border border-border p-2" aria-live="polite">
-      {#if searchLoading}<p role="status">{tr.loading}</p>{:else if searchFailed}<p role="alert" class="text-danger">{tr.loadError}</p>{:else if !options.length}<p>{tr.noResults}</p>{/if}
-      {#each options as option (option.patient.id)}<Button variant="ghost" class="w-full justify-start text-left" disabled={saving} onclick={() => { selectedPatient = option.patient; selectedOwner = option.owner; patientId = option.patient.id; ownerId = option.owner.id; query = ''; }}>{option.patient.name} · {option.owner.fullName}</Button>{/each}
-    </div>{/if}
-    {#if errors.patientId || errors.ownerId}<p role="alert" class="text-danger">{tr.invalidField}</p>{/if}
+  <fieldset disabled={saving || contextLoading} class="grid min-w-0 gap-4">
+    <fieldset class="grid min-w-0 gap-3"><legend class="mb-2 text-sm font-medium">{tr.appointmentPatient}</legend>
+      <Checkbox label={tr.appointmentClinicTask} bind:checked={clinicTask} />
+      {#if contextLoading}<p role="status">{tr.loading}</p>{/if}
+      {#if contextFailed}<p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" onclick={() => contextRetry++}>{tr.retry}</Button>{/if}
+      {#if !clinicTask && !contextLoading && !contextFailed}<RecordPicker bind:selected />{/if}
+      {#if errors.patientId}<p role="alert" tabindex="-1" class="text-sm text-danger">{errors.patientId}</p>{/if}
+    </fieldset>
+    <fieldset><legend class="mb-2 text-sm font-medium">{tr.appointmentKind}</legend><div class="flex flex-wrap gap-2">
+      {#each kindOptions as value}<Button size="sm" variant="secondary" aria-pressed={kind === value} class={kind === value ? 'text-accent underline' : ''} onclick={() => kind = value}>{kinds[value]}</Button>{/each}
+    </div></fieldset>
+    <div class="grid gap-4 sm:grid-cols-2"><DateInput label={tr.appointmentDate} min="0001-01-01" max="9999-12-31" bind:value={startsOn} required error={errors.startsOn} /><TimeInput label={tr.appointmentTime} optional bind:value={startsTime} hint={tr.appointmentTimeHint} error={errors.startsTime} /></div>
+    <fieldset><legend class="mb-2 text-sm font-medium">{tr.appointmentDuration}</legend><div class="flex flex-wrap gap-2">
+      {#each [15, 30, 45, 60] as minutes}<Button size="sm" variant="secondary" aria-pressed={!customDuration && duration === String(minutes)} onclick={() => { duration = String(minutes); customDuration = false; }}>{minutes} {tr.inputMinuteUnit}</Button>{/each}
+      <Button size="sm" variant="secondary" aria-pressed={customDuration} onclick={() => customDuration = true}>{tr.appointmentDurationCustom}</Button>
+    </div>{#if customDuration}<div class="mt-3"><NumberInput icon={Hourglass} label={tr.appointmentDurationCustom} bind:value={() => parseDecimal(duration), n => duration = n === null ? '' : String(n)} error={errors.durationMin} min={1} max={2147483647} step={1} unit={tr.inputMinuteUnit} /></div>{/if}</fieldset>
+    <Input icon={ClipboardList} label={tr.appointmentTitle} bind:value={title} oninput={() => titleEdited = true} required={clinicTask} error={errors.title} />
+    {#if !initial.appointment}
+      <Select label={tr.appointmentRepeatLabel} bind:value={repeat} options={[
+        {value:'none', label:tr.appointmentRepeatNone}, {value:'weekly', label:tr.appointmentRepeatWeekly},
+        {value:'monthly', label:tr.appointmentRepeatMonthly}, {value:'yearly', label:tr.appointmentRepeatYearly}, {value:'days', label:tr.appointmentRepeatDays}
+      ]} />
+      {#if repeat !== 'none'}<div class="grid gap-4 sm:grid-cols-2"><NumberInput icon={Repeat} label={tr.appointmentCount} bind:value={() => parseDecimal(count), n => count = n === null ? '' : String(n)} error={errors.count} hint={tr.appointmentRepeatHint} min={2} max={52} step={1} />
+        {#if repeat === 'days'}<NumberInput icon={Repeat} label={tr.appointmentInterval} bind:value={() => parseDecimal(interval), n => interval = n === null ? '' : String(n)} error={errors.everyDays} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} />{/if}</div>
+        <div aria-live="polite"><h3 class="type-caption">{tr.appointmentPreview}</h3><ol class="mt-2 max-h-32 list-inside list-decimal overflow-y-auto text-fg-muted tabular-nums">{#each preview as day}<li>{formatDate(day)}</li>{/each}</ol></div>
+      {/if}
+    {:else}<p class="type-caption text-fg-muted">{tr.appointmentEditHint}</p>{/if}
+    <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />
   </fieldset>
-  <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />
-  {#if !initial.appointment}<Checkbox label={tr.appointmentRepeat} bind:checked={repeat} />
-    {#if repeat}<div class="grid grid-cols-2 gap-4"><NumberInput icon={Repeat} label={tr.appointmentCount} bind:value={() => parseDecimal(count), n => count = n === null ? '' : String(n)} error={errors.count} hint={tr.appointmentRepeatHint} min={2} max={52} step={1} /><NumberInput icon={Repeat} label={tr.appointmentInterval} bind:value={() => parseDecimal(interval), n => interval = n === null ? '' : String(n)} error={errors.everyDays} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} /></div>
-      <div aria-live="polite"><h3 class="type-caption">{tr.appointmentPreview}</h3><ol class="mt-2 max-h-40 list-inside list-decimal overflow-y-auto text-fg-muted tabular-nums">{#each preview as day}<li>{formatDate(day)}</li>{/each}</ol></div>
-    {/if}
-  {:else}<p class="type-caption text-fg-muted">{tr.appointmentEditHint}</p>{/if}
   {#if errors.form}<p role="alert" class="text-danger">{errors.form}</p>{/if}
-  <div class="flex justify-end gap-2"><Button variant="secondary" disabled={saving} onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving || contextLoading}>{saving ? tr.saving : tr.save}</Button></div>
+  <div class="flex justify-end gap-2"><Button variant="secondary" disabled={saving} onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving || contextLoading || contextFailed}>{saving ? tr.saving : tr.save}</Button></div>
 </form>

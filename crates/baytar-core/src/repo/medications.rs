@@ -274,11 +274,14 @@ fn prepare(_conn: &Connection, input: &mut NewMedication, _id: Option<i64>) -> R
     Ok(())
 }
 pub fn list(conn: &Connection) -> Result<Vec<Medication>> {
+    list_with_deleted(conn, false)
+}
+pub fn list_with_deleted(conn: &Connection, include_deleted: bool) -> Result<Vec<Medication>> {
     let mut stmt = conn.prepare(&format!(
-        "SELECT {COLUMNS} FROM medications WHERE deleted_at IS NULL"
+        "SELECT {COLUMNS} FROM medications WHERE (?1 OR deleted_at IS NULL)"
     ))?;
     let mut rows = stmt
-        .query_map([], row)?
+        .query_map([include_deleted], row)?
         .collect::<std::result::Result<Vec<_>, _>>()?;
     rows.sort_by_key(|m| (crate::text::fold(&m.name), m.id));
     Ok(rows)
