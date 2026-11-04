@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { page } from '$app/state';
+  import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { User, Building2, IdCard, MapPin, ExternalLink, Settings2, Moon, Stethoscope, ShieldCheck, Import, RefreshCw, Info, Upload, MessageCircle } from '@lucide/svelte';
-  import { PageHeader, IconChip, Card, EmailInput, Input, Textarea } from '$lib/components/ui';
+  import { PageHeader, IconChip, Card, EmailInput, Input, Textarea, Select } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { applyBranding } from '$lib/branding.svelte';
   import { whatsappPhone } from '$lib/format';
@@ -18,6 +20,14 @@
   import Dialog from '$lib/components/ui/Dialog.svelte';
   import { buttonStyles } from '$lib/components/ui/button';
 
+  const sections = [
+    {value:'clinic',label:tr.settingsNavClinic}, {value:'appearance',label:tr.settingsNavAppearance},
+    {value:'security',label:tr.settingsNavSecurity}, {value:'templates',label:tr.clinicalTemplates},
+    {value:'reminders',label:tr.remindersTemplatesTitle}, {value:'whatsapp',label:tr.whatsappTitle},
+    {value:'backups',label:tr.settingsBackups}, {value:'import',label:tr.settingsNavImport},
+    {value:'updates',label:tr.settingsNavUpdate}, {value:'about',label:tr.settingsAbout}
+  ];
+  const activeSection = $derived(sections.find(s => s.value === page.url.searchParams.get('section'))?.value ?? 'clinic');
   let logoInput: HTMLInputElement;
   let whatsappMode = $state<WhatsappMode>('auto');
   let savedPhone = $state('');
@@ -84,17 +94,23 @@
 </script>
 
 <svelte:head><title>{tr.settings} · {tr.appName}</title></svelte:head>
-<main class="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-8">
+<div class="grid gap-6">
   <PageHeader title={tr.settings} subtitle={tr.settingsDescription} icon={Settings2}>
     {#snippet actions()}<button class={buttonStyles('primary')} disabled={busy} onclick={() => void backupNow()}>{tr.settingsBackupNow}</button>{/snippet}
   </PageHeader>
   {#if error}<p role="alert" class="text-danger">{error}</p>{/if}
   {#if toast}<p role="status" class="text-success">{toast}</p>{/if}
-  <section class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface p-5 sm:p-6">
+  <div class="settings-grid">
+    <nav class="settings-nav" aria-label={tr.settingsSection}>
+      {#each sections as section}<a href={'?section=' + section.value} aria-current={activeSection === section.value ? 'page' : undefined} class="flex min-h-10 items-center rounded-sm px-3 text-sm hover:bg-surface-muted" class:text-accent={activeSection === section.value} class:bg-surface-muted={activeSection === section.value}>{section.label}</a>{/each}
+    </nav>
+    <div class="settings-select"><Select label={tr.settingsSection} value={activeSection} options={sections} onchange={event => void goto('?section=' + event.currentTarget.value, {noScroll:true, keepFocus:true})} /></div>
+    <div class="min-w-0">
+  <section id="appearance" hidden={activeSection !== 'appearance'} class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface p-5 sm:p-6">
     <div class="flex items-center gap-3"><IconChip icon={Moon} tone="neutral" size="sm" /><div><h2 class="type-section">{tr.theme}</h2><p class="text-sm text-fg-muted">{theme.preference === 'system' ? tr.themeFollowSystem : tr.themeManual}</p></div></div>
     <button class="type-caption min-h-7 text-accent underline underline-offset-4" onclick={() => theme.set('system')}>{tr.useSystemTheme}</button>
   </section>
-  <Card title={tr.documentsClinic} icon={Stethoscope}>
+  <section id="clinic" hidden={activeSection !== 'clinic'}><Card title={tr.documentsClinic} icon={Stethoscope}>
     <form class="grid gap-4 sm:grid-cols-2" onsubmit={(e) => { e.preventDefault(); if (validateForm(e.currentTarget)) void saveClinic(); }}>
       <fieldset disabled={!clinicReady || clinicBusy} class="contents">
       {#each [['clinic_name', tr.settingsClinicName], ['vet_name', tr.settingsVetName], ['clinic_title', tr.documentsVetTitle], ['clinic_registry_no', tr.documentsRegistry], ['clinic_tax_office', tr.documentsTaxOffice], ['clinic_tax_no', tr.documentsTaxNo]] as [key, label]}
@@ -120,8 +136,8 @@
       <div class="sm:col-span-2"><button class={buttonStyles('primary')} type="submit" disabled={logoBusy || clinicBusy || !clinicReady}>{clinicBusy || logoBusy ? tr.loading : tr.save}</button></div>
       </fieldset>
     </form>
-  </Card>
-  <section id="whatsapp">
+  </Card></section>
+  <section id="whatsapp" hidden={activeSection !== 'whatsapp'}>
     <Card title={tr.whatsappTitle} icon={MessageCircle}>
       <fieldset class="grid gap-3" disabled={!clinicReady || whatsappBusy}>
         <legend class="mb-2 text-sm font-medium">{tr.whatsappCurrentMode}</legend>
@@ -132,16 +148,16 @@
       {#if !whatsappPhone(savedPhone)}<p class="mt-2 text-sm text-fg-muted">{tr.whatsappPhoneHint}</p>{/if}
     </Card>
   </section>
-  <LockCard />
-  <VisitTemplatesCard />
-  <ReminderTemplatesCard />
-  <section class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section flex items-center gap-3"><IconChip icon={ShieldCheck} tone="accent" size="sm" />{tr.settingsBackups}</h2>
+  <section id="security" hidden={activeSection !== 'security'}><LockCard /></section>
+  <section id="templates" hidden={activeSection !== 'templates'}><VisitTemplatesCard /></section>
+  <section id="reminders" hidden={activeSection !== 'reminders'}><ReminderTemplatesCard /></section>
+  <section id="backups" hidden={activeSection !== 'backups'} class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section flex items-center gap-3"><IconChip icon={ShieldCheck} tone="accent" size="sm" />{tr.settingsBackups}</h2>
     <p class="mt-2 text-fg-muted">{tr.settingsBackupPolicy}</p>
     <div class="mt-4 flex flex-wrap gap-2"><button class={buttonStyles('primary')} disabled={busy} onclick={() => void backupNow()}>{tr.settingsBackupNow}</button><button class={buttonStyles('secondary')} onclick={() => void exportBackup()}>{tr.settingsExport}</button></div>
     <ul class="mt-4 divide-y divide-border">{#each backups as backup (backup.path)}<li class="flex flex-wrap items-center justify-between gap-3 py-3"><div><span class="tabular-nums">{date(backup.createdAt)}</span><span class="mx-2 text-fg-muted">· {kinds[backup.kind]}</span><span class="text-fg-muted">{size(backup.sizeBytes)}</span></div><button class={buttonStyles('secondary')} onclick={() => { restoreTarget = backup; restoreDialogOpen = true; }}>{tr.settingsRestore}</button></li>{:else}<li class="py-3 text-fg-muted">—</li>{/each}</ul>
   </section>
-  <section class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section flex items-center gap-3"><IconChip icon={Import} tone="neutral" size="sm" />{tr.settingsLegacy}</h2><a class="mt-3 inline-block text-accent underline" href="/import">{tr.importTitle}</a></section>
-  <section class="rounded-lg border border-border bg-surface p-5 sm:p-6">
+  <section id="import" hidden={activeSection !== 'import'} class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section flex items-center gap-3"><IconChip icon={Import} tone="neutral" size="sm" />{tr.settingsLegacy}</h2><a class="mt-3 inline-block text-accent underline" href="/import">{tr.importTitle}</a></section>
+  <section id="updates" hidden={activeSection !== 'updates'} class="rounded-lg border border-border bg-surface p-5 sm:p-6">
     <h2 class="type-section flex items-center gap-3"><IconChip icon={RefreshCw} tone="neutral" size="sm" />{tr.settingsUpdates}</h2>
     <label class="mt-3 flex min-h-11 items-center gap-3"><input type="checkbox" class="size-5 accent-ink" checked={updateEnabled} onchange={setUpdates} />{tr.settingsUpdateCheck}</label>
     <div class="mt-3 flex flex-wrap gap-2">
@@ -158,9 +174,23 @@
     </div>
     {#if updater.error}<p role="alert" class="mt-2 text-sm text-danger">{updater.error}</p>{/if}
   </section>
-  <section class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section flex items-center gap-3"><IconChip icon={Info} tone="neutral" size="sm" />{tr.settingsAbout}</h2><p class="mt-3">{tr.version}: {info?.version ?? '—'}</p><p class="mt-1 text-fg-muted">{tr.settingsLicense}</p><a class="mt-2 inline-flex items-center gap-2 text-accent underline" href="https://github.com/muhammedalikutbay/baytar" target="_blank" rel="noreferrer"><ExternalLink size={16} />GitHub</a><p class="mt-4">{tr.localData}</p><p class="break-all text-sm text-fg-muted">{info?.dataFolder ?? '—'}</p><button class={`${buttonStyles('secondary')} mt-3`} onclick={() => void api.openDataFolder()}>{tr.settingsOpenFolder}</button></section>
-</main>
+  <section id="about" hidden={activeSection !== 'about'} class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section flex items-center gap-3"><IconChip icon={Info} tone="neutral" size="sm" />{tr.settingsAbout}</h2><p class="mt-3">{tr.version}: {info?.version ?? '—'}</p><p class="mt-1 text-fg-muted">{tr.settingsLicense}</p><a class="mt-2 inline-flex items-center gap-2 text-accent underline" href="https://github.com/muhammedalikutbay/baytar" target="_blank" rel="noreferrer"><ExternalLink size={16} />GitHub</a><p class="mt-4">{tr.localData}</p><p class="break-all text-sm text-fg-muted">{info?.dataFolder ?? '—'}</p><button class={`${buttonStyles('secondary')} mt-3`} onclick={() => void api.openDataFolder()}>{tr.settingsOpenFolder}</button></section>
+    </div>
+  </div>
+</div>
 
 <Dialog bind:open={restoreDialogOpen} title={tr.settingsRestoreTitle} description={tr.settingsRestoreDescription}>
   {#snippet footer()}<button class={buttonStyles('secondary')} onclick={() => { restoreTarget = null; restoreDialogOpen = false; }}>{tr.cancel}</button><button class={buttonStyles('primary')} disabled={busy} onclick={() => void restore()}>{tr.settingsRestore}</button>{/snippet}
 </Dialog>
+
+<style>
+  .settings-grid { display: grid; grid-template-columns: 196px minmax(0, 1fr); gap: 24px; align-items: start; }
+  .settings-nav { position: sticky; top: 64px; display: grid; gap: 4px; }
+  .settings-select { display: none; }
+  section[hidden] { display: none; }
+  @media (max-width: 899px) {
+    .settings-grid { grid-template-columns: minmax(0, 1fr); }
+    .settings-nav { display: none; }
+    .settings-select { display: block; }
+  }
+</style>

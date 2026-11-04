@@ -265,14 +265,28 @@ pub fn set_status(conn: &Connection, id: i64, status: &str) -> Result<Appointmen
 }
 pub fn create_series(
     conn: &Connection,
+    base: NewAppointment,
+    count: u32,
+    every_days: i64,
+) -> Result<Vec<Appointment>> {
+    create_series_with_months(conn, base, count, every_days, None)
+}
+
+/// Calendar repeats stay anchored to the original day, clamping to each month's end.
+pub fn create_series_with_months(
+    conn: &Connection,
     mut base: NewAppointment,
     count: u32,
     every_days: i64,
+    every_months: Option<u32>,
 ) -> Result<Vec<Appointment>> {
     if !(1..=52).contains(&count) {
         return Err(super::invalid("count", "must be between 1 and 52"));
     }
     super::positive_days("everyDays", Some(every_days))?;
+    if every_months.is_some_and(|months| months != 1 && months != 12) {
+        return Err(super::invalid("everyMonths", "must be 1 or 12"));
+    }
     let tx = transaction(conn)?;
     prepare(&tx, &mut base, None)?;
     let start = super::date("startsOn", &base.starts_on)?;
@@ -284,11 +298,16 @@ pub fn create_series(
             .checked_mul(i64::from(index))
             .and_then(chrono::Duration::try_days)
             .ok_or_else(|| super::invalid("everyDays", "date overflow"))?;
-        let date = start
-            .checked_add_signed(days)
-            .ok_or_else(|| super::invalid("everyDays", "date overflow"))?
-            .format("%Y-%m-%d")
-            .to_string();
+        let date = (if let Some(months) = every_months {
+            months
+                .checked_mul(index)
+                .and_then(|offset| start.checked_add_months(chrono::Months::new(offset)))
+        } else {
+            start.checked_add_signed(days)
+        })
+        .ok_or_else(|| super::invalid("everyDays", "date overflow"))?
+        .format("%Y-%m-%d")
+        .to_string();
         super::date("startsOn", &date)?;
         let mut input = base.clone();
         input.starts_on = date;

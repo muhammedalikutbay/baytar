@@ -18,7 +18,7 @@
     <div class="flex flex-wrap items-center gap-2"><Icon size={18} class="text-fg-muted" aria-hidden="true" /><h3 class="break-words font-medium">{appointment.title}</h3><span class="type-caption text-fg-muted">{kindLabels[appointment.kind]}</span></div>
     <p class="mt-1 break-words text-fg-muted">{#if item.patientName}<a class="text-accent underline" href={`/patients/pet?id=${appointment.patientId}`}>{item.patientName}</a>{/if}{item.patientName && item.ownerName ? ' · ' : ''}{item.ownerName}{item.phone ? ` · ${formatPhone(item.phone)}` : ''}</p>
     {#if appointment.notes}<p class="mt-1 whitespace-pre-wrap break-words text-fg-muted">{appointment.notes}</p>{/if}
-    <div class="mt-2 flex flex-wrap gap-2"><Badge variant={appointment.status === 'done' ? 'success' : 'neutral'}>{statusLabels[appointment.status]}</Badge>{#if isOverdue(appointment, now)}<Badge variant="highlight">{tr.appointmentOverdue}</Badge>{/if}</div>
+    {#if appointment.status !== 'planned' || isOverdue(appointment, now)}<div class="mt-2 flex flex-wrap gap-2">{#if appointment.status !== 'planned'}<Badge variant={appointment.status === 'done' ? 'success' : 'neutral'}>{statusLabels[appointment.status]}</Badge>{/if}{#if isOverdue(appointment, now)}<Badge variant="highlight">{tr.appointmentOverdue}</Badge>{/if}</div>{/if}
   </div>
   <div class="flex flex-wrap gap-2" aria-label={appointment.title}>
     {#if appointment.status === 'planned'}<Button size="sm" variant="secondary" disabled={busy} onclick={() => onstatus(appointment.id, 'done')}>{tr.appointmentDone}</Button><Button size="sm" variant="ghost" disabled={busy} onclick={() => onstatus(appointment.id, 'cancelled')}>{tr.appointmentCancel}</Button>{/if}

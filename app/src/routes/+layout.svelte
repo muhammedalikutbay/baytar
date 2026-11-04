@@ -3,8 +3,6 @@
   import { onMount, type Snippet } from 'svelte';
   import { page } from '$app/state';
   import { ShieldCheck } from '@lucide/svelte';
-  import Logo from '$lib/components/brand/Logo.svelte';
-  import { branding } from '$lib/branding.svelte';
   import { tr } from '$lib/i18n/tr';
   import { theme } from '$lib/theme.svelte';
   import { updater } from '$lib/updater.svelte';
@@ -57,11 +55,10 @@
 {:else if lock.ready}
 <div class="app-shell">
   <aside class="sidebar">
-    <div class="sidebar-label flex items-center gap-2 px-5 pt-5"><Logo size={28} /><span class="truncate font-semibold">{branding.name || tr.appName}</span></div>
-    <p class="sidebar-label type-caption px-5 pt-7 pb-3 text-fg-subtle">{tr.navWorkspace}</p>
+    <p class="sidebar-label type-caption px-5 pt-4 pb-2 text-fg-subtle">{tr.navWorkspace}</p>
     <nav aria-label={tr.navigation} class="grid gap-1 px-3">
       {#each navigation as item, index (item.href)}
-        {#if index === 1}<p class="sidebar-label type-caption px-2 pt-5 pb-2 text-fg-subtle">{tr.navClinical}</p>{/if}
+        {#if index === 1}<p class="sidebar-label type-caption px-2 pt-3 pb-1 text-fg-subtle">{tr.navClinical}</p>{/if}
         <a href={item.href} class:active={(pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/')))} class="nav-item"
           aria-current={(pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/'))) ? 'page' : undefined} aria-label={item.title} title={item.title}>
           <item.icon size={21} strokeWidth={1.75} aria-hidden="true" />
@@ -75,7 +72,7 @@
         <settingsNavigation.icon size={21} strokeWidth={1.75} aria-hidden="true" />
         <span class="sidebar-label">{tr.settings}</span>
       </a>
-      <div class="sidebar-label border-t border-border px-2 pt-4">
+      <div class="sidebar-label border-t border-border px-2 pt-2">
         <p class="type-caption flex items-center gap-2 text-fg-muted"><ShieldCheck size={14} aria-hidden="true" />{tr.localData}</p>
       </div>
       <div class="theme-area">
@@ -111,12 +108,14 @@
 
 <style>
   .app-shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: calc(100dvh - 40px); }
-  .sidebar { position: sticky; top: 40px; display: flex; height: calc(100dvh - 40px); min-height: 560px; flex-direction: column; overflow-y: auto; border-right: 1px solid var(--color-border); background: var(--color-surface); }
+  .sidebar { position: sticky; top: 40px; display: flex; height: calc(100dvh - 40px); min-height: 0; flex-direction: column; overflow-y: auto; scrollbar-width: thin; scrollbar-color: transparent transparent; border-right: 1px solid var(--color-border); background: var(--color-surface); }
+  .sidebar:hover, .sidebar:focus-within { scrollbar-color: var(--color-border-strong) transparent; }
+  .sidebar > nav, .sidebar-footer { flex-shrink: 0; }
   .nav-item { position: relative; display: flex; min-height: 44px; align-items: center; gap: 12px; border-radius: var(--radius-sm); padding: 0 12px; color: var(--color-fg-muted); transition: background var(--default-transition-duration); }
   .nav-item:hover { background: var(--color-surface-muted); color: var(--color-fg); }
   .nav-item.active { background: var(--color-accent-soft); color: var(--color-accent); font-weight: 600; }
   .nav-item.active::before { position: absolute; inset: 10px auto 10px 0; width: 3px; border-radius: var(--radius-pill); background: var(--color-accent); content: ''; }
-  .sidebar-footer { display: grid; gap: 16px; margin-top: auto; padding: 32px 12px 20px; }
+  .sidebar-footer { display: grid; gap: 10px; margin-top: auto; padding: 16px 12px 12px; }
   .theme-area { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 8px; }
   .content { width: 100%; max-width: 1264px; margin: 0 auto; padding: 36px 32px; }
   .skip-link { position: fixed; z-index: 60; top: 12px; left: 12px; transform: translateY(-200%); border-radius: var(--radius-sm); background: var(--color-ink); padding: 12px 16px; color: var(--color-ink-fg); }
@@ -125,7 +124,7 @@
     .app-shell { grid-template-columns: 76px minmax(0, 1fr); }
     .sidebar-label { display: none; }
     .nav-item { justify-content: center; padding: 0; }
-    .sidebar-footer { justify-items: center; padding-top: 24px; }
+    .sidebar-footer { justify-items: center; padding-top: 12px; }
     .sidebar-footer > .nav-item { width: 100%; }
     .theme-area { padding: 0; }
     .content { padding: 28px 24px; }

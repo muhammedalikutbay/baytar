@@ -12,7 +12,7 @@
   import Statement from '$lib/components/billing/Statement.svelte';
   import OwnerPicker from '$lib/components/billing/OwnerPicker.svelte';
   import ServiceForm from '$lib/components/billing/ServiceForm.svelte';
-  import ChargeForm from '$lib/components/billing/ChargeForm.svelte';
+  import ChargeDialog from '$lib/components/billing/ChargeDialog.svelte';
   import PaymentDialog from '$lib/components/billing/PaymentDialog.svelte';
   import { categoryLabels, paymentLabels } from '$lib/components/billing/options';
   let tab=$state('receivables');
@@ -125,4 +125,4 @@
 </Dialog>
 <Dialog bind:open={picker} title={tr.billingChooseOwner} description={tr.billingChooseOwnerDescription}>{#if picker}<OwnerPicker onselect={selectOwner} />{#if actionError}<p role="alert" class="text-danger">{actionError}</p>{/if}{/if}{#snippet footer()}{/snippet}</Dialog>
 {#if paymentOpen && selected}<PaymentDialog bind:open={paymentOpen} ownerId={selected.id} balance={selectedBalance} onsaved={changed} />{/if}
-<Dialog bind:open={chargeOpen} title={tr.billingAddCharge} description={tr.billingChargeDescription}>{#if chargeOpen && selected}<ChargeForm ownerId={selected.id} onsaved={()=>{chargeOpen=false;changed();}} oncancel={()=>chargeOpen=false} />{/if}{#snippet footer()}{/snippet}</Dialog>
+{#if selected}<ChargeDialog bind:open={chargeOpen} ownerId={selected.id} onsaved={changed} />{/if}

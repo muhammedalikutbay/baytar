@@ -74,11 +74,16 @@
 </script>
 <svelte:window onkeydown={event => { if (open && event.key === 'Escape') { open = false; ref?.focus(); } }} onclick={event => { if (open && picker && !picker.contains(event.target as Node)) open = false; }} />
 <div class="relative" bind:this={picker} role="group" aria-label={label}>
+  <label for={id} class="mb-1.5 block text-sm font-medium text-fg">{label}{#if required}<span aria-hidden="true" class="text-danger"> *</span>{/if}</label>
   <div class="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-2">
-    <button type="button" class="mt-[26px] min-h-10 text-sm rounded-md border border-border-control bg-surface px-3 text-fg" aria-label={tr.inputCountry} aria-expanded={open} aria-controls={id + '-countries'} disabled={rest.disabled} onclick={toggle}>{flag(country)} +{getCountryCallingCode(country)}</button>
-    <Input {...rest} {id} {label} {required} type="tel" autocomplete="tel" inputmode="tel" bind:ref bind:value={text} oninput={input}
-      onblur={() => { touched = true; }} error={error || (touched ? message : '')} />
+    <button type="button" class="h-10 text-sm rounded-md border border-border-control bg-surface px-3 text-fg hover:bg-surface-muted disabled:bg-surface-muted disabled:text-fg-subtle" aria-label={tr.inputCountry} aria-expanded={open} aria-controls={id + '-countries'} disabled={rest.disabled} onclick={toggle}>{flag(country)} +{getCountryCallingCode(country)}</button>
+    <input {...rest} {id} {required} type="tel" autocomplete="tel" inputmode="tel" bind:this={ref} bind:value={text} oninput={input}
+      class="h-10 w-full min-w-0 rounded-md border border-border-control bg-surface px-3 text-sm text-fg hover:bg-surface-muted disabled:bg-surface-muted disabled:text-fg-subtle"
+      class:border-danger={!!(error || (touched && message))} aria-invalid={!!(error || (touched && message))}
+      aria-describedby={[rest['aria-describedby'], (error || (touched && message)) && id + '-error'].filter(Boolean).join(' ') || undefined}
+      onblur={() => { touched = true; }} />
   </div>
+  {#if error || (touched && message)}<p id={id + '-error'} class="type-caption mt-1.5 text-danger">{error || message}</p>{/if}
   {#if open}
     <div id={id + '-countries'} class="absolute z-50 mt-1 w-full rounded-md border border-border-control bg-surface p-2 shadow-lg">
       <Input label={tr.inputCountrySearch} bind:value={query} bind:ref={searchRef} type="search" onkeydown={event => {
