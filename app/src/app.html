@@ -3,6 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      (() => {
+        let preference = 'system';
+        try {
+          const saved = localStorage.getItem('baytar.theme');
+          if (saved === 'light' || saved === 'dark') preference = saved;
+        } catch { /* Storage can be unavailable in a restricted webview. */ }
+        document.documentElement.dataset.theme = preference === 'system'
+          ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : preference;
+      })();
+    </script>
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">

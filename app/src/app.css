@@ -1,1 +1,122 @@
-@import "tailwindcss";
+@import '@fontsource-variable/inter/wght.css';
+@import 'tailwindcss';
+
+/* The contrast contract lives in docs/design-language.md. */
+@theme static {
+  --color-*: initial;
+  --font-sans: 'Inter Variable', Inter, ui-sans-serif, system-ui, sans-serif;
+  --color-canvas: #f7f7f9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f2f2f5;
+  --color-border: #e9e9ee;
+  --color-border-strong: #c9c9d2;
+  --color-border-control: #85858f;
+  --color-fg: #0b0b0f;
+  --color-fg-muted: #62626c;
+  --color-fg-subtle: #6e6e78;
+  --color-ink: #111114;
+  --color-ink-fg: #ffffff;
+  --color-accent: #11756f;
+  --color-highlight: #a9521c;
+  --color-success: #1f7a4d;
+  --color-danger: #c42b1c;
+  --color-overlay: rgb(11 11 15 / 0.42);
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+  --shadow-hairline: 0 0 0 1px var(--color-border);
+  --shadow-float: 0 2px 4px rgb(11 11 15 / 0.03), 0 12px 32px -8px rgb(11 11 15 / 0.12);
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@theme inline {
+  /* Opaque sRGB mixes keep badge contrast independent of the parent. Badges only. */
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+  --color-highlight-soft: color-mix(in srgb, var(--color-highlight) 10%, var(--color-surface));
+  --color-success-soft: color-mix(in srgb, var(--color-success) 10%, var(--color-surface));
+  --color-danger-soft: color-mix(in srgb, var(--color-danger) 10%, var(--color-surface));
+}
+
+:root, [data-theme='light'] { color-scheme: light; }
+
+/* Scoped overrides also support the two independent gallery previews. */
+[data-theme='light'] {
+  --color-canvas: #f7f7f9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f2f2f5;
+  --color-border: #e9e9ee;
+  --color-border-strong: #c9c9d2;
+  --color-border-control: #85858f;
+  --color-fg: #0b0b0f;
+  --color-fg-muted: #62626c;
+  --color-fg-subtle: #6e6e78;
+  --color-ink: #111114;
+  --color-ink-fg: #ffffff;
+  --color-accent: #11756f;
+  --color-highlight: #a9521c;
+  --color-success: #1f7a4d;
+  --color-danger: #c42b1c;
+  --shadow-hairline: 0 0 0 1px var(--color-border);
+  --shadow-float: 0 2px 4px rgb(11 11 15 / 0.03), 0 12px 32px -8px rgb(11 11 15 / 0.12);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --color-canvas: #0b0b0f;
+  --color-surface: #141418;
+  --color-surface-muted: #1c1c22;
+  --color-border: #26262e;
+  --color-border-strong: #3a3a44;
+  --color-border-control: #6b6b76;
+  --color-fg: #f2f2f5;
+  --color-fg-muted: #a1a1aa;
+  --color-fg-subtle: #858590;
+  --color-ink: #f2f2f5;
+  --color-ink-fg: #0b0b0f;
+  --color-accent: #4fc3b8;
+  --color-highlight: #f0a06a;
+  --color-success: #5bc48a;
+  --color-danger: #f27a6e;
+  --shadow-hairline: 0 0 0 1px var(--color-border);
+  --shadow-float: 0 2px 4px rgb(0 0 0 / 0.08), 0 12px 32px -8px rgb(0 0 0 / 0.18);
+}
+
+@layer base {
+  html { background: var(--color-canvas); text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.55;
+    font-feature-settings: 'ss01', 'cv11';
+    -webkit-font-smoothing: antialiased;
+  }
+  button, input, textarea, select { font: inherit; }
+  button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+  button:not(:disabled), select:not(:disabled) { cursor: pointer; }
+  button:disabled, input:disabled, textarea:disabled, select:disabled { cursor: not-allowed; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+  ::selection { color: var(--color-ink-fg); background: var(--color-ink); }
+  input::placeholder, textarea::placeholder { color: var(--color-fg-subtle); opacity: 1; }
+  input[type='search']::-webkit-search-cancel-button { cursor: pointer; }
+  svg { flex-shrink: 0; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+  @media (forced-colors: active) {
+    :focus-visible { outline-color: Highlight; }
+    button, input, textarea, select { border: 1px solid ButtonText; }
+  }
+}
+
+@utility type-page { font-size: 28px; line-height: 1.25; letter-spacing: -0.035em; font-weight: 600; }
+@utility type-title { font-size: 20px; line-height: 1.35; letter-spacing: -0.025em; font-weight: 600; }
+@utility type-section { font-size: 15px; line-height: 1.5; letter-spacing: -0.01em; font-weight: 600; }
+@utility type-body { font-size: 14px; line-height: 1.55; font-weight: 400; }
+@utility type-caption { font-size: 12px; line-height: 1.5; font-weight: 500; }
+@utility tabular { font-variant-numeric: tabular-nums; }
