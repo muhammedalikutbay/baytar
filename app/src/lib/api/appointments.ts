@@ -1,0 +1,11 @@
+import { call } from './client';
+import type { NewAppointment, AppointmentPatch, AppointmentStatus } from './types';
+export const get = (id: number) => call('appointment_get', { id });
+export const create = (input: NewAppointment) => call('appointment_create', { input });
+export const update = (id: number, patch: AppointmentPatch) => call('appointment_update', { id, patch });
+export const softDelete = (id: number) => call('appointment_delete', { id });
+export const restore = (id: number) => call('appointment_restore', { id });
+export const setStatus = (id: number, status: AppointmentStatus) => call('appointment_set_status', { id, status });
+export const createSeries = (base: NewAppointment, count: number, everyDays: number) => call('appointment_create_series', { base, count, everyDays });
+export const between = (from: string, to: string) => call('appointments_between', { from, to });
+export const today = (today: string) => call('appointments_today', { today });

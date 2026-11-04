@@ -1,0 +1,11 @@
+import { call } from './client';
+import type { NewVaccination, VaccinationPatch } from './types';
+export const get = (id: number) => call('vaccination_get', { id });
+export const create = (input: NewVaccination) => call('vaccination_create', { input });
+export const update = (id: number, patch: VaccinationPatch) => call('vaccination_update', { id, patch });
+export const softDelete = (id: number) => call('vaccination_delete', { id });
+export const restore = (id: number) => call('vaccination_restore', { id });
+export const listByPatient = (patientId: number) => call('vaccinations_by_patient', { patientId });
+export const suggestNextDue = (typeId: number, givenOn: string) => call('vaccination_suggest_next_due', { typeId, givenOn });
+export const dueBetween = (from: string, to: string) => call('vaccinations_due_between', { from, to });
+export const overdue = (today: string) => call('vaccinations_overdue', { today });

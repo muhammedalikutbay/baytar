@@ -12,6 +12,30 @@ use baytar_core::{
         ListQuery, RepoError,
     },
 };
+use baytar_core::{
+    model::Appointment,
+    repo::appointments::{self, AppointmentPatch, NewAppointment},
+};
+use baytar_core::{
+    model::Medication,
+    repo::medications::{self, MedicationPatch, NewMedication},
+};
+use baytar_core::{
+    model::PrescriptionItem,
+    repo::prescriptions::{self, NewPrescription, PrescriptionPatch},
+};
+use baytar_core::{
+    model::Vaccination,
+    repo::vaccinations::{self, NewVaccination, VaccinationPatch},
+};
+use baytar_core::{
+    model::VaccineType,
+    repo::vaccine_types::{self, NewVaccineType, VaccineTypePatch},
+};
+use baytar_core::{
+    model::Visit,
+    repo::visits::{self, NewVisit, VisitPatch},
+};
 use serde::Serialize;
 use std::sync::Mutex;
 use tauri::{Manager, State};
@@ -86,6 +110,9 @@ impl AppDatabase {
         })();
         match result {
             Ok(db) => {
+                if repo::vaccine_types::seed(db.conn()).is_err() {
+                    return Self::failed(None);
+                }
                 let now = chrono::Utc::now();
                 let backups = dir.join("backups");
                 // Preserve a usable database if maintenance fails, and expose the warning.
@@ -256,6 +283,285 @@ fn search(
     state.with(|conn| repo::search::search(conn, &query, limit))
 }
 
+#[tauri::command]
+fn visit_get(state: State<'_, AppDatabase>, id: i64) -> Result<Visit, CommandError> {
+    state.with(|conn| visits::get(conn, id))
+}
+#[tauri::command]
+fn visit_create(state: State<'_, AppDatabase>, input: NewVisit) -> Result<Visit, CommandError> {
+    state.with(|conn| visits::create(conn, input))
+}
+#[tauri::command]
+fn visit_update(
+    state: State<'_, AppDatabase>,
+    id: i64,
+    patch: VisitPatch,
+) -> Result<Visit, CommandError> {
+    state.with(|conn| visits::update(conn, id, patch))
+}
+#[tauri::command]
+fn visit_delete(state: State<'_, AppDatabase>, id: i64) -> Result<Visit, CommandError> {
+    state.with(|conn| visits::soft_delete(conn, id))
+}
+#[tauri::command]
+fn visit_restore(state: State<'_, AppDatabase>, id: i64) -> Result<Visit, CommandError> {
+    state.with(|conn| visits::restore(conn, id))
+}
+#[tauri::command]
+fn visits_by_patient(
+    state: State<'_, AppDatabase>,
+    patient_id: i64,
+) -> Result<Vec<Visit>, CommandError> {
+    state.with(|conn| visits::list_by_patient(conn, patient_id))
+}
+#[tauri::command]
+fn visit_latest_weight(
+    state: State<'_, AppDatabase>,
+    patient_id: i64,
+) -> Result<Option<visits::LatestWeight>, CommandError> {
+    state.with(|conn| visits::latest_weight(conn, patient_id))
+}
+#[tauri::command]
+fn vaccine_type_get(state: State<'_, AppDatabase>, id: i64) -> Result<VaccineType, CommandError> {
+    state.with(|conn| vaccine_types::get(conn, id))
+}
+#[tauri::command]
+fn vaccine_type_create(
+    state: State<'_, AppDatabase>,
+    input: NewVaccineType,
+) -> Result<VaccineType, CommandError> {
+    state.with(|conn| vaccine_types::create(conn, input))
+}
+#[tauri::command]
+fn vaccine_type_update(
+    state: State<'_, AppDatabase>,
+    id: i64,
+    patch: VaccineTypePatch,
+) -> Result<VaccineType, CommandError> {
+    state.with(|conn| vaccine_types::update(conn, id, patch))
+}
+#[tauri::command]
+fn vaccine_type_delete(
+    state: State<'_, AppDatabase>,
+    id: i64,
+) -> Result<VaccineType, CommandError> {
+    state.with(|conn| vaccine_types::soft_delete(conn, id))
+}
+#[tauri::command]
+fn vaccine_type_restore(
+    state: State<'_, AppDatabase>,
+    id: i64,
+) -> Result<VaccineType, CommandError> {
+    state.with(|conn| vaccine_types::restore(conn, id))
+}
+#[tauri::command]
+fn vaccine_types_list(state: State<'_, AppDatabase>) -> Result<Vec<VaccineType>, CommandError> {
+    state.with(vaccine_types::list)
+}
+#[tauri::command]
+fn vaccination_get(state: State<'_, AppDatabase>, id: i64) -> Result<Vaccination, CommandError> {
+    state.with(|conn| vaccinations::get(conn, id))
+}
+#[tauri::command]
+fn vaccination_create(
+    state: State<'_, AppDatabase>,
+    input: NewVaccination,
+) -> Result<Vaccination, CommandError> {
+    state.with(|conn| vaccinations::create(conn, input))
+}
+#[tauri::command]
+fn vaccination_update(
+    state: State<'_, AppDatabase>,
+    id: i64,
+    patch: VaccinationPatch,
+) -> Result<Vaccination, CommandError> {
+    state.with(|conn| vaccinations::update(conn, id, patch))
+}
+#[tauri::command]
+fn vaccination_delete(state: State<'_, AppDatabase>, id: i64) -> Result<Vaccination, CommandError> {
+    state.with(|conn| vaccinations::soft_delete(conn, id))
+}
+#[tauri::command]
+fn vaccination_restore(
+    state: State<'_, AppDatabase>,
+    id: i64,
+) -> Result<Vaccination, CommandError> {
+    state.with(|conn| vaccinations::restore(conn, id))
+}
+#[tauri::command]
+fn vaccinations_by_patient(
+    state: State<'_, AppDatabase>,
+    patient_id: i64,
+) -> Result<Vec<Vaccination>, CommandError> {
+    state.with(|conn| vaccinations::list_by_patient(conn, patient_id))
+}
+#[tauri::command]
+fn vaccination_suggest_next_due(
+    state: State<'_, AppDatabase>,
+    type_id: i64,
+    given_on: String,
+) -> Result<Option<String>, CommandError> {
+    state.with(|conn| vaccinations::suggest_next_due(conn, type_id, &given_on))
+}
+#[tauri::command]
+fn vaccinations_due_between(
+    state: State<'_, AppDatabase>,
+    from: String,
+    to: String,
+) -> Result<Vec<vaccinations::DueVaccination>, CommandError> {
+    state.with(|conn| vaccinations::due_between(conn, &from, &to))
+}
+#[tauri::command]
+fn vaccinations_overdue(
+    state: State<'_, AppDatabase>,
+    today: String,
+) -> Result<Vec<vaccinations::DueVaccination>, CommandError> {
+    state.with(|conn| vaccinations::overdue(conn, &today))
+}
+#[tauri::command]
+fn medication_get(state: State<'_, AppDatabase>, id: i64) -> Result<Medication, CommandError> {
+    state.with(|conn| medications::get(conn, id))
+}
+#[tauri::command]
+fn medication_create(
+    state: State<'_, AppDatabase>,
+    input: NewMedication,
+) -> Result<Medication, CommandError> {
+    state.with(|conn| medications::create(conn, input))
+}
+#[tauri::command]
+fn medication_update(
+    state: State<'_, AppDatabase>,
+    id: i64,
+    patch: MedicationPatch,
+) -> Result<Medication, CommandError> {
+    state.with(|conn| medications::update(conn, id, patch))
+}
+#[tauri::command]
+fn medication_delete(state: State<'_, AppDatabase>, id: i64) -> Result<Medication, CommandError> {
+    state.with(|conn| medications::soft_delete(conn, id))
+}
+#[tauri::command]
+fn medication_restore(state: State<'_, AppDatabase>, id: i64) -> Result<Medication, CommandError> {
+    state.with(|conn| medications::restore(conn, id))
+}
+#[tauri::command]
+fn medications_list(state: State<'_, AppDatabase>) -> Result<Vec<Medication>, CommandError> {
+    state.with(medications::list)
+}
+#[tauri::command]
+fn medications_search(
+    state: State<'_, AppDatabase>,
+    query: String,
+) -> Result<Vec<Medication>, CommandError> {
+    state.with(|conn| medications::search(conn, &query))
+}
+#[tauri::command]
+fn prescription_get(
+    state: State<'_, AppDatabase>,
+    id: i64,
+) -> Result<PrescriptionItem, CommandError> {
+    state.with(|conn| prescriptions::get(conn, id))
+}
+#[tauri::command]
+fn prescription_create(
+    state: State<'_, AppDatabase>,
+    input: NewPrescription,
+) -> Result<PrescriptionItem, CommandError> {
+    state.with(|conn| prescriptions::create(conn, input))
+}
+#[tauri::command]
+fn prescription_update(
+    state: State<'_, AppDatabase>,
+    id: i64,
+    patch: PrescriptionPatch,
+) -> Result<PrescriptionItem, CommandError> {
+    state.with(|conn| prescriptions::update(conn, id, patch))
+}
+#[tauri::command]
+fn prescription_delete(
+    state: State<'_, AppDatabase>,
+    id: i64,
+) -> Result<PrescriptionItem, CommandError> {
+    state.with(|conn| prescriptions::soft_delete(conn, id))
+}
+#[tauri::command]
+fn prescription_restore(
+    state: State<'_, AppDatabase>,
+    id: i64,
+) -> Result<PrescriptionItem, CommandError> {
+    state.with(|conn| prescriptions::restore(conn, id))
+}
+#[tauri::command]
+fn prescriptions_by_visit(
+    state: State<'_, AppDatabase>,
+    visit_id: i64,
+) -> Result<Vec<PrescriptionItem>, CommandError> {
+    state.with(|conn| prescriptions::list_by_visit(conn, visit_id))
+}
+#[tauri::command]
+fn appointment_get(state: State<'_, AppDatabase>, id: i64) -> Result<Appointment, CommandError> {
+    state.with(|conn| appointments::get(conn, id))
+}
+#[tauri::command]
+fn appointment_create(
+    state: State<'_, AppDatabase>,
+    input: NewAppointment,
+) -> Result<Appointment, CommandError> {
+    state.with(|conn| appointments::create(conn, input))
+}
+#[tauri::command]
+fn appointment_update(
+    state: State<'_, AppDatabase>,
+    id: i64,
+    patch: AppointmentPatch,
+) -> Result<Appointment, CommandError> {
+    state.with(|conn| appointments::update(conn, id, patch))
+}
+#[tauri::command]
+fn appointment_delete(state: State<'_, AppDatabase>, id: i64) -> Result<Appointment, CommandError> {
+    state.with(|conn| appointments::soft_delete(conn, id))
+}
+#[tauri::command]
+fn appointment_restore(
+    state: State<'_, AppDatabase>,
+    id: i64,
+) -> Result<Appointment, CommandError> {
+    state.with(|conn| appointments::restore(conn, id))
+}
+#[tauri::command]
+fn appointment_set_status(
+    state: State<'_, AppDatabase>,
+    id: i64,
+    status: String,
+) -> Result<Appointment, CommandError> {
+    state.with(|conn| appointments::set_status(conn, id, &status))
+}
+#[tauri::command]
+fn appointment_create_series(
+    state: State<'_, AppDatabase>,
+    base: NewAppointment,
+    count: u32,
+    every_days: i64,
+) -> Result<Vec<Appointment>, CommandError> {
+    state.with(|conn| appointments::create_series(conn, base, count, every_days))
+}
+#[tauri::command]
+fn appointments_between(
+    state: State<'_, AppDatabase>,
+    from: String,
+    to: String,
+) -> Result<Vec<appointments::CalendarAppointment>, CommandError> {
+    state.with(|conn| appointments::between(conn, &from, &to))
+}
+#[tauri::command]
+fn appointments_today(
+    state: State<'_, AppDatabase>,
+    today: String,
+) -> Result<Vec<appointments::CalendarAppointment>, CommandError> {
+    state.with(|conn| appointments::today(conn, &today))
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
@@ -281,6 +587,50 @@ pub fn run() {
             import::import_execute,
             import::import_cancel,
             import::import_save_report,
+            visit_get,
+            visit_create,
+            visit_update,
+            visit_delete,
+            visit_restore,
+            visits_by_patient,
+            visit_latest_weight,
+            vaccine_type_get,
+            vaccine_type_create,
+            vaccine_type_update,
+            vaccine_type_delete,
+            vaccine_type_restore,
+            vaccine_types_list,
+            vaccination_get,
+            vaccination_create,
+            vaccination_update,
+            vaccination_delete,
+            vaccination_restore,
+            vaccinations_by_patient,
+            vaccination_suggest_next_due,
+            vaccinations_due_between,
+            vaccinations_overdue,
+            medication_get,
+            medication_create,
+            medication_update,
+            medication_delete,
+            medication_restore,
+            medications_list,
+            medications_search,
+            prescription_get,
+            prescription_create,
+            prescription_update,
+            prescription_delete,
+            prescription_restore,
+            prescriptions_by_visit,
+            appointment_get,
+            appointment_create,
+            appointment_update,
+            appointment_delete,
+            appointment_restore,
+            appointment_set_status,
+            appointment_create_series,
+            appointments_between,
+            appointments_today,
             app_version,
             startup_status,
             owners_list,

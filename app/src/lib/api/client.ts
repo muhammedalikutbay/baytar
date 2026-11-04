@@ -1,4 +1,5 @@
 import { tr, importIssueKeys } from '$lib/i18n/tr';
+import { createClinicalMock } from './clinical-mock';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import type { ImportPreview, ImportReport, ApiError, CommandMap, ListQuery, NewOwner, NewPatient, Owner, OwnerPatch, Patient, PatientPatch, SearchHit } from './types';
 
@@ -111,6 +112,8 @@ patientCreate({ ownerId: first.id, name: 'Şimşek', species: 'dog', sex: 'male'
 patientCreate({ ownerId: second.id, name: 'Boncuk', species: 'bird' });
 patientCreate({ ownerId: third.id, name: 'Fındık', species: 'rabbit' });
 
+const clinical = createClinicalMock({ patientGet, ownerGet, fail, fold, now });
+
 // Dispatch types are checked at the public call boundary and by each handler.
 
 const importPrepared = new Map<string, ImportPreview>();
@@ -134,6 +137,7 @@ function mockPreview(path: string): ImportPreview {
 }
 
 function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['args']): unknown {
+  if (clinical.has(command)) return clinical.call(command, args);
   switch (command) {
     case 'import_candidates': return [{ path: '/demo/HastaTakipDB.db', fileName: 'HastaTakipDB.db', sizeBytes: 942080, modifiedAt: '2026-10-30T12:00:00Z', location: '/demo' }];
     case 'import_prepare': { const { path } = args as { path: string }; const token = String(++importSequence); const preview = mockPreview(path); importPrepared.set(token, preview); return { token, preview }; }

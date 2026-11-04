@@ -1,4 +1,4 @@
-//! Owner and patient persistence. Get resolves historical rows; lists hide deletions.
+//! Domain persistence. Get resolves historical rows; lists hide deletions.
 pub mod owners;
 pub mod patients;
 pub mod search;
@@ -75,4 +75,55 @@ impl From<rusqlite::Error> for RepoError {
             Self::Database(error)
         }
     }
+}
+
+pub mod appointments;
+pub mod medications;
+pub mod prescriptions;
+pub mod vaccinations;
+pub mod vaccine_types;
+pub mod visits;
+
+pub(crate) fn date(field: &str, value: &str) -> Result<chrono::NaiveDate> {
+    chrono::NaiveDate::parse_from_str(value, "%Y-%m-%d")
+        .ok()
+        .filter(|d| d.format("%Y-%m-%d").to_string() == value && value.len() == 10)
+        .ok_or_else(|| invalid(field, "expected a valid YYYY-MM-DD date"))
+}
+pub(crate) fn time(field: &str, value: Option<&str>) -> Result<()> {
+    if let Some(value) = value {
+        if !chrono::NaiveTime::parse_from_str(value, "%H:%M")
+            .is_ok_and(|t| t.format("%H:%M").to_string() == value)
+        {
+            return Err(invalid(field, "expected a valid HH:MM time"));
+        }
+    }
+    Ok(())
+}
+pub(crate) fn positive(field: &str, value: Option<f64>) -> Result<()> {
+    if value.is_some_and(|v| !v.is_finite() || v <= 0.0) {
+        return Err(invalid(field, "must be finite and greater than zero"));
+    }
+    Ok(())
+}
+pub(crate) fn positive_days(field: &str, value: Option<i64>) -> Result<()> {
+    if value.is_some_and(|v| v <= 0) {
+        return Err(invalid(field, "must be greater than zero"));
+    }
+    Ok(())
+}
+pub(crate) fn active_patient(conn: &Connection, id: i64) -> Result<crate::model::Patient> {
+    let patient = patients::get(conn, id)?;
+    if patient.deleted_at.is_some() || owners::get(conn, patient.owner_id)?.deleted_at.is_some() {
+        return Err(RepoError::NotFound);
+    }
+    Ok(patient)
+}
+pub(crate) fn range(from: &str, to: &str) -> Result<()> {
+    date("from", from)?;
+    date("to", to)?;
+    if from > to {
+        return Err(invalid("to", "must be on or after from"));
+    }
+    Ok(())
 }

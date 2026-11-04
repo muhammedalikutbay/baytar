@@ -63,3 +63,130 @@ export interface ImportPreview {
 // The core report flattens its preview into the report.
 export interface ImportReport extends ImportPreview { inserted: ImportCounts; skipped: ImportCounts; runId: number; orphanOwnerCreated: boolean; backupFile: string }
 export interface PreparedImport { token: string; preview: ImportPreview }
+export type MedicationForm = 'tablet' | 'capsule' | 'injection' | 'suspension' | 'drops' | 'ointment' | 'other';
+export type AppointmentKind = 'visit' | 'vaccine' | 'reminder' | 'other';
+export type AppointmentStatus = 'planned' | 'done' | 'cancelled';
+export interface Visit extends Audit {
+  patientId: number;
+  visitOn: string;
+  visitTime: string | null;
+  reason: string | null;
+  findings: string | null;
+  diagnosis: string | null;
+  treatment: string | null;
+  weightKg: number | null;
+  temperatureC: number | null;
+  notes: string | null;
+}
+export type NewVisit = Pick<Visit, 'patientId' | 'visitOn'> & Partial<Omit<Visit, keyof Audit | 'patientId' | 'visitOn'>>;
+export type VisitPatch = Partial<NewVisit>;
+export interface VaccineType extends Audit {
+  name: string;
+  species: Species | null;
+  defaultIntervalDays: number | null;
+  notes: string | null;
+  isActive: boolean;
+}
+export type NewVaccineType = Pick<VaccineType, 'name'> & Partial<Omit<VaccineType, keyof Audit | 'name'>>;
+export type VaccineTypePatch = Partial<NewVaccineType>;
+export interface Vaccination extends Audit {
+  patientId: number;
+  vaccineTypeId: number | null;
+  vaccineName: string;
+  givenOn: string;
+  nextDueOn: string | null;
+  batchNo: string | null;
+  visitId: number | null;
+  notes: string | null;
+}
+export type NewVaccination = Pick<Vaccination, 'patientId' | 'vaccineName' | 'givenOn'> & Partial<Omit<Vaccination, keyof Audit | 'patientId' | 'vaccineName' | 'givenOn'>>;
+export type VaccinationPatch = Partial<NewVaccination>;
+export interface Medication extends Audit {
+  name: string;
+  activeIngredient: string | null;
+  form: MedicationForm | null;
+  concentrationMgPerMl: number | null;
+  strengthMgPerUnit: number | null;
+  doseMgPerKgMin: number | null;
+  doseMgPerKgMax: number | null;
+  route: string | null;
+  notes: string | null;
+}
+export type NewMedication = Pick<Medication, 'name'> & Partial<Omit<Medication, keyof Audit | 'name'>>;
+export type MedicationPatch = Partial<NewMedication>;
+export interface PrescriptionItem extends Audit {
+  visitId: number;
+  medicationId: number | null;
+  medicationName: string;
+  doseMg: number | null;
+  doseMl: number | null;
+  doseText: string | null;
+  frequency: string | null;
+  durationDays: number | null;
+  notes: string | null;
+}
+export type NewPrescription = Pick<PrescriptionItem, 'visitId'> & Partial<Omit<PrescriptionItem, keyof Audit | 'visitId'>>;
+export type PrescriptionPatch = Partial<NewPrescription>;
+export interface Appointment extends Audit {
+  patientId: number | null;
+  ownerId: number | null;
+  title: string;
+  startsOn: string;
+  startsTime: string | null;
+  durationMin: number | null;
+  kind: AppointmentKind;
+  status: AppointmentStatus;
+  seriesId: string | null;
+  notes: string | null;
+}
+export type NewAppointment = Pick<Appointment, 'title' | 'startsOn'> & Partial<Omit<Appointment, keyof Audit | 'title' | 'startsOn'>>;
+export type AppointmentPatch = Partial<NewAppointment>;
+export interface LatestWeight { weightKg: number; visitOn: string }
+export interface DueVaccination { vaccination: Vaccination; patientName: string; ownerName: string }
+export interface CalendarAppointment { appointment: Appointment; patientName: string | null; ownerName: string | null }
+export interface CommandMap {
+  visit_get: { args: { id: number }; result: Visit };
+  visit_create: { args: { input: NewVisit }; result: Visit };
+  visit_update: { args: { id: number; patch: VisitPatch }; result: Visit };
+  visit_delete: { args: { id: number }; result: Visit };
+  visit_restore: { args: { id: number }; result: Visit };
+  visits_by_patient: { args: { patientId: number }; result: Visit[] };
+  visit_latest_weight: { args: { patientId: number }; result: LatestWeight | null };
+  vaccine_type_get: { args: { id: number }; result: VaccineType };
+  vaccine_type_create: { args: { input: NewVaccineType }; result: VaccineType };
+  vaccine_type_update: { args: { id: number; patch: VaccineTypePatch }; result: VaccineType };
+  vaccine_type_delete: { args: { id: number }; result: VaccineType };
+  vaccine_type_restore: { args: { id: number }; result: VaccineType };
+  vaccine_types_list: { args: Record<string, never>; result: VaccineType[] };
+  vaccination_get: { args: { id: number }; result: Vaccination };
+  vaccination_create: { args: { input: NewVaccination }; result: Vaccination };
+  vaccination_update: { args: { id: number; patch: VaccinationPatch }; result: Vaccination };
+  vaccination_delete: { args: { id: number }; result: Vaccination };
+  vaccination_restore: { args: { id: number }; result: Vaccination };
+  vaccinations_by_patient: { args: { patientId: number }; result: Vaccination[] };
+  vaccination_suggest_next_due: { args: { typeId: number; givenOn: string }; result: string | null };
+  vaccinations_due_between: { args: { from: string; to: string }; result: DueVaccination[] };
+  vaccinations_overdue: { args: { today: string }; result: DueVaccination[] };
+  medication_get: { args: { id: number }; result: Medication };
+  medication_create: { args: { input: NewMedication }; result: Medication };
+  medication_update: { args: { id: number; patch: MedicationPatch }; result: Medication };
+  medication_delete: { args: { id: number }; result: Medication };
+  medication_restore: { args: { id: number }; result: Medication };
+  medications_list: { args: Record<string, never>; result: Medication[] };
+  medications_search: { args: { query: string }; result: Medication[] };
+  prescription_get: { args: { id: number }; result: PrescriptionItem };
+  prescription_create: { args: { input: NewPrescription }; result: PrescriptionItem };
+  prescription_update: { args: { id: number; patch: PrescriptionPatch }; result: PrescriptionItem };
+  prescription_delete: { args: { id: number }; result: PrescriptionItem };
+  prescription_restore: { args: { id: number }; result: PrescriptionItem };
+  prescriptions_by_visit: { args: { visitId: number }; result: PrescriptionItem[] };
+  appointment_get: { args: { id: number }; result: Appointment };
+  appointment_create: { args: { input: NewAppointment }; result: Appointment };
+  appointment_update: { args: { id: number; patch: AppointmentPatch }; result: Appointment };
+  appointment_delete: { args: { id: number }; result: Appointment };
+  appointment_restore: { args: { id: number }; result: Appointment };
+  appointment_set_status: { args: { id: number; status: AppointmentStatus }; result: Appointment };
+  appointment_create_series: { args: { base: NewAppointment; count: number; everyDays: number }; result: Appointment[] };
+  appointments_between: { args: { from: string; to: string }; result: CalendarAppointment[] };
+  appointments_today: { args: { today: string }; result: CalendarAppointment[] };
+}
