@@ -113,7 +113,7 @@
       </div>
       <div class="grid gap-5">
         <AttentionCard overdue={overdueRows} {debts} {alerts} />
-        <MonthStats newOwners={month.newOwners} revenueMinor={month.revenue} collectionsMinor={month.collections} />
+        <MonthStats {today} />
       </div>
     </div>
   {/if}

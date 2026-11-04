@@ -10,7 +10,9 @@
   const max = $derived(Math.max(1, ...series.flatMap(s => s.values)));
   const slot = $derived((W - left - right) / Math.max(1, months.length));
   const gap = $derived(Math.min(6, slot * 0.2));
-  const barW = $derived(Math.max(1, (slot - gap * 2) / series.length - 1));
+  // Bars stay slim (max 40 px) and the group is centred in its month slot, so one month never fills the chart.
+  const barW = $derived(Math.min(40, Math.max(1, (slot - gap * 2) / series.length - 1)));
+  const groupW = $derived(series.length * (barW + 1) - 1);
   const step = $derived(Math.ceil(months.length / 12));
   const short = (month: string) => new Intl.DateTimeFormat('tr-TR', { month: 'short', timeZone: 'UTC' }).format(new Date(month + '-01T00:00:00Z'));
 </script>
@@ -25,7 +27,7 @@
     {#each months as month, i (month)}
       {#each series as s, j (s.name)}
         {@const height = (s.values[i] / max) * plotH}
-        <rect x={left + i * slot + gap + j * (barW + 1)} y={top + plotH - height} width={barW} height={Math.max(height, s.values[i] > 0 ? 1 : 0)} rx="2"
+        <rect x={left + i * slot + (slot - groupW) / 2 + j * (barW + 1)} y={top + plotH - height} width={barW} height={Math.max(height, s.values[i] > 0 ? 1 : 0)} rx="2"
           class={s.tone === 'accent' ? 'fill-accent' : 'fill-highlight'}><title>{formatMonth(month + '-01')} · {s.name}: {format(s.values[i])}</title></rect>
       {/each}
       {#if i % step === 0}
