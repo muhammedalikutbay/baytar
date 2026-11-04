@@ -161,10 +161,14 @@ name = "baytar-app"
 version = "0.2.0"
 dependencies = [
  "baytar-core",
+ "chrono",
  "env_logger",
  "log",
+ "rusqlite",
+ "serde",
  "tauri",
  "tauri-build",
+ "tempfile",
 ]
 
 [[package]]

@@ -4,6 +4,7 @@ pub mod backup;
 pub mod db;
 pub mod legacy;
 pub mod model;
+pub mod repo;
 pub mod text;
 
 pub const APP_NAME: &str = "Baytar";

@@ -18,3 +18,9 @@ tauri = { version = "2", features = [] }
 baytar-core = { path = "../../crates/baytar-core" }
 env_logger.workspace = true
 log.workspace = true
+serde.workspace = true
+chrono.workspace = true
+rusqlite.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
