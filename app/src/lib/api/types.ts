@@ -188,6 +188,54 @@ export type AppointmentPatch = Partial<NewAppointment>;
 export interface LatestWeight { weightKg: number; visitOn: string }
 export interface DueVaccination { vaccination: Vaccination; patientName: string; ownerName: string }
 export interface CalendarAppointment { appointment: Appointment; patientName: string | null; ownerName: string | null }
+export type InventoryKind = 'medication' | 'vaccine' | 'supply' | 'food' | 'product' | 'other';
+export type StockReason = 'purchase' | 'use' | 'sale' | 'adjust' | 'expired' | 'return';
+export interface ItemInput {
+  name: string; kind: InventoryKind; medicationId: number | null; vaccineTypeId: number | null;
+  unit: string; salePriceMinor: number | null; reorderLevel: number | null; isActive: boolean; notes: string | null;
+}
+export interface InventoryItem extends Audit, ItemInput { stock: number; nearestExpiry: string | null; unallocatedDelta: number }
+export interface LotInput {
+  itemId: number; lotNo: string | null; expiresOn: string | null; quantity: number;
+  costMinor: number | null; receivedOn: string | null; notes: string | null;
+}
+export interface InventoryLot extends Audit, LotInput {}
+export interface StockMovement extends Audit {
+  itemId: number; lotId: number | null; delta: number; reason: StockReason;
+  refTable: 'vaccinations' | 'prescription_items' | null; refId: number | null; movedOn: string; notes: string | null;
+}
+export interface ReceiveInput { lotId: number | null; lot: LotInput; movedOn: string }
+export interface AdjustInput { lotId: number; delta: number; movedOn: string; notes: string }
+export interface ConsumeInput {
+  itemId: number; quantity: number; reason: 'use' | 'sale'; movedOn: string; allowNegative: boolean;
+  refTable: 'vaccinations' | 'prescription_items' | null; refId: number | null; notes: string | null;
+}
+export interface ExpiringLot { item: InventoryItem; lot: InventoryLot }
+export interface InventoryAlerts {
+  itemCount: number; lowStockCount: number; expiringCount: number; expiredCount: number;
+  lowStock: InventoryItem[]; expiring: ExpiringLot[]; expired: ExpiringLot[];
+}
+export interface CommandMap {
+  inventory_items: { args: { includeDeleted: boolean }; result: InventoryItem[] };
+  inventory_item_get: { args: { id: number }; result: InventoryItem };
+  inventory_item_create: { args: { input: ItemInput }; result: InventoryItem };
+  inventory_item_update: { args: { id: number; input: ItemInput }; result: InventoryItem };
+  inventory_item_set_deleted: { args: { id: number; deleted: boolean }; result: InventoryItem };
+  inventory_from_catalog: { args: { kind: 'medication' | 'vaccine'; catalogId: number }; result: InventoryItem };
+  inventory_lots: { args: { itemId: number; includeDeleted: boolean }; result: InventoryLot[] };
+  inventory_lot_create: { args: { input: LotInput; movedOn: string }; result: InventoryLot };
+  inventory_lot_update: { args: { id: number; input: LotInput; movedOn: string; reason: string }; result: InventoryLot };
+  inventory_lot_set_deleted: { args: { id: number; deleted: boolean }; result: InventoryLot };
+  inventory_receive: { args: { input: ReceiveInput }; result: InventoryLot };
+  inventory_adjust: { args: { input: AdjustInput }; result: StockMovement };
+  inventory_write_off_expired: { args: { itemId: number; today: string }; result: StockMovement[] };
+  inventory_consume: { args: { input: ConsumeInput }; result: StockMovement[] };
+  inventory_history: { args: { itemId: number }; result: StockMovement[] };
+  inventory_low_stock: { args: Record<string, never>; result: InventoryItem[] };
+  inventory_expiring: { args: { today: string; days: number }; result: ExpiringLot[] };
+  inventory_expired: { args: { today: string }; result: ExpiringLot[] };
+  inventory_alerts: { args: { today?: string }; result: InventoryAlerts };
+}
 export interface CommandMap {
   visit_get: { args: { id: number }; result: Visit };
   visit_create: { args: { input: NewVisit }; result: Visit };

@@ -1,4 +1,5 @@
 mod import;
+mod inventory;
 mod settings;
 
 use baytar_core::{
@@ -675,7 +676,26 @@ pub fn run() {
             patient_update,
             patient_delete,
             patient_restore,
-            search
+            search,
+            inventory::inventory_items,
+            inventory::inventory_item_get,
+            inventory::inventory_item_create,
+            inventory::inventory_item_update,
+            inventory::inventory_item_set_deleted,
+            inventory::inventory_from_catalog,
+            inventory::inventory_lots,
+            inventory::inventory_lot_create,
+            inventory::inventory_lot_update,
+            inventory::inventory_lot_set_deleted,
+            inventory::inventory_receive,
+            inventory::inventory_adjust,
+            inventory::inventory_write_off_expired,
+            inventory::inventory_consume,
+            inventory::inventory_history,
+            inventory::inventory_low_stock,
+            inventory::inventory_expiring,
+            inventory::inventory_expired,
+            inventory::inventory_alerts
         ])
         .run(tauri::generate_context!())
         .expect("error while running Baytar");
