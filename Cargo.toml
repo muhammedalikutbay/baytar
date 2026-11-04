@@ -20,6 +20,8 @@ clap = { version = "4", features = ["derive"] }
 # Shared date/time support for clinical records and appointments.
 chrono = { version = "0.4", features = ["serde"] }
 tempfile = "3"
+# SHA-256 identity of legacy source files.
+sha2 = "0.10"
 
 [profile.release]
 lto = true
