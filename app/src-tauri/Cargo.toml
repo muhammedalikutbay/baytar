@@ -1,0 +1,20 @@
+[package]
+name = "baytar-app"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Baytar veterinary patient records"
+
+[lib]
+name = "baytar_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+baytar-core = { path = "../../crates/baytar-core" }
+env_logger.workspace = true
+log.workspace = true

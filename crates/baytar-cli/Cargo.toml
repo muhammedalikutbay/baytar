@@ -1,0 +1,10 @@
+[package]
+name = "baytar-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+baytar-core = { path = "../baytar-core" }
+clap.workspace = true
