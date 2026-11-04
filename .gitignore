@@ -28,3 +28,6 @@ Thumbs.db
 
 # Worker reports
 /.worker/
+
+# UI check output
+tools/ui-check/out/

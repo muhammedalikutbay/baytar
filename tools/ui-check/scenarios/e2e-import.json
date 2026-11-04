@@ -1,0 +1,26 @@
+{
+  "name": "e2e-import",
+  "description": "Real window, real database: first-run welcome, legacy import through the Tauri commands (the native file dialog cannot be automated), idempotent re-import, Turkish search, phone normalization, backups, and the screens showing imported data. Start from an empty app data folder. LEGACY_DB is replaced by run.mjs --legacy-db or must point to a synthetic file from make-legacy-db.py.",
+  "steps": [
+    { "type": "localStorage.clear" },
+    { "type": "reload" },
+    { "type": "wait", "text": "hoş geldiniz", "timeout": 60000 },
+    { "type": "screenshot", "path": "01-first-run.png" },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_prepare', { path: 'C:/Users/Kutbay/AppData/Local/Temp/claude/70d3e84999248758/fa4581e0-6d5c-4dac-a91d-c874caa67e92/scratchpad/legacy-synthetic.db' }).then(p => { window.__tok = p.token; return p.preview.found; })", "expect": { "owners": 2, "patients": 4, "todos": 2 } },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_execute', { token: window.__tok }).then(r => r.inserted)", "expect": { "owners": 2, "patients": 4, "todos": 2 } },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_prepare', { path: 'C:/Users/Kutbay/AppData/Local/Temp/claude/70d3e84999248758/fa4581e0-6d5c-4dac-a91d-c874caa67e92/scratchpad/legacy-synthetic.db' }).then(p => { window.__tok2 = p.token; return p.preview.toImport; })", "expect": { "owners": 0, "patients": 0, "todos": 0 } },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_cancel', { token: window.__tok2 }).then(() => 'cancelled')", "expect": "cancelled" },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('search', { query: 'tarcin', limit: 10 }).then(h => h.map(x => x.owner.fullName))", "expect": ["Deneme Yılmaz"] },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('owners_list', { query: { includeDeleted: false, limit: 50, offset: 0 } }).then(o => o.map(x => [x.fullName, x.phone]).sort())", "expect": [["Deneme Yılmaz", "05551112233"], ["Sahibi bilinmeyen", null], ["Sınama Kaya", "05554445566"]] },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('backups_list').then(b => b.map(x => x.kind).sort())", "expect": ["daily", "pre-import"] },
+    { "type": "reload" },
+    { "type": "wait", "text": "Bugün", "timeout": 20000 },
+    { "type": "screenshot", "path": "02-home-after-import.png" },
+    { "type": "click", "text": "Hastalar" },
+    { "type": "wait", "text": "Deneme Yılmaz", "timeout": 15000 },
+    { "type": "screenshot", "path": "03-patients.png" },
+    { "type": "click", "text": "Deneme Yılmaz" },
+    { "type": "wait", "text": "Tarçın", "timeout": 15000 },
+    { "type": "screenshot", "path": "04-owner.png" }
+  ]
+}
