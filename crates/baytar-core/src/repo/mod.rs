@@ -1,4 +1,5 @@
 //! Domain persistence. Get resolves historical rows; lists hide deletions.
+pub mod inventory;
 pub mod owners;
 pub mod patients;
 pub mod search;

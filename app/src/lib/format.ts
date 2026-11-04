@@ -3,9 +3,9 @@ import { toE164 } from './validation';
 export { toE164, parseDecimal } from './validation';
 import { tr } from '$lib/i18n/tr';
 
-/** Format integer minor units (kuruş) for display. */
-export function formatMoney(minor: number): string {
-  return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(minor / 100);
+/** Format integer minor units (kuruş) for display; a missing amount shows as a dash. */
+export function formatMoney(minor: number | null | undefined): string {
+  return minor == null ? '—' : new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(minor / 100);
 }
 
 export function todayDate(): string {
