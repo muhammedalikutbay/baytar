@@ -19,7 +19,7 @@ fn seed_owner_and_patient(conn: &Connection) {
 #[test]
 fn fresh_database_has_all_tables_strict_types_indexes_and_no_triggers() {
     let db = Database::open_in_memory().unwrap();
-    assert_eq!(db.schema_version().unwrap(), 2);
+    assert_eq!(db.schema_version().unwrap(), 3);
     let conn = db.conn();
     let mut stmt = conn
         .prepare("SELECT name, strict FROM pragma_table_list WHERE schema = 'main' AND name NOT LIKE 'sqlite_%' ORDER BY name")
@@ -113,6 +113,9 @@ fn fresh_database_has_all_tables_strict_types_indexes_and_no_triggers() {
 fn connected_clinical_records_and_import_provenance_can_be_inserted() {
     let db = Database::open_in_memory().unwrap();
     let conn = db.conn();
+    // These tests use fixed ids; start from an empty catalog instead of the seeded one (0003).
+    conn.execute_batch("DELETE FROM vaccine_types; DELETE FROM medications; DELETE FROM services;")
+        .unwrap();
     seed_owner_and_patient(conn);
     conn.execute_batch(
         "INSERT INTO visits (id, patient_id, visit_on, visit_time, weight_kg, temperature_c)
@@ -241,6 +244,9 @@ fn foreign_keys_restrict_deletion_even_after_soft_delete() {
 fn vaccine_name_uniqueness_excludes_only_soft_deleted_rows() {
     let db = Database::open_in_memory().unwrap();
     let conn = db.conn();
+    // These tests use fixed ids; start from an empty catalog instead of the seeded one (0003).
+    conn.execute_batch("DELETE FROM vaccine_types; DELETE FROM medications; DELETE FROM services;")
+        .unwrap();
     conn.execute(
         "INSERT INTO vaccine_types (name, is_active) VALUES ('Synthetic Vaccine', 0)",
         [],

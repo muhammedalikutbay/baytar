@@ -1,5 +1,6 @@
 import { toE164 } from '$lib/validation';
 import { tr, importIssueKeys } from '$lib/i18n/tr';
+import { createBillingMock } from './billing-mock';
 import { createClinicalMock } from './clinical-mock';
 import { calculateMock } from './dose-mock';
 import { invoke, isTauri } from '@tauri-apps/api/core';
@@ -149,6 +150,8 @@ for (const [visitOn, weightKg] of [['2026-09-12', 3.9], ['2026-10-03', 4.0], ['2
   clinical.call('visit_create', { input: { patientId: 4, visitOn, weightKg, reason: tr.visit } });
 }
 
+const billing = createBillingMock({ owners: () => owners, ownerGet, patientGet, visitGet: id => clinical.call('visit_get', { id }) as import('./types').Visit, now, fail });
+
 // Dispatch types are checked at the public call boundary and by each handler.
 
 const importPrepared = new Map<string, ImportPreview>();
@@ -174,6 +177,7 @@ function mockPreview(path: string): ImportPreview {
 }
 
 function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['args']): unknown {
+  if (billing.has(command)) return billing.call(command, args);
   if (clinical.has(command)) return clinical.call(command, args);
   switch (command) {
     case 'settings_get_all': return settingValues;

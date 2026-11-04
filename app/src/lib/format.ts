@@ -117,3 +117,4 @@ export function formatAge(value: string | null | undefined, estimate = false, to
     : months > 0 ? `${months} ${tr.monthsOld}` : `${Math.floor((current - birth.getTime()) / 86400000)} ${tr.daysOld}`;
   return (estimate ? '~' : '') + age;
 }
+

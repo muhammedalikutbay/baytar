@@ -165,7 +165,7 @@ fn fresh_database_reaches_v2_with_new_tables_columns_and_indexes() {
     let tmp = tempfile::tempdir().unwrap();
     let bdir = tmp.path().join("backups");
     let db = Database::open(&tmp.path().join("a.db"), &bdir).unwrap();
-    assert_eq!(db.schema_version().unwrap(), 2);
+    assert_eq!(db.schema_version().unwrap(), latest());
     assert!(backups(&bdir).is_empty(), "no backup for a brand-new file");
     let conn = db.conn();
 
@@ -299,13 +299,22 @@ fn populated_v1_database_migrates_with_every_row_and_foreign_key_intact() {
     assert!(backups(&bdir).is_empty());
 
     let db = Database::open(&path, &bdir).unwrap();
-    assert_eq!(db.schema_version().unwrap(), 2);
+    assert_eq!(db.schema_version().unwrap(), latest());
     let conn = db.conn();
 
     // Every pre-existing value of every pre-existing column is unchanged (phone/phone_alt are
     // compared separately below).
     for (table, columns, rows) in &before {
-        let after = snapshot(conn, table, columns);
+        let mut after = snapshot(conn, table, columns);
+        if matches!(*table, "vaccine_types" | "medications") {
+            // The catalog seed (0003) appends built-in rows after the existing ids.
+            let seeded = count(
+                conn,
+                &format!("SELECT count(*) FROM {table} WHERE is_builtin = 1"),
+            ) as usize;
+            assert_eq!(after.len(), rows.len() + seeded, "{table}");
+            after.truncate(rows.len());
+        }
         assert_eq!(&after, rows, "table {table} changed during migration");
     }
     assert_eq!(count(conn, "SELECT count(*) FROM owners"), 8);
@@ -354,14 +363,14 @@ fn populated_v1_database_migrates_with_every_row_and_foreign_key_intact() {
     assert_eq!(
         count(
             conn,
-            "SELECT count(*) FROM vaccine_types WHERE is_builtin != 0 OR manufacturer IS NOT NULL"
+            "SELECT count(*) FROM vaccine_types WHERE is_builtin = 0 AND manufacturer IS NOT NULL"
         ),
         0
     );
     assert_eq!(
         count(
             conn,
-            "SELECT count(*) FROM medications WHERE is_builtin != 0 OR category IS NOT NULL"
+            "SELECT count(*) FROM medications WHERE is_builtin = 0 AND category IS NOT NULL"
         ),
         0
     );
@@ -432,7 +441,10 @@ fn populated_v1_database_migrates_with_every_row_and_foreign_key_intact() {
     let b = backups(&bdir);
     assert_eq!(b.len(), 1);
     let name = b[0].file_name().unwrap().to_str().unwrap();
-    assert!(name.starts_with("pre-migration-v1-to-v2-"), "{name}");
+    assert!(
+        name.starts_with(&format!("pre-migration-v1-to-v{}-", latest())),
+        "{name}"
+    );
     let old = Connection::open_with_flags(&b[0], OpenFlags::SQLITE_OPEN_READ_ONLY).unwrap();
     assert_eq!(version(&old), 1);
     assert_eq!(phones(&old), phones_before);
@@ -459,7 +471,7 @@ fn reopening_a_v2_database_is_a_no_op() {
     assert_eq!(backups(&bdir).len(), 1);
 
     let db = Database::open(&path, &bdir).unwrap();
-    assert_eq!(db.schema_version().unwrap(), 2);
+    assert_eq!(db.schema_version().unwrap(), latest());
     assert_eq!(backups(&bdir).len(), 1, "no second backup");
     assert_eq!(
         phones(db.conn())[0],
@@ -608,20 +620,20 @@ fn failed_v2_migration_rolls_back_to_an_intact_v1_database() {
     // transaction, so the already executed table rebuilds and phone updates must vanish.
     let mut list = migrations().to_vec();
     list.push(Migration {
-        version: 3,
+        version: latest() + 1,
         name: "broken",
         sql: "CREATE TABLE half_done (x INTEGER); THIS IS NOT SQL;",
     });
     let err = Database::open_with(&path, &bdir, &list).err().unwrap();
     assert!(
-        matches!(err, DbError::MigrationFailed { version: 3, .. }),
+        matches!(err, DbError::MigrationFailed { version: v, .. } if v == latest() + 1),
         "{err}"
     );
 
     // A violation that only surfaces at commit time (deferred FK) also rolls everything back.
     let mut list = migrations().to_vec();
     list.push(Migration {
-        version: 3,
+        version: latest() + 1,
         name: "dangling_fk",
         sql: "PRAGMA defer_foreign_keys = ON; INSERT INTO visits (patient_id, visit_on) VALUES (12345, '2026-01-01');",
     });
@@ -663,6 +675,12 @@ fn failed_v2_migration_rolls_back_to_an_intact_v1_database() {
     // The same file still upgrades cleanly afterwards.
     drop(conn);
     let db = Database::open(&path, &bdir).unwrap();
-    assert_eq!(db.schema_version().unwrap(), 2);
+    assert_eq!(db.schema_version().unwrap(), latest());
     check_integrity(db.conn()).unwrap();
+}
+
+/// The newest schema version this build ships (later migrations, such as the catalog
+/// seed, must not break the v2 checks).
+fn latest() -> u32 {
+    migrations().len() as u32
 }

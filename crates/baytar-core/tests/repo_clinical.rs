@@ -89,6 +89,15 @@ fn invalid<T: std::fmt::Debug>(result: Result<T, RepoError>, expected: &str) {
     );
 }
 
+/// Tests written for the v1 behaviour start from an empty catalog: remove the rows the
+/// catalog migration (0003) seeds. A fresh database never references them yet.
+fn clear_builtin_catalog(c: &rusqlite::Connection) {
+    c.execute_batch(
+        "DELETE FROM vaccine_types WHERE is_builtin = 1; DELETE FROM medications WHERE is_builtin = 1;",
+    )
+    .unwrap();
+}
+
 #[test]
 fn visits_crud_nullable_patch_and_latest_weight() {
     let db = Database::open_in_memory().unwrap();
@@ -257,6 +266,7 @@ fn vaccine_catalog_seeds_once_and_supports_crud() {
     let backups = dir.path().join("backups");
     let db = Database::open(&path, &backups).unwrap();
     let c = db.conn();
+    clear_builtin_catalog(c);
     vaccine_types::seed(c).unwrap();
     let seeded = vaccine_types::list(c).unwrap();
     assert_eq!(seeded.len(), 6);
@@ -325,6 +335,7 @@ fn vaccine_catalog_seeds_once_and_supports_crud() {
 fn preexisting_catalog_is_preserved_and_marked() {
     let db = Database::open_in_memory().unwrap();
     let c = db.conn();
+    clear_builtin_catalog(c);
     vaccine_types::create(
         c,
         NewVaccineType {
@@ -546,6 +557,7 @@ fn supersession_uses_type_even_when_snapshot_name_changes() {
 fn medication_crud_folded_search_and_dose_validation() {
     let db = Database::open_in_memory().unwrap();
     let c = db.conn();
+    clear_builtin_catalog(c);
     let m = medications::create(
         c,
         NewMedication {

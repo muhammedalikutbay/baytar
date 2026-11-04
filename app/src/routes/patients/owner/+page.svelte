@@ -8,6 +8,7 @@
   import * as owners from '$lib/api/owners';
   import type { OwnerDetail } from '$lib/api/types';
   import PrintButton from '$lib/components/print/PrintButton.svelte';
+  import AccountCard from '$lib/components/billing/AccountCard.svelte';
   import OwnerForm from '$lib/components/patients/OwnerForm.svelte';
   import PatientForm from '$lib/components/patients/PatientForm.svelte';
   import SpeciesIcon from '$lib/components/patients/SpeciesIcon.svelte';
@@ -66,6 +67,7 @@
       {#if detail.owner.address}<div><dt class="type-caption text-fg-muted">{tr.address}</dt><dd class="mt-2 whitespace-pre-wrap break-words">{detail.owner.address}</dd></div>{/if}
       {#if detail.owner.notes}<div class="sm:col-span-2"><dt class="type-caption text-fg-muted">{tr.notes}</dt><dd class="mt-2 whitespace-pre-wrap break-words">{detail.owner.notes}</dd></div>{/if}
     </dl></Card>
+    {#key detail.owner.id}<AccountCard ownerId={detail.owner.id} />{/key}
     <Card><h2 class="type-section mb-4">{tr.pets}</h2>
       {#if detail.patients.length}<ul class="divide-y divide-border">
         {#each detail.patients as pet (pet.id)}<li><a href={`/patients/pet?id=${pet.id}`} class="flex min-h-16 flex-wrap items-center gap-3 rounded-sm p-3 hover:bg-surface-muted">

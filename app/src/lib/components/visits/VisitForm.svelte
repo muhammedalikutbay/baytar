@@ -8,6 +8,7 @@
   import * as prescriptions from '$lib/api/prescriptions';
   import * as medications from '$lib/api/medications';
   import type { Visit, Medication, PrescriptionItem } from '$lib/api/types';
+  import VisitCharges from '$lib/components/billing/VisitCharges.svelte';
   import DoseCalculator from '$lib/components/medications/DoseCalculator.svelte';
   import { formatUnits } from '$lib/format';
 
@@ -167,3 +168,5 @@
     <Button type="submit" disabled={saving || loading || loadFailed}>{saving ? tr.saving : tr.save}</Button>
   </div>
 </form>
+
+{#if initial}<div class="mt-6"><VisitCharges visitId={initial.id} {patientId} date={initial.visitOn} /></div>{:else}<p class="type-caption mt-4 text-fg-muted">{tr.billingSaveVisitFirst}</p>{/if}

@@ -2,6 +2,7 @@
   import { Stethoscope, Syringe, CalendarDays, ChevronDown } from '@lucide/svelte';
   import { Button, Card, Dialog, EmptyState, Toast } from '$lib/components/ui';
   import PrintButton from '$lib/components/print/PrintButton.svelte';
+  import VisitCharges from '$lib/components/billing/VisitCharges.svelte';
   import VisitForm from '$lib/components/visits/VisitForm.svelte';
   import HistoryRecordForm from './HistoryRecordForm.svelte';
   import { tr } from '$lib/i18n/tr';
@@ -155,6 +156,7 @@
                       </ul>
                     </section>
                   {/if}
+                  {#if entry.kind === 'visit'}<VisitCharges visitId={entry.record.id} {patientId} date={entry.record.visitOn} />{/if}
                   <div class="flex flex-wrap gap-2">{#if entry.kind === 'visit'}<PrintButton kind="prescription" id={entry.record.id} /><PrintButton kind="summary" id={entry.record.id} />{/if}<Button variant="secondary" size="sm" onclick={() => { editing = entry; editOpen = true; }}>{tr.edit}</Button><Button variant="danger" size="sm" disabled={busy} onclick={() => { actionError = ''; deleting = entry; deleteOpen = true; }}>{tr.delete}</Button></div>
                 </div>
               </details>
