@@ -69,6 +69,31 @@ export function formatAgendaDate(value: string): string {
   return `${weekday[0].toLocaleUpperCase('tr-TR') + weekday.slice(1)}, ${formatDate(value)}`;
 }
 
+export function isValidDate(value: string): boolean { return parseDate(value) !== null; }
+
+export function localToday(): string {
+  const today = new Date();
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+}
+
+// Clinical decimal fields accept either Turkish commas or decimal points, never grouping.
+export function parseDecimal(value: string): number | null {
+  if (!value.trim()) return null;
+  if (!/^[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(value.trim())) return NaN;
+  return Number(value.trim().replace(',', '.'));
+}
+
+export function formatNumber(value: number): string {
+  return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 6 }).format(value);
+}
+
+export function formatMonth(value: string): string {
+  const date = parseDate(value);
+  if (!date) return value;
+  const month = new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date);
+  return month.charAt(0).toLocaleUpperCase('tr-TR') + month.slice(1);
+}
+
 export function formatDate(value: string | null | undefined): string {
   if (!value) return '';
   const date = parseDate(value);

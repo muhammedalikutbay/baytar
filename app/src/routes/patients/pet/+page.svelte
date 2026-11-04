@@ -9,14 +9,15 @@
   import type { Patient, Owner } from '$lib/api/types';
   import PatientForm from '$lib/components/patients/PatientForm.svelte';
   import PatientVisits from '$lib/components/patients/PatientVisits.svelte';
-  import PatientVaccinations from '$lib/components/patients/PatientVaccinations.svelte';
-  import PatientAppointments from '$lib/components/patients/PatientAppointments.svelte';
+  import VisitForm from '$lib/components/visits/VisitForm.svelte';
   let patient = $state<Patient | null>(null);
   let owner = $state<Owner | null>(null);
   let loading = $state(true);
   let failed = $state(false);
   let refresh = $state(0);
   let edit = $state(false);
+  let addVisit = $state(false);
+  let historyRevision = $state(0);
   let confirm = $state(false);
   let busy = $state(false);
   let actionError = $state('');
@@ -26,7 +27,7 @@
   $effect(() => {
     const id = Number(page.url.searchParams.get('id')); refresh;
     let cancelled = false;
-    patient = null; owner = null; loading = true; failed = false; edit = false; confirm = false;
+    patient = null; owner = null; loading = true; failed = false; edit = false; confirm = false; addVisit = false;
     if (!Number.isSafeInteger(id) || id <= 0) { loading = false; return; }
     (async () => {
       try { const pet = await patients.get(id); const person = await owners.get(pet.ownerId);
@@ -47,6 +48,7 @@
     try { await patients.restore(deletedId); deletedId = null; toast = tr.restored; toastOpen = true; refresh++; }
     catch { actionError = tr.actionError; } finally { busy = false; }
   }
+  function setVisitOpen(open: boolean) { addVisit = open; if (!open) historyRevision++; }
 </script>
 <a href={owner ? `/patients/owner?id=${owner.id}` : '/patients'} class="text-accent underline">{owner ? tr.backOwner : tr.backPatients}</a>
 <div class="mt-6 grid gap-8">
@@ -55,7 +57,7 @@
   {:else if patient && owner}
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div><h1 class="type-page break-words">{patient.name}</h1><p class="mt-2 text-fg-muted">{tr[patient.species]}{patient.speciesNote ? ` · ${patient.speciesNote}` : ''}{patient.breed ? ` · ${patient.breed}` : ''}</p></div>
-      <div class="flex gap-2"><Button variant="secondary" onclick={() => { actionError = ''; confirm = true; }}>{tr.deletePatient}</Button><Button onclick={() => edit = true}>{tr.edit}</Button></div>
+      <div class="flex flex-wrap gap-2"><Button variant="secondary" onclick={() => { actionError = ''; confirm = true; }}>{tr.deletePatient}</Button><Button variant="secondary" onclick={() => edit = true}>{tr.edit}</Button><Button onclick={() => addVisit = true}>{tr.addVisit}</Button></div>
     </div>
     <Card><dl class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       <div><dt class="type-caption text-fg-muted">{tr.owner}</dt><dd class="mt-2"><a class="text-accent underline" href={`/patients/owner?id=${owner.id}`}>{owner.fullName}</a></dd></div>
@@ -63,11 +65,15 @@
         <div><dt class="type-caption text-fg-muted">{field.label}</dt><dd class="mt-2 break-words">{field.value}</dd></div>
       {/each}
     </dl>{#if patient.notes}<div class="mt-6 border-t border-border pt-5"><h2 class="type-caption text-fg-muted">{tr.notes}</h2><p class="mt-2 whitespace-pre-wrap break-words">{patient.notes}</p></div>{/if}</Card>
-    <PatientVisits /><PatientVaccinations /><PatientAppointments />
+    {#key patient.id}<PatientVisits patientId={patient.id} revision={historyRevision} />{/key}
   {:else}<Card><EmptyState icon={PawPrint} title={failed ? tr.loadError : tr.recordMissing} description={tr.recordMissingDescription}>
     {#snippet action()}{#if failed}<Button variant="secondary" onclick={() => refresh++}>{tr.retry}</Button>{/if}{/snippet}
   </EmptyState></Card>{/if}
 </div>
+<Dialog bind:open={() => addVisit, setVisitOpen} title={tr.addVisit} description={tr.visitFormDescription}>
+  {#if addVisit && patient}<VisitForm patientId={patient.id} onsaved={() => setVisitOpen(false)} oncancel={() => setVisitOpen(false)} />{/if}
+  {#snippet footer()}{/snippet}
+</Dialog>
 <Dialog bind:open={edit} title={tr.edit} description={tr.patientFormDescription}>
   {#if edit && patient}<PatientForm {patient} ownerId={patient.ownerId} onsaved={() => { edit = false; refresh++; }} oncancel={() => edit = false} />{/if}
   {#snippet footer()}{/snippet}

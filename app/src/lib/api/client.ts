@@ -140,6 +140,10 @@ for (const input of [
   { title: tr.appointmentSampleVaccine, startsOn: agendaDate(2), patientId: 4, ownerId: first.id, kind: 'vaccine' },
   { title: tr.appointmentSampleVisit, startsOn: agendaDate(-2), patientId: 4, ownerId: first.id, kind: 'visit', status: 'done' }
 ]) clinical.call('appointment_create', { input });
+// Synthetic measurements make the patient history and its weight trend reviewable in a browser.
+for (const [visitOn, weightKg] of [['2026-09-12', 3.9], ['2026-10-03', 4.0], ['2026-10-24', 4.1]] as const) {
+  clinical.call('visit_create', { input: { patientId: 4, visitOn, weightKg, reason: tr.visit } });
+}
 
 // Dispatch types are checked at the public call boundary and by each handler.
 
