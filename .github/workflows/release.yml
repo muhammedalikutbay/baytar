@@ -1,0 +1,109 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      # Serialize shared draft creation and latest.json read/merge/upload.
+      max-parallel: 1
+      matrix:
+        include:
+          - os: windows-latest
+            args: --bundles nsis
+            targets: x86_64-pc-windows-msvc
+          - os: macos-latest
+            args: --target universal-apple-darwin --bundles dmg,app
+            targets: aarch64-apple-darwin,x86_64-apple-darwin
+          - os: ubuntu-22.04
+            args: --bundles appimage,deb
+            targets: x86_64-unknown-linux-gnu
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require a release tag
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" != refs/tags/v* ]]; then
+            echo 'Select an existing vX.Y.Z tag when dispatching this workflow.' >&2
+            exit 1
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.targets }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: release-${{ matrix.os }}
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install --yes libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev build-essential curl wget file libxdo-dev
+      - name: Install frontend dependencies
+        working-directory: app
+        run: npm ci
+      - name: Configure optional updater artifacts
+        id: updater
+        shell: bash
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        # Tauri requires a signing key when createUpdaterArtifacts is true.
+        # Missing secrets become empty strings: explicitly disable artifacts in
+        # that case so unsigned installers still build. Never print the key.
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const config = { bundle: { createUpdaterArtifacts: Boolean(process.env.TAURI_SIGNING_PRIVATE_KEY) } };
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `config=${JSON.stringify(config)}\n`);
+          NODE
+      - name: Build installers and upload to draft release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          projectPath: app
+          tagName: ${{ github.ref_name }}
+          releaseName: Baytar ${{ github.ref_name }}
+          releaseDraft: true
+          prerelease: false
+          includeUpdaterJson: true
+          args: ${{ matrix.args }} --config '${{ steps.updater.outputs.config }}'
+          releaseBody: |
+            ## Türkçe
+            Baytar, bağımsız veterinerler ve küçük klinikler için ücretsiz, açık kaynaklı,
+            çevrimdışı çalışan bir hasta takip uygulamasıdır. Veriler bilgisayarınızda kalır.
+
+            - Windows: NSIS kurulum dosyasını çalıştırın. İmzasız derlemelerde SmartScreen
+              uyarısı çıkarsa “Daha fazla bilgi → Yine de çalıştır” (More info → Run anyway) seçin.
+              Kurulum yalnızca mevcut kullanıcı içindir ve yönetici izni gerektirmez.
+            - macOS: DMG dosyasını açıp Baytar'ı Applications klasörüne sürükleyin.
+              İmzasız uygulamayı ilk açışta sağ tıklayın → Aç (right-click → Open).
+            - Linux: AppImage için `chmod +x Baytar*.AppImage` çalıştırın ve dosyayı açın;
+              Debian/Ubuntu için `.deb` paketini kullanabilirsiniz.
+
+            ## English
+            Baytar is a free, open-source, offline-first patient records app for independent
+            veterinarians and small clinics. Your data stays on your computer.
+
+            - Windows: Run the NSIS installer. Builds are unsigned; if SmartScreen appears,
+              select “More info → Run anyway”. Installation is per user and needs no administrator prompt.
+            - macOS: Open the DMG and drag Baytar into Applications. For the unsigned app's
+              first launch, right-click → Open.
+            - Linux: Run `chmod +x Baytar*.AppImage`, then open the AppImage;
+              a `.deb` package is also available for Debian/Ubuntu.

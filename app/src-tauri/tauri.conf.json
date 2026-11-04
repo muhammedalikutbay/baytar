@@ -23,6 +23,22 @@
   },
   "bundle": {
     "active": true,
+    "targets": ["nsis", "dmg", "app", "appimage", "deb"],
+    "publisher": "Muhammed Ali Kutbay",
+    "copyright": "Copyright © 2026 Muhammed Ali Kutbay",
+    "category": "Business",
+    "shortDescription": "Offline veterinary patient records for small clinics",
+    "longDescription": "Baytar is a free, open-source desktop application for independent veterinarians and small clinics. Manage owners, patients, visits, vaccinations, medications, dose calculations, and appointments while keeping all data on your computer.",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["Turkish", "English"],
+        "displayLanguageSelector": false
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "11.0"
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
