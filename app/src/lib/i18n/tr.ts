@@ -377,6 +377,27 @@ export const tr = {
   billingFrom: 'Başlangıç', billingTo: 'Bitiş', billingCharged: 'Yazılan ücretler', billingCollected: 'Tahsilatlar', billingRangeInvalid: 'Geçerli bir tarih aralığı seçin.',
   billingOwner: 'Sahip', billingChooseOwner: 'Sahip seçin', billingChooseOwnerDescription: 'Ücret veya tahsilat kaydedilecek sahibi arayın.', billingSearchOwner: 'Sahip ara', billingNoOwners: 'Sahip bulunamadı.',
   billingSaveVisitFirst: 'Ücret eklemek için önce muayeneyi kaydedin; ardından geçmişteki muayeneyi açın.', billingArchiveOwner: 'Arşivlenmiş sahip hesabı',
+  // Vaccination planning and schedules
+  vaccineGive: 'Aşı uygula', vaccinePlan: 'Aşı planla', vaccinePostpone: 'Ertele',
+  vaccineWorkflowDescription: 'Hasta ve aşıyı seçin; uygulama veya plan bilgilerini kaydedin.',
+  vaccinePlanNext: 'Sonraki dozu bu tarihe planla', vaccineCatalogHint: 'Aşılar hastanın türüne göre katalogdan süzülür.',
+  vaccinePatientSearch: 'Hasta veya sahip adı ara', vaccineChoosePatient: 'Bir hasta seçin',
+  vaccineChangePatient: 'Hasta değiştir', vaccineNoPatients: 'Eşleşen hasta yok.',
+  vaccineChoose: 'Katalogdan aşı seçin', vaccineNoCatalog: 'Bu tür için etkin aşı bulunamadı. Kataloğa bir aşı ekleyin.',
+  vaccineSuggestionHint: 'Sonraki tarih, kaydedilecek doz dahil primer seri ve rapel aralığından önerilir. Düzenleyebilirsiniz.',
+  vaccineThisWeek: 'Bu hafta', vaccineThisMonth: 'Bu ay', vaccineAll: 'Tüm aşılar',
+  vaccineUpcoming: 'Yaklaşan uygulamalar', vaccineSchedule: 'Aşı programı',
+  vaccineCurrent: 'Güncel', vaccineApproaching: 'Yaklaşıyor', vaccineLate: 'Gecikti', vaccineNoPlan: 'Plan yok',
+  vaccineGiven: 'Uygulanan', vaccinePlanned: 'Planlanan', vaccineDoses: 'doz',
+  vaccineWeek: '+1 hafta', vaccineTwoWeeks: '+2 hafta', vaccineMonth: '+1 ay', vaccineYear: '+1 yıl',
+  vaccinePostponeDescription: 'Yeni tarih için randevu oluşturulur veya mevcut plan güncellenir.',
+  vaccineNextAfterGiven: 'Sonraki tarih uygulama tarihinden sonra olmalı.',
+  vaccineReminder: 'Merhaba {owner}, {patient} için {vaccine} aşısının tarihi {date}. Randevu için kliniğimizle iletişime geçebilirsiniz.',
+  vaccineWhatsApp: 'WhatsApp', vaccineReminderError: 'WhatsApp açılamadı. Telefon numarasını kontrol edip yeniden deneyin.',
+  vaccineCalendar: 'Aşı takvimi', vaccinePreviousMonth: 'Önceki ay', vaccineNextMonth: 'Sonraki ay',
+  vaccineDayPlan: '{date} için aşı planla', vaccineDaysAfter: '{days} gün sonra', vaccineDaysLate: '{days} gün gecikti',
+  vaccineHistoryEmpty: 'Henüz uygulanmış doz yok.', vaccineScheduleEmpty: 'Henüz aşı programı yok. İlk dozu uygulayın veya bir aşı planlayın.',
+  vaccineNoDue: 'Bu filtrelerde bekleyen aşı yok.', vaccineUntypedPlan: 'Katalog aşısını seçerek planlayın.',
 } as const satisfies Record<string, string>;
 
 export type TranslationKey = keyof typeof tr;

@@ -2,6 +2,7 @@ import { toE164 } from '$lib/validation';
 import { tr, importIssueKeys } from '$lib/i18n/tr';
 import { createBillingMock } from './billing-mock';
 import { createClinicalMock } from './clinical-mock';
+import { createVaccineMock } from './vaccinations-mock';
 import { calculateMock } from './dose-mock';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import type { ImportPreview, ImportReport, ApiError, CommandMap, ListQuery, NewOwner, NewPatient, Owner, OwnerPatch, Patient, PatientPatch, SearchHit } from './types';
@@ -118,6 +119,7 @@ patientCreate({ ownerId: second.id, name: 'Boncuk', species: 'bird' });
 patientCreate({ ownerId: third.id, name: 'Fındık', species: 'rabbit' });
 
 const clinical = createClinicalMock({ patientGet, ownerGet, fail, fold, now });
+const vaccines = createVaccineMock({ clinical, patients, patientGet, ownerGet, fail });
 
 // Synthetic vaccination examples, relative to the local day for useful previews.
 const demoDate = (offset: number) => {
@@ -178,6 +180,7 @@ function mockPreview(path: string): ImportPreview {
 
 function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['args']): unknown {
   if (billing.has(command)) return billing.call(command, args);
+  if (vaccines.has(command)) return vaccines.call(command, args);
   if (clinical.has(command)) return clinical.call(command, args);
   switch (command) {
     case 'settings_get_all': return settingValues;

@@ -274,3 +274,20 @@ export interface CommandMap {
   billing_daily_summary: {args:{from:string;to:string};result:DailySummary};
   billing_charge_sources: {args:Record<string,never>;result:ChargeSource[]};
 }
+export interface VaccineDue {
+  patientId: number; patientName: string; species: Species; ownerName: string; phone: string | null;
+  vaccineTypeId: number | null; vaccineName: string; dueOn: string;
+  appointmentId: number | null; vaccinationId: number | null;
+}
+export interface VaccineDueQuery { patientId?: number; species?: Species; vaccineTypeId?: number; from?: string; to?: string }
+export interface GiveVaccination { vaccination: NewVaccination; appointmentId: number | null; planNext: boolean }
+export interface PlanVaccination { patientId: number; vaccineTypeId: number; startsOn: string; startsTime: string | null; notes: string | null }
+export interface VaccineCalendarEvent { patientId: number; patientName: string; vaccineName: string; on: string; planned: boolean }
+export interface CommandMap {
+  vaccines_due_list: { args: { query: VaccineDueQuery }; result: VaccineDue[] };
+  vaccines_give: { args: { input: GiveVaccination }; result: Vaccination };
+  vaccines_plan: { args: { input: PlanVaccination }; result: Appointment };
+  vaccines_suggest: { args: { patientId: number; typeId: number; givenOn: string }; result: string | null };
+  vaccines_calendar: { args: { from: string; to: string }; result: VaccineCalendarEvent[] };
+  vaccines_postpone: { args: { appointmentId: number | null; vaccinationId: number | null; on: string }; result: Appointment };
+}

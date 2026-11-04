@@ -1,6 +1,7 @@
 mod billing;
 mod import;
 mod settings;
+mod vaccines;
 
 use baytar_core::{
     backup,
@@ -701,6 +702,12 @@ pub fn run() {
             billing::accounts_receivables,
             billing::billing_daily_summary,
             billing::billing_charge_sources,
+            vaccines::vaccines_due_list,
+            vaccines::vaccines_give,
+            vaccines::vaccines_plan,
+            vaccines::vaccines_suggest,
+            vaccines::vaccines_calendar,
+            vaccines::vaccines_postpone
         ])
         .run(tauri::generate_context!())
         .expect("error while running Baytar");

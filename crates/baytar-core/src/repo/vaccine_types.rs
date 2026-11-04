@@ -104,6 +104,23 @@ impl Default for NewVaccineType {
     }
 }
 const COLUMNS: &str = "id, name, species, default_interval_days, notes, is_active, created_at, updated_at, deleted_at, is_builtin, manufacturer, diseases, primary_doses, primary_interval_days, min_age_weeks";
+pub fn available_for_patient(conn: &Connection, id: i64, patient_id: i64) -> Result<VaccineType> {
+    let patient = super::active_patient(conn, patient_id)?;
+    let vaccine = get(conn, id)?;
+    if vaccine.deleted_at.is_some() || !vaccine.is_active {
+        return Err(RepoError::NotFound);
+    }
+    if vaccine
+        .species
+        .is_some_and(|species| species != patient.species)
+    {
+        return Err(super::invalid(
+            "vaccineTypeId",
+            "vaccine species must match patient",
+        ));
+    }
+    Ok(vaccine)
+}
 pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<VaccineType> {
     Ok(VaccineType {
         id: r.get(0)?,
