@@ -1,4 +1,5 @@
 mod import;
+mod settings;
 
 use baytar_core::{
     backup,
@@ -99,7 +100,7 @@ pub struct StartupStatus {
     pub supported_version: Option<u32>,
 }
 pub struct AppDatabase {
-    database: Mutex<Option<Database>>,
+    pub(crate) database: Mutex<Option<Database>>,
     status: StartupStatus,
 }
 impl AppDatabase {
@@ -572,6 +573,7 @@ pub fn run() {
     );
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             import::initialize(app)?;
             let state = match app.path().app_data_dir() {
@@ -587,6 +589,14 @@ pub fn run() {
             import::import_execute,
             import::import_cancel,
             import::import_save_report,
+            settings::settings_get_all,
+            settings::settings_set,
+            settings::backups_list,
+            settings::backup_create,
+            settings::backup_export,
+            settings::backup_restore,
+            settings::app_info,
+            settings::open_data_folder,
             visit_get,
             visit_create,
             visit_update,

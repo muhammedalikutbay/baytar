@@ -204,6 +204,12 @@ export const tr = {
   galleryColorHighlight: 'Turuncu',
   galleryColorSuccess: 'Başarılı',
   galleryColorDanger: 'Hata'
+  ,settingsClinic: 'Hekim ve klinik bilgileri', settingsClinicName: 'Klinik adı', settingsVetName: 'Hekim adı', settingsPhone: 'Telefon', settingsAddress: 'Adres',
+  settingsBackups: 'Yedekler', settingsBackupPolicy: 'Baytar her gün otomatik yedek alır; son 14 gün ve son 8 hafta saklanır.',
+  settingsBackupNow: 'Şimdi yedekle', settingsExport: 'Yedeği başka bir klasöre kaydet', settingsRestore: 'Bu yedeğe dön',
+  settingsRestoreTitle: 'Yedek geri yüklensin mi?', settingsRestoreDescription: 'Önce mevcut verilerinizin yedeği alınır. Geri yüklemeden sonra uygulama yeniden başlatılır.',
+  settingsRestoreDone: 'Yedek geri yüklendi. Uygulamayı yeniden başlatın.', settingsDaily: 'Günlük', settingsManual: 'Elle', settingsPreUpdate: 'Güncelleme öncesi', settingsPreImport: 'İçe aktarma öncesi', settingsPreRestore: 'Geri yükleme öncesi', settingsPreMigration: 'Migrasyon öncesi',
+  settingsLegacy: 'Eski verileri aktar', settingsUpdates: 'Güncellemeler', settingsUpdateCheck: 'Açılışta yeni sürüm kontrol edilsin', settingsAbout: 'Hakkında', settingsLicense: 'Ücretsiz ve açık kaynak (GPL-3.0)', settingsOpenFolder: 'Klasörü aç', settingsSaved: 'Bilgiler kaydedildi.', settingsExportFolder: 'Yedek klasörünü seç', settingsError: 'Ayarlar kaydedilemedi. Yeniden deneyin.', settingsRestoreError: 'Yedek geri yüklenemedi. Verileriniz korunuyor.', settingsBackupError: 'Yedekleme tamamlanamadı. Yeniden deneyin.', settingsBackupExported: 'Yedek dışa aktarıldı.'
 } as const satisfies Record<string, string>;
 
 export type TranslationKey = keyof typeof tr;

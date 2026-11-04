@@ -119,6 +119,8 @@ const clinical = createClinicalMock({ patientGet, ownerGet, fail, fold, now });
 const importPrepared = new Map<string, ImportPreview>();
 const importReports = new Map<string, ImportReport>();
 const importedFiles = new Set<string>();
+const settingValues: Record<string, string> = { update_check_enabled: '1' };
+const mockBackups: import('./types').BackupInfo[] = [];
 let importSequence = 0;
 function mockPreview(path: string): ImportPreview {
   const found = { owners: 24, patients: 31, todos: 8 };
@@ -139,6 +141,14 @@ function mockPreview(path: string): ImportPreview {
 function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['args']): unknown {
   if (clinical.has(command)) return clinical.call(command, args);
   switch (command) {
+    case 'settings_get_all': return settingValues;
+    case 'settings_set': { const { key, value } = args as { key: string; value: string }; settingValues[key] = value; return null; }
+    case 'backups_list': return mockBackups;
+    case 'backup_create': { const row = { path: '/demo/baytar-manual-20261104-120000Z.db', createdAt: new Date().toISOString(), kind: 'manual' as const, sizeBytes: 204800 }; mockBackups.unshift(row); return row; }
+    case 'backup_export': return (args as { path: string }).path + '/baytar-manual-20261104-120000Z.db';
+    case 'backup_restore': return null;
+    case 'app_info': return { version: '0.2.0', dataFolder: '/demo/Baytar', backupsFolder: '/demo/Baytar/backups', databaseSizeBytes: 204800 };
+    case 'open_data_folder': return null;
     case 'import_candidates': return [{ path: '/demo/HastaTakipDB.db', fileName: 'HastaTakipDB.db', sizeBytes: 942080, modifiedAt: '2026-10-30T12:00:00Z', location: '/demo' }];
     case 'import_prepare': { const { path } = args as { path: string }; const token = String(++importSequence); const preview = mockPreview(path); importPrepared.set(token, preview); return { token, preview }; }
     case 'import_cancel': { importPrepared.delete((args as { token: string }).token); return null; }

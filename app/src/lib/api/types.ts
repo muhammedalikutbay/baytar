@@ -25,6 +25,14 @@ export interface StartupStatus {
   foundVersion: number | null; supportedVersion: number | null;
 }
 export interface CommandMap {
+  settings_get_all: { args: Record<string, never>; result: Record<string, string> };
+  settings_set: { args: { key: string; value: string }; result: null };
+  backups_list: { args: Record<string, never>; result: BackupInfo[] };
+  backup_create: { args: Record<string, never>; result: BackupInfo };
+  backup_export: { args: { path: string }; result: string };
+  backup_restore: { args: { path: string }; result: null };
+  app_info: { args: Record<string, never>; result: AppInfo };
+  open_data_folder: { args: Record<string, never>; result: null };
   import_candidates: { args: Record<string, never>; result: ImportCandidate[] };
   import_prepare: { args: { path: string }; result: PreparedImport };
   import_execute: { args: { token: string }; result: ImportReport };
@@ -46,6 +54,9 @@ export interface CommandMap {
   patient_restore: { args: { id: number }; result: Patient };
   search: { args: { query: string; limit: number }; result: SearchHit[] };
 }
+
+export interface BackupInfo { path: string; createdAt: string; kind: 'daily' | 'manual' | 'pre-migration' | 'pre-restore' | 'pre-import' | 'pre-update'; sizeBytes: number }
+export interface AppInfo { version: string; dataFolder: string; backupsFolder: string; databaseSizeBytes: number }
 
 export interface ImportCandidate { path: string; fileName: string; sizeBytes: number; modifiedAt: string | null; location: string }
 export interface ImportCounts { owners: number; patients: number; todos: number }
