@@ -1,0 +1,2694 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "advocate",
+      "title": "EMA: advocate, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/advocate"
+    },
+    {
+      "id": "analgesia",
+      "title": "Merck Veterinary Manual: analgesics used in animals",
+      "url": "https://www.merckvetmanual.com/therapeutics/pain-assessment-and-management/analgesics-used-in-animals"
+    },
+    {
+      "id": "anesthesia",
+      "title": "AAHA: 2020 anesthesia guidelines, anesthetic protocols",
+      "url": "https://www.aaha.org/resources/2020-aaha-anesthesia-and-monitoring-guidelines-for-dogs-and-cats/phase-2-day-of-anesthesia/step-4-anesthetic-protocol/"
+    },
+    {
+      "id": "anthelmintics",
+      "title": "Merck Veterinary Manual: pharmacodynamics of anthelmintics in animals",
+      "url": "https://www.merckvetmanual.com/pharmacology/anthelmintics/pharmacodynamics-mechanisms-of-anthelmintic-action-in-animals"
+    },
+    {
+      "id": "antiemetics",
+      "title": "Merck Veterinary Manual: drugs controlling vomiting in monogastric animals",
+      "url": "https://www.merckvetmanual.com/pharmacology/systemic-pharmacotherapeutics-of-the-digestive-system/drugs-used-to-control-or-stimulate-vomiting-in-monogastric-animals"
+    },
+    {
+      "id": "antisedan",
+      "title": "VetCompendium Belgium: Antisedan, species-specific reversal",
+      "url": "https://www.vetcompendium.be/nl/node/3855"
+    },
+    {
+      "id": "antiviral",
+      "title": "Merck Veterinary Manual: antiviral agents used in animals",
+      "url": "https://www.merckvetmanual.com/pharmacology/antiviral-agents/overview-of-antiviral-agents-used-in-animals"
+    },
+    {
+      "id": "apoquel",
+      "title": "EMA: apoquel, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/apoquel"
+    },
+    {
+      "id": "atopica",
+      "title": "Elanco: Atopica product information",
+      "url": "https://my.elanco.com/uk/atopica"
+    },
+    {
+      "id": "azoles",
+      "title": "Merck Veterinary Manual: azoles for use in animals",
+      "url": "https://www.merckvetmanual.com/pharmacology/antifungal-agents/azoles-for-use-in-animals"
+    },
+    {
+      "id": "baytril",
+      "title": "Elanco: Baytril tablets product information",
+      "url": "https://my.elanco.com/uk/baytril"
+    },
+    {
+      "id": "bravecto",
+      "title": "EMA: bravecto, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/bravecto"
+    },
+    {
+      "id": "broadline",
+      "title": "EMA: broadline, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/broadline"
+    },
+    {
+      "id": "cardalis",
+      "title": "EMA: cardalis, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/cardalis"
+    },
+    {
+      "id": "cardio",
+      "title": "Merck Veterinary Manual: principles of therapy of cardiovascular disease in animals",
+      "url": "https://www.merckvetmanual.com/circulatory-system/cardiovascular-system-introduction/principles-of-therapy-of-cardiovascular-disease-in-animals"
+    },
+    {
+      "id": "cardio-doses",
+      "title": "Merck Veterinary Manual: cardiac medications of dogs and cats",
+      "url": "https://www.merckvetmanual.com/multimedia/table/cardiac-medications-of-dogs-and-cats"
+    },
+    {
+      "id": "catosal",
+      "title": "Elanco: Catosal product information",
+      "url": "https://my.elanco.com/uk/catosal"
+    },
+    {
+      "id": "cerenia",
+      "title": "EMA: cerenia, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/cerenia"
+    },
+    {
+      "id": "convenia",
+      "title": "EMA: convenia, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/convenia"
+    },
+    {
+      "id": "credelio",
+      "title": "EMA: credelio, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/credelio"
+    },
+    {
+      "id": "dechra-pets",
+      "title": "Dechra UK: cat prescription products, strengths and SPC links",
+      "url": "https://www.dechra.co.uk/products/cat/prescription"
+    },
+    {
+      "id": "derm",
+      "title": "Merck Veterinary Manual: dermatitis in animals",
+      "url": "https://www.merckvetmanual.com/integumentary-system/integumentary-system-introduction/dermatitis-in-animals"
+    },
+    {
+      "id": "dexdomitor",
+      "title": "EMA: dexdomitor, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/dexdomitor"
+    },
+    {
+      "id": "diabetes",
+      "title": "Merck Veterinary Manual: diabetes mellitus in dogs and cats",
+      "url": "https://www.merckvetmanual.com/endocrine-system/the-pancreas/diabetes-mellitus-in-dogs-and-cats"
+    },
+    {
+      "id": "drontal",
+      "title": "Vetoquinol: Drontal product information",
+      "url": "https://www.vetoquinol.co.uk/products/drontal"
+    },
+    {
+      "id": "easotic",
+      "title": "EMA: easotic, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/easotic"
+    },
+    {
+      "id": "elanco-pets",
+      "title": "Elanco: Advantix and Seresto product information",
+      "url": "https://my.elanco.com/uk/our-products"
+    },
+    {
+      "id": "eye-route",
+      "title": "Merck Veterinary Manual: routes of administration for ocular medications in animals",
+      "url": "https://www.merckvetmanual.com/pharmacology/systemic-pharmacotherapeutics-of-the-eye/routes-of-administration-for-ocular-medications-in-animals"
+    },
+    {
+      "id": "fluid",
+      "title": "AAHA/AAFP: fluid therapy guidelines (crystalloid types)",
+      "url": "https://www.aaha.org/public_documents/professional/guidelines/fluid_therapy_guidelines.pdf"
+    },
+    {
+      "id": "fortekor",
+      "title": "Elanco: Fortekor product information",
+      "url": "https://my.elanco.com/uk/fortekor"
+    },
+    {
+      "id": "frontline",
+      "title": "Boehringer Ingelheim: Frontline Spot On dog label",
+      "url": "https://www.frontline.co.uk/sites/default/files/2023-02/Frontline%20Spot%20On%20Dog%20SPC.pdf"
+    },
+    {
+      "id": "frontline-combo",
+      "title": "Dutch medicines authority: Frontline Combo cat 50 mg/60 mg",
+      "url": "https://www.diergeneesmiddeleninformatiebank.nl/nl/regnl112224"
+    },
+    {
+      "id": "furosemide-stock",
+      "title": "VMD: Furosoral 40 mg tablet leaflet",
+      "url": "https://www.vmd.defra.gov.uk/productinformationdatabase/files/QRD_Documents/QRD-Auth_775321.PDF"
+    },
+    {
+      "id": "gabapentin-stock",
+      "title": "HPRA: 100 mg gabapentin capsule presentations (human stock)",
+      "url": "https://www.hpra.ie/img/uploaded/swedocuments/IC0109-024-001.pdf"
+    },
+    {
+      "id": "galliprant",
+      "title": "EMA: galliprant, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/galliprant"
+    },
+    {
+      "id": "gastro",
+      "title": "Merck Veterinary Manual: drugs treating gastrointestinal ulcers in monogastric animals",
+      "url": "https://www.merckvetmanual.com/pharmacology/systemic-pharmacotherapeutics-of-the-digestive-system/drugs-used-to-treat-gastrointestinal-ulcers-in-monogastric-animals"
+    },
+    {
+      "id": "hypothyroid",
+      "title": "Merck Veterinary Manual: hypothyroidism in animals",
+      "url": "https://www.merckvetmanual.com/endocrine-system/the-thyroid-gland/hypothyroidism-in-animals"
+    },
+    {
+      "id": "isoflo",
+      "title": "Zoetis/NOAH: IsoFlo product information",
+      "url": "https://www.noahcompendium.co.uk/?query=IsoFlo"
+    },
+    {
+      "id": "kesium",
+      "title": "VMD: Kesium 50 mg/12.5 mg presentation",
+      "url": "https://www.vmd.defra.gov.uk/productinformationdatabase/files/PAA_Documents/PAA_437400.PDF"
+    },
+    {
+      "id": "ketasol",
+      "title": "University of Zurich: approved Ketasol-100 product information",
+      "url": "https://www.vetpharm.uzh.ch/TAK/05000000/00050375.02"
+    },
+    {
+      "id": "macrolides",
+      "title": "MSD Veterinary Manual: macrolide use in animals",
+      "url": "https://www.msdvetmanual.com/pharmacology/antibacterial-agents/macrolide-use-in-animals"
+    },
+    {
+      "id": "marbocyl",
+      "title": "Dutch medicines authority: Marbocyl P 5 mg",
+      "url": "https://www.diergeneesmiddeleninformatiebank.nl/nl/regnl10236"
+    },
+    {
+      "id": "metacam",
+      "title": "EMA: metacam, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/metacam"
+    },
+    {
+      "id": "metrobactin",
+      "title": "VMD: Metrobactin 250 mg product details and SPC",
+      "url": "https://www.vmd.defra.gov.uk/productinformationdatabase/product/A009223"
+    },
+    {
+      "id": "milbemax",
+      "title": "Elanco: Milbemax product information",
+      "url": "https://my.elanco.com/uk/milbemax"
+    },
+    {
+      "id": "milpro",
+      "title": "VMD: Milpro 4 mg/10 mg cat product leaflet",
+      "url": "https://vmd.defra.gov.uk/productinformationdatabase/files/QRD_Documents/QRD-Auth_605222.PDF"
+    },
+    {
+      "id": "nexgard",
+      "title": "EMA: nexgard, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/nexgard"
+    },
+    {
+      "id": "nexgard-combo",
+      "title": "EMA: nexgard-combo, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/nexgard-combo"
+    },
+    {
+      "id": "nexgard-spectra",
+      "title": "EMA: nexgard-spectra, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/nexgard-spectra"
+    },
+    {
+      "id": "nsaid",
+      "title": "Merck Veterinary Manual: nonsteroidal anti-inflammatory drugs in animals",
+      "url": "https://www.merckvetmanual.com/pharmacology/inflammation/nonsteroidal-anti-inflammatory-drugs-in-animals"
+    },
+    {
+      "id": "ocular-ab",
+      "title": "Merck Veterinary Manual: antimicrobial use in animals, ocular medications",
+      "url": "https://www.merckvetmanual.com/pharmacology/systemic-pharmacotherapeutics-of-the-eye/antimicrobial-use-in-animals"
+    },
+    {
+      "id": "onsior",
+      "title": "EMA: onsior, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/onsior"
+    },
+    {
+      "id": "orion",
+      "title": "VMD: Domitor 1 mg/ml, Orion manufacturer and SPC",
+      "url": "https://www.vmd.defra.gov.uk/productinformationdatabase/product/A000284"
+    },
+    {
+      "id": "osurnia",
+      "title": "EMA: osurnia, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/osurnia"
+    },
+    {
+      "id": "otomax",
+      "title": "MSD Animal Health: Otomax product information",
+      "url": "https://www.msd-animal-health-hub.co.uk/Products/Otomax"
+    },
+    {
+      "id": "panacur",
+      "title": "VMD: Panacur Small Animal 100 mg/ml product leaflet",
+      "url": "https://www.vmd.defra.gov.uk/ProductInformationDatabase/files/QRD_Documents/QRD-Auth_1234734.PDF"
+    },
+    {
+      "id": "penicillins",
+      "title": "Merck Veterinary Manual: penicillins use in animals",
+      "url": "https://www.merckvetmanual.com/pharmacology/antibacterial-agents/penicillins-use-in-animals"
+    },
+    {
+      "id": "previcox",
+      "title": "EMA: previcox, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/previcox"
+    },
+    {
+      "id": "profender",
+      "title": "EMA: profender, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/profender"
+    },
+    {
+      "id": "propoven",
+      "title": "HPRA: Fresenius propofol 1% EU leaflet, Propoven trade names",
+      "url": "https://assets.hpra.ie/products/Human/30250/c9c910ce-3428-458e-85a9-c71ac83339a3.pdf"
+    },
+    {
+      "id": "resp-ab",
+      "title": "ISCAID: antimicrobial use guidelines for respiratory tract disease in dogs and cats",
+      "url": "https://academic.oup.com/jvim/article/31/2/279/8449357"
+    },
+    {
+      "id": "rilexine",
+      "title": "VMD: Rilexine 75 mg product leaflet",
+      "url": "https://vmd.defra.gov.uk/productinformationdatabase/files/QRD_Documents/QRD-Auth_1236295.PDF"
+    },
+    {
+      "id": "rimadyl",
+      "title": "Dutch medicines authority: Rimadyl 50 mg palatable tablets for dogs",
+      "url": "https://www.diergeneesmiddeleninformatiebank.nl/nl/regnl10022"
+    },
+    {
+      "id": "rompun",
+      "title": "VMD: Rompun 2% product and authorisation holder",
+      "url": "https://www.vmd.defra.gov.uk/productinformationdatabase/files/PAA_Documents/PAA_581915.PDF"
+    },
+    {
+      "id": "ronaxan",
+      "title": "EMA: Ronaxan harmonised product information, 20 and 100 mg",
+      "url": "https://www.ema.europa.eu/en/documents/referral/ronaxan-and-its-associated-names-article-34-referral-annex-i-ii-iii_en.pdf"
+    },
+    {
+      "id": "sedation",
+      "title": "AAHA: 2020 anesthesia guidelines, premedication and sedation",
+      "url": "https://www.aaha.org/resources/2020-aaha-anesthesia-and-monitoring-guidelines-for-dogs-and-cats/drug-combinations/premedication-and-sedation/"
+    },
+    {
+      "id": "sedation-doses",
+      "title": "AAHA 2020: anxiolytic, sedation and premedication combinations",
+      "url": "https://www.aaha.org/wp-content/uploads/globalassets/02-guidelines/2020-anesthesia/aahaanesthesiaguidelines_premedicationandsedation.pdf"
+    },
+    {
+      "id": "semintra",
+      "title": "EMA: semintra, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/semintra"
+    },
+    {
+      "id": "simparica",
+      "title": "EMA: simparica, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/simparica"
+    },
+    {
+      "id": "simparica-trio",
+      "title": "EMA: simparica-trio, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/simparica-trio"
+    },
+    {
+      "id": "skin-ab",
+      "title": "Merck Veterinary Manual: antibacterials for integumentary disease in animals",
+      "url": "https://www.merckvetmanual.com/pharmacology/systemic-pharmacotherapeutics-of-the-integumentary-system/antibacterials-for-integumentary-disease-in-animals"
+    },
+    {
+      "id": "steroids",
+      "title": "Merck Veterinary Manual: corticosteroids in animals",
+      "url": "https://www.merckvetmanual.com/pharmacology/inflammation/corticosteroids-in-animals"
+    },
+    {
+      "id": "stronghold",
+      "title": "EMA: stronghold, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/stronghold"
+    },
+    {
+      "id": "stronghold-plus",
+      "title": "EMA: stronghold-plus, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/stronghold-plus"
+    },
+    {
+      "id": "surolan",
+      "title": "VMD: Surolan ear drops and cutaneous suspension leaflet",
+      "url": "https://vmd.defra.gov.uk/productinformationdatabase/files/QRD_Documents/QRD-Auth_1168398.PDF"
+    },
+    {
+      "id": "synulox",
+      "title": "Zoetis Spain: Synulox 250 mg and product information",
+      "url": "https://www.zoetis.es/buscador-productos/index.aspx"
+    },
+    {
+      "id": "torbugesic",
+      "title": "Dutch medicines authority: Torbugesic Vet 10 mg/ml",
+      "url": "https://www.diergeneesmiddeleninformatiebank.nl/nl/regnl110896"
+    },
+    {
+      "id": "tr-b12",
+      "title": "Teknovet Türkiye: Teknosol-B12 ürün bilgisi",
+      "url": "https://teknovet.com.tr/tr/urunler/vitamin%2C-mineral-ve-elektrolitler/teknosol-b12"
+    },
+    {
+      "id": "tr-bravecto",
+      "title": "MSD Turkey: pet products including Bravecto oral and spot-on",
+      "url": "https://www.msd-hayvan-sagligi.com/product-category/evcil-hayvan/"
+    },
+    {
+      "id": "tr-marboflex",
+      "title": "Teknovet Türkiye: pet ürünleri, Marboflex 10 mg",
+      "url": "https://teknovet.com.tr/tr/urunler/urun-gruplari/pet-urunlerimiz"
+    },
+    {
+      "id": "tr-tek-vitamins",
+      "title": "Teknovet Türkiye: vitamin, mineral ve elektrolit ürünleri",
+      "url": "https://teknovet.com.tr/tr/urunler/urun-gruplari/vitamin%2C-mineral-ve-elektrolitler"
+    },
+    {
+      "id": "vetergesic",
+      "title": "VMD: Vetergesic 0.3 mg/ml dogs and cats",
+      "url": "https://www.vmd.defra.gov.uk/productinformationdatabase/product/A002036"
+    },
+    {
+      "id": "vetmedin",
+      "title": "Boehringer Ingelheim: Vetmedin product information",
+      "url": "https://www.vetmedin.co.uk/"
+    },
+    {
+      "id": "zodon",
+      "title": "Ceva Bulgaria: Zodon 25 mg/ml product information",
+      "url": "https://www.ceva.bg/Produkti/Produktova-lista/Zodon"
+    },
+    {
+      "id": "zoletil",
+      "title": "VMD/ANSES: Zoletil 50 and 100 assessment",
+      "url": "https://www.vmd.defra.gov.uk/productinformationdatabase/files/UKPAR_Documents/UKPAR_1995618.PDF"
+    }
+  ],
+  "items": [
+    {
+      "name": "Advantix 100 mg/500 mg spot-on (köpek)",
+      "active_ingredient": "İmidakloprid, permetrin",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deriye damlatma",
+      "target_species": "Köpek",
+      "manufacturer": "Elanco",
+      "prescription_required": 0,
+      "pack_unit": "pipet",
+      "notes": "1 ml pipet: 100 mg imidakloprid + 500 mg permetrin; >4–10 kg köpek. Genellikle 4 haftada bir. KEDİDE KULLANILMAZ; kuruyana kadar kedilerden ayrılır. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "elanco-pets"
+      ]
+    },
+    {
+      "name": "Advocate 40 mg/4 mg spot-on (kedi)",
+      "active_ingredient": "İmidakloprid, moksidektin",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deriye damlatma",
+      "target_species": "Kedi",
+      "manufacturer": "Elanco",
+      "prescription_required": 1,
+      "pack_unit": "pipet",
+      "notes": "0,4 ml pipet: 40 mg imidakloprid + 4 mg moksidektin; ≤4 kg kedi, endikasyona göre aylık. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "advocate"
+      ]
+    },
+    {
+      "name": "Alfaksalon — enjeksiyon",
+      "active_ingredient": "Alfaksalon",
+      "category": "anesthetic",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "flakon",
+      "notes": "Jenerik indüksiyon ajanı; ürün, premedikasyon ve hasta yanıtına göre titre edilir.",
+      "source_ids": [
+        "anesthesia"
+      ]
+    },
+    {
+      "name": "Amlodipin — tablet",
+      "active_ingredient": "Amlodipin",
+      "category": "cardio",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağız yoluyla",
+      "target_species": "Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Jenerik antihipertansif; kan basıncı takibi ile ayarlanır.",
+      "source_ids": [
+        "cardio"
+      ]
+    },
+    {
+      "name": "Amoksisilin + klavulanik asit 50 mg — tablet",
+      "active_ingredient": "Amoksisilin, klavulanik asit",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 50,
+      "dose_mg_per_kg_min": 12.5,
+      "dose_mg_per_kg_max": 25,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Günde 2 kez; duyarlı bakteriyel enfeksiyonlarda toplam amoksisilin+klavulanat dozu, 4:1 ürün içindir. 50 mg tablette 40 mg amoksisilin + 10 mg klavulanik asit; güç toplam etkendir.",
+      "source_ids": [
+        "skin-ab",
+        "kesium",
+        "synulox"
+      ]
+    },
+    {
+      "name": "Amoksisilin — tablet",
+      "active_ingredient": "Amoksisilin",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 11,
+      "dose_mg_per_kg_max": 30,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Duyarlı bakteriyel enfeksiyonlarda uygulama başına; 8–24 saatte bir, endikasyon ve duyarlılığa göre hekim tarafından seçilir.",
+      "source_ids": [
+        "penicillins"
+      ]
+    },
+    {
+      "name": "Ampisilin — enjeksiyon",
+      "active_ingredient": "Ampisilin sodyum",
+      "category": "antibiotic",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 10,
+      "dose_mg_per_kg_max": 40,
+      "route": "Damar içi",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "flakon",
+      "notes": "Köpekte duyarlı bakteriyel enfeksiyonlarda 6–12 saatte bir. Sodyum tuzunun suda çözünen formu içindir; süspansiyon damar içine verilmez. Kedide 6,6–20 mg/kg 8–12 saatte bir; köpek aralığı kullanılmaz.",
+      "source_ids": [
+        "penicillins"
+      ]
+    },
+    {
+      "name": "Antisedan 5 mg/ml enjeksiyon",
+      "active_ingredient": "Atipamezol hidroklorür",
+      "category": "sedative",
+      "form": "injection",
+      "concentration_mg_per_ml": 5,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Kas içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Orion Pharma",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Alfa-2 sedasyonunun geri çevrilmesinde tek uygulama; doz uygulanan medetomidin/deksmedetomidin miktarına ve türe bağlıdır. Sabit mg/kg aralığı verilmez.",
+      "source_ids": [
+        "orion",
+        "antisedan"
+      ]
+    },
+    {
+      "name": "Apoquel 5,4 mg tablet",
+      "active_ingredient": "Oklasitinib",
+      "category": "dermatologic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 5.4,
+      "dose_mg_per_kg_min": 0.4,
+      "dose_mg_per_kg_max": 0.6,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Alerjik kaşıntıda ilk 14 gün günde 2 kez; sonra günde 1 kez. 12 aydan küçük köpeklerde kullanılmaz.",
+      "source_ids": [
+        "apoquel"
+      ]
+    },
+    {
+      "name": "Asepromazin — enjeksiyon",
+      "active_ingredient": "Asepromazin",
+      "category": "sedative",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.01,
+      "dose_mg_per_kg_max": 0.03,
+      "route": "Kas içi",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "flakon",
+      "notes": "Köpekte dengeli anestezi premedikasyonunda tek uygulama. Tek başına analjezi sağlamaz; kedide doz farklıdır.",
+      "source_ids": [
+        "sedation-doses"
+      ]
+    },
+    {
+      "name": "Atopica 25 mg kapsül",
+      "active_ingredient": "Siklosporin",
+      "category": "dermatologic",
+      "form": "capsule",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 25,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 5,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Elanco",
+      "prescription_required": 1,
+      "pack_unit": "kapsül",
+      "notes": "Atopik dermatitte başlangıçta günde 1 kez; yanıta göre uygulama sıklığı azaltılır. Kedi oral çözeltisinin dozu farklıdır.",
+      "source_ids": [
+        "atopica"
+      ]
+    },
+    {
+      "name": "Atropin — enjeksiyon",
+      "active_ingredient": "Atropin",
+      "category": "other",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deri altı / Kas içi / Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Jenerik antikolinerjik; perioperatif bradikardi endikasyonu ve uygulama protokolü hekim tarafından belirlenir.",
+      "source_ids": [
+        "anesthesia"
+      ]
+    },
+    {
+      "name": "Azitromisin — tablet",
+      "active_ingredient": "Azitromisin",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Jenerik kayıt; endikasyon ve duyarlılık değerlendirilir.",
+      "source_ids": [
+        "resp-ab",
+        "macrolides"
+      ]
+    },
+    {
+      "name": "B vitamini kompleksi — enjeksiyon",
+      "active_ingredient": "B grubu vitaminler (ürüne göre B1, B2, B6, B12)",
+      "category": "vitamin",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ürüne göre",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 0,
+      "pack_unit": "ml",
+      "notes": "Jenerik destek ürünü; bileşim ve her vitaminin miktarı ürüne göre değişir. Tek mg/ml veya mg/kg sayısına çevrilmez; uygulama sıklığı seçilen ürün/endikasyona göre belirlenir.",
+      "source_ids": [
+        "tr-tek-vitamins"
+      ]
+    },
+    {
+      "name": "Baytril 25 mg tablet",
+      "active_ingredient": "Enrofloksasin",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 25,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 5,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Elanco",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Etiket dozu 5 mg/kg günde 1 kez. Kedide 5 mg/kg/gün aşılmaz (retina toksisitesi); köpekte daha yüksek jenerik aralık bu marka kaydına uygulanmaz.",
+      "source_ids": [
+        "baytril",
+        "skin-ab"
+      ]
+    },
+    {
+      "name": "Benazepril 5 mg — tablet",
+      "active_ingredient": "Benazepril hidroklorür",
+      "category": "cardio",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 5,
+      "dose_mg_per_kg_min": 0.25,
+      "dose_mg_per_kg_max": 0.5,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Köpekte kalp yetersizliğinde günde 1 kez; böbrek işlevi ve potasyum izlenir.",
+      "source_ids": [
+        "cardio",
+        "fortekor"
+      ]
+    },
+    {
+      "name": "Bravecto 250 mg spot-on (kedi)",
+      "active_ingredient": "Fluralaner",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": 280,
+      "strength_mg_per_unit": 250,
+      "dose_mg_per_kg_min": 40,
+      "dose_mg_per_kg_max": 94,
+      "route": "Deriye damlatma",
+      "target_species": "Kedi",
+      "manufacturer": "MSD Animal Health",
+      "prescription_required": 1,
+      "pack_unit": "pipet",
+      "notes": "Pipet 250 mg (280 mg/ml); kedide 40–94 mg/kg, genellikle 12 haftada bir. Köpek oral dozu kullanılmaz. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "bravecto"
+      ]
+    },
+    {
+      "name": "Bravecto 500 mg spot-on (köpek)",
+      "active_ingredient": "Fluralaner",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": 280,
+      "strength_mg_per_unit": 500,
+      "dose_mg_per_kg_min": 25,
+      "dose_mg_per_kg_max": 56,
+      "route": "Deriye damlatma",
+      "target_species": "Köpek",
+      "manufacturer": "MSD Animal Health",
+      "prescription_required": 1,
+      "pack_unit": "pipet",
+      "notes": "Pipet 500 mg (280 mg/ml); köpeklerde genellikle 12 haftalık pire/kene kontrolü. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "bravecto"
+      ]
+    },
+    {
+      "name": "Bravecto 500 mg çiğneme tableti (köpek)",
+      "active_ingredient": "Fluralaner",
+      "category": "antiparasitic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 500,
+      "dose_mg_per_kg_min": 25,
+      "dose_mg_per_kg_max": 56,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "MSD Animal Health",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Pire/kene için genellikle 12 haftada bir, yemekle; kene türüne göre süre değişir. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "tr-bravecto",
+        "bravecto"
+      ]
+    },
+    {
+      "name": "Broadline 0,9 ml spot-on (kedi)",
+      "active_ingredient": "Fipronil, (S)-metopren, eprinomektin, prazikuantel",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deriye damlatma",
+      "target_species": "Kedi",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 1,
+      "pack_unit": "pipet",
+      "notes": "0,9 ml pipet: 74,7 mg fipronil + 90 mg (S)-metopren + 3,6 mg eprinomektin + 74,7 mg prazikuantel. 2,5–7,5 kg; endikasyona göre aylık. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "broadline"
+      ]
+    },
+    {
+      "name": "Buprenorfin 0,3 mg/ml — enjeksiyon",
+      "active_ingredient": "Buprenorfin",
+      "category": "analgesic",
+      "form": "injection",
+      "concentration_mg_per_ml": 0.3,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.01,
+      "dose_mg_per_kg_max": 0.02,
+      "route": "Kas içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "ampul",
+      "notes": "Perioperatif analjezide uygulama başına; etki ve protokole göre genellikle 4–8 saatte bir yeniden değerlendirilir.",
+      "source_ids": [
+        "analgesia",
+        "vetergesic"
+      ]
+    },
+    {
+      "name": "Butorfanol 10 mg/ml — enjeksiyon",
+      "active_ingredient": "Butorfanol",
+      "category": "analgesic",
+      "form": "injection",
+      "concentration_mg_per_ml": 10,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.2,
+      "dose_mg_per_kg_max": 0.4,
+      "route": "Kas içi",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "flakon",
+      "notes": "Köpekte perioperatif analjezi/sedasyon kombinasyonunda tek uygulama; tekrar gereksinimi klinik etkiye göre değerlendirilir.",
+      "source_ids": [
+        "analgesia",
+        "torbugesic"
+      ]
+    },
+    {
+      "name": "Cardalis 2,5 mg/20 mg tablet",
+      "active_ingredient": "Benazepril hidroklorür, spironolakton",
+      "category": "cardio",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Ceva",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Tablet: 2,5 mg benazepril HCl + 20 mg spironolakton. Kalp yetersizliğinde günde 1 kez, yemekle; hedef 0,25 ve 2 mg/kg. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "cardalis"
+      ]
+    },
+    {
+      "name": "Catosal 100 mg/ml + 0,05 mg/ml enjeksiyon",
+      "active_ingredient": "Butafosfan, siyanokobalamin",
+      "category": "vitamin",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deri altı / Kas içi / Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Elanco",
+      "prescription_required": 0,
+      "pack_unit": "ml",
+      "notes": "1 ml: 100 mg butafosfan + 0,05 mg siyanokobalamin (B12). Destek tedavisi; hacim ve tekrar sıklığı tür ve endikasyona göre seçilir. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "catosal",
+        "tr-b12"
+      ]
+    },
+    {
+      "name": "Cerenia 10 mg/ml enjeksiyon",
+      "active_ingredient": "Maropitant",
+      "category": "antiemetic",
+      "form": "injection",
+      "concentration_mg_per_ml": 10,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 1,
+      "dose_mg_per_kg_max": 1,
+      "route": "Deri altı / Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Kusma kontrolünde günde 1 kez, en fazla 5 gün. Damar içi yavaş uygulanır. Oral tablet/motion sickness dozu bu enjeksiyondan türetilmez.",
+      "source_ids": [
+        "cerenia"
+      ]
+    },
+    {
+      "name": "Convenia 80 mg/ml enjeksiyon",
+      "active_ingredient": "Sefovesin",
+      "category": "antibiotic",
+      "form": "injection",
+      "concentration_mg_per_ml": 80,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 8,
+      "dose_mg_per_kg_max": 8,
+      "route": "Deri altı",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Sulandırıldıktan sonra 80 mg/ml. Deri/yumuşak doku enfeksiyonlarında tek doz; gerekirse 14 gün sonra tekrar değerlendirme. Tür ve endikasyona göre izin verilen tekrar sayısı doğrulanır.",
+      "source_ids": [
+        "convenia"
+      ]
+    },
+    {
+      "name": "Credelio 225 mg çiğneme tableti (köpek)",
+      "active_ingredient": "Lotilaner",
+      "category": "antiparasitic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 225,
+      "dose_mg_per_kg_min": 20,
+      "dose_mg_per_kg_max": 43,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Elanco",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Pire/kene için ayda 1 kez, yemekle veya yemekten sonra. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "credelio"
+      ]
+    },
+    {
+      "name": "Deksmedetomidin 0,5 mg/ml — enjeksiyon",
+      "active_ingredient": "Deksmedetomidin hidroklorür",
+      "category": "sedative",
+      "form": "injection",
+      "concentration_mg_per_ml": 0.5,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.005,
+      "dose_mg_per_kg_max": 0.02,
+      "route": "Kas içi",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "flakon",
+      "notes": "Köpekte kombinasyon premedikasyonunda tek uygulama; monoterapi dozu değildir.",
+      "source_ids": [
+        "sedation",
+        "dexdomitor"
+      ]
+    },
+    {
+      "name": "Dekstroz %5 — infüzyon",
+      "active_ingredient": "Dekstroz",
+      "category": "fluid",
+      "form": "other",
+      "concentration_mg_per_ml": 50,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "torba",
+      "notes": "%5 w/v dekstroz: 50 mg/ml. Sıvı hacmi/hızı glisemi, hidrasyon ve elektrolitlere göre belirlenir; mg/kg bolus aralığı verilmez.",
+      "source_ids": [
+        "fluid"
+      ]
+    },
+    {
+      "name": "Dexdomitor 0,5 mg/ml enjeksiyon",
+      "active_ingredient": "Deksmedetomidin hidroklorür",
+      "category": "sedative",
+      "form": "injection",
+      "concentration_mg_per_ml": 0.5,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.005,
+      "dose_mg_per_kg_max": 0.02,
+      "route": "Kas içi / Damar içi",
+      "target_species": "Köpek",
+      "manufacturer": "Orion Pharma",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Köpekte kombinasyon premedikasyonu için standart klinik aralık, tek uygulama; etiketin vücut yüzeyi tablosu ayrıca kontrol edilir. Kedi monoterapi dozu bu aralıktan türetilmez.",
+      "source_ids": [
+        "dexdomitor",
+        "sedation"
+      ]
+    },
+    {
+      "name": "Doksisiklin 20 mg — tablet",
+      "active_ingredient": "Doksisiklin",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 20,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 10,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Solunum yolu enfeksiyonlarında 10 mg/kg günde 1 kez veya 5 mg/kg günde 2 kez; kedide ardından su/besin verilir.",
+      "source_ids": [
+        "resp-ab",
+        "ronaxan"
+      ]
+    },
+    {
+      "name": "Domitor 1 mg/ml enjeksiyon",
+      "active_ingredient": "Medetomidin hidroklorür",
+      "category": "sedative",
+      "form": "injection",
+      "concentration_mg_per_ml": 1,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.01,
+      "dose_mg_per_kg_max": 0.04,
+      "route": "Kas içi / Damar içi",
+      "target_species": "Köpek",
+      "manufacturer": "Orion Pharma",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Köpekte dengeli anestezi premedikasyonu için standart klinik aralık, tek uygulama. Monoterapi ve kedide sedasyon dozları farklıdır; kardiyovasküler izlem gerekir.",
+      "source_ids": [
+        "orion",
+        "sedation"
+      ]
+    },
+    {
+      "name": "Drontal Cat 230 mg/20 mg tablet",
+      "active_ingredient": "Pirantel embonat, prazikuantel",
+      "category": "antiparasitic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağızdan",
+      "target_species": "Kedi",
+      "manufacturer": "Vetoquinol",
+      "prescription_required": null,
+      "pack_unit": "tablet",
+      "notes": "Tablet: 230 mg pirantel embonat + 20 mg prazikuantel; tek doz 1 tablet/4 kg. Tekrar parazit/risk durumuna göre. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "drontal"
+      ]
+    },
+    {
+      "name": "Drontal Plus 150 mg/144 mg/50 mg tablet",
+      "active_ingredient": "Febantel, pirantel embonat, prazikuantel",
+      "category": "antiparasitic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Vetoquinol",
+      "prescription_required": null,
+      "pack_unit": "tablet",
+      "notes": "Tablet: 150 mg febantel + 144 mg pirantel embonat (50 mg baz) + 50 mg prazikuantel; tek doz 1 tablet/10 kg, endikasyona göre tekrar. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "drontal"
+      ]
+    },
+    {
+      "name": "Easotic kulak süspansiyonu",
+      "active_ingredient": "Hidrokortizon aseponat, mikonazol nitrat, gentamisin",
+      "category": "otic",
+      "form": "suspension",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Kulak içine",
+      "target_species": "Köpek",
+      "manufacturer": "Virbac",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "1 ml: 1,11 mg hidrokortizon aseponat + 15,1 mg mikonazol nitrat + 1505 IU gentamisin. Etkilenen kulağa 1 ml günde 1 kez, 5 gün; kulak zarı kontrol edilir. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "easotic"
+      ]
+    },
+    {
+      "name": "Enalapril — tablet",
+      "active_ingredient": "Enalapril",
+      "category": "cardio",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.25,
+      "dose_mg_per_kg_max": 0.5,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Kalp yetersizliğinde uygulama başına, 12–24 saatte bir; böbrek işlevi, potasyum ve kan basıncı izlenir.",
+      "source_ids": [
+        "cardio-doses"
+      ]
+    },
+    {
+      "name": "Enrofloksasin — tablet",
+      "active_ingredient": "Enrofloksasin",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 20,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Köpekte duyarlı bakteriyel enfeksiyonlarda standart endikasyona bağlı aralık, günde 1 kez; 20 mg/kg yalnız uygun endikasyonda hekim kararıyla. Kedide kullanılacak doz bu kayıttan hesaplanmaz; kedide 5 mg/kg/gün aşılmaz.",
+      "source_ids": [
+        "skin-ab"
+      ]
+    },
+    {
+      "name": "Famotidin — tablet",
+      "active_ingredient": "Famotidin",
+      "category": "gastro",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.5,
+      "dose_mg_per_kg_max": 1,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "tablet",
+      "notes": "Asit baskılama endikasyonunda günde 1 kez; böbrek işlevi ve tedavi süresi değerlendirilir.",
+      "source_ids": [
+        "gastro"
+      ]
+    },
+    {
+      "name": "Famsiklovir — tablet",
+      "active_ingredient": "Famsiklovir",
+      "category": "antiviral",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağız yoluyla",
+      "target_species": "Kedi",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "tablet",
+      "notes": "Jenerik kayıt; FHV-1 endikasyonu ve hasta bazında tedavi şeması değerlendirilir.",
+      "source_ids": [
+        "antiviral"
+      ]
+    },
+    {
+      "name": "Felimazole 2,5 mg tablet",
+      "active_ingredient": "Tiamazol (metimazol)",
+      "category": "hormone",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 2.5,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağızdan",
+      "target_species": "Kedi",
+      "manufacturer": "Dechra",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Hipertiroidide başlangıç sıklıkla 2,5 mg/hayvan günde 2 kez; mg/kg alanına aktarılmaz. T4, kan sayımı ve böbrek işlevine göre titre edilir.",
+      "source_ids": [
+        "dechra-pets"
+      ]
+    },
+    {
+      "name": "Fenbendazol 100 mg/ml — oral süspansiyon",
+      "active_ingredient": "Fenbendazol",
+      "category": "antiparasitic",
+      "form": "suspension",
+      "concentration_mg_per_ml": 100,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 50,
+      "dose_mg_per_kg_max": 50,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "şişe",
+      "notes": "Köpekte bağırsak nematodlarında günde 1 kez, 3 gün; parazite göre süre uyarlanır.",
+      "source_ids": [
+        "anthelmintics",
+        "panacur"
+      ]
+    },
+    {
+      "name": "Fentanil — enjeksiyon",
+      "active_ingredient": "Fentanil",
+      "category": "analgesic",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "ampul",
+      "notes": "Bolus ve sürekli infüzyon dozları farklı birimlerle ifade edilir; otomatik aralık verilmemiştir.",
+      "source_ids": [
+        "analgesia"
+      ]
+    },
+    {
+      "name": "Flukonazol — kapsül",
+      "active_ingredient": "Flukonazol",
+      "category": "antifungal",
+      "form": "capsule",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 10,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "kapsül",
+      "notes": "Duyarlı mantar enfeksiyonlarında 12–24 saatte bir; etken, enfeksiyon yeri ve böbrek işlevine göre seçilir. Kedi dozu bu kayıttan hesaplanmaz.",
+      "source_ids": [
+        "azoles"
+      ]
+    },
+    {
+      "name": "Fortekor 5 mg tablet",
+      "active_ingredient": "Benazepril hidroklorür",
+      "category": "cardio",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 5,
+      "dose_mg_per_kg_min": 0.25,
+      "dose_mg_per_kg_max": 0.5,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Elanco",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Kalp yetersizliğinde günde 1 kez; böbrek işlevi, potasyum ve kan basıncı izlenir. Kedi dozuna bu kayıttan geçilmez.",
+      "source_ids": [
+        "fortekor",
+        "cardio"
+      ]
+    },
+    {
+      "name": "Frontline Combo 50 mg/60 mg spot-on (kedi)",
+      "active_ingredient": "Fipronil, (S)-metopren",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deriye damlatma",
+      "target_species": "Kedi",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 0,
+      "pack_unit": "pipet",
+      "notes": "0,5 ml pipet: 50 mg fipronil + 60 mg (S)-metopren; en az 4 hafta aralık. Tavşanda kullanılmaz. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "frontline-combo"
+      ]
+    },
+    {
+      "name": "Frontline Spot On 67 mg (köpek)",
+      "active_ingredient": "Fipronil",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": 100,
+      "strength_mg_per_unit": 67,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deriye damlatma",
+      "target_species": "Köpek",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 0,
+      "pack_unit": "pipet",
+      "notes": "0,67 ml pipet, 2–10 kg köpek. En az 4 hafta aralık; tavşanda kullanılmaz. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "frontline"
+      ]
+    },
+    {
+      "name": "Furosemid 40 mg — tablet",
+      "active_ingredient": "Furosemid",
+      "category": "cardio",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 40,
+      "dose_mg_per_kg_min": 1,
+      "dose_mg_per_kg_max": 4,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Köpekte konjestif kalp yetersizliğinde uygulama başına, genellikle 8–12 saatte bir; hidrasyon, elektrolit ve böbrek izlemi. Kedi için ayrı titrasyon gerekir.",
+      "source_ids": [
+        "cardio",
+        "furosemide-stock"
+      ]
+    },
+    {
+      "name": "Gabapentin 100 mg — kapsül",
+      "active_ingredient": "Gabapentin",
+      "category": "analgesic",
+      "form": "capsule",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 100,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 20,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "kapsül",
+      "notes": "Köpekte yardımcı analjezide uygulama başına, genellikle 8–12 saatte bir; böbrek işlevi ve sedasyona göre ayarlanır. Kedide ayrı şema seçilir.",
+      "source_ids": [
+        "analgesia",
+        "gabapentin-stock"
+      ]
+    },
+    {
+      "name": "Galliprant 20 mg tablet",
+      "active_ingredient": "Grapiprant",
+      "category": "nsaid",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 20,
+      "dose_mg_per_kg_min": 2,
+      "dose_mg_per_kg_max": 2,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Elanco",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Osteoartrit ağrısında günde 1 kez, aç karnına; EP4 antagonistidir. NSAİİ/kortikosteroid ile birlikte verilmez; hidrasyon, böbrek ve gastrointestinal risk değerlendirilir.",
+      "source_ids": [
+        "galliprant"
+      ]
+    },
+    {
+      "name": "Isathal 10 mg/g göz damlası",
+      "active_ingredient": "Fusidik asit",
+      "category": "ophthalmic",
+      "form": "drops",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Göze",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Dechra",
+      "prescription_required": 1,
+      "pack_unit": "tüp",
+      "notes": "Viskoz süspansiyon; 10 mg/g, mg/ml değildir. Duyarlı bakteriyel konjunktivitte günde 2 kez 1 damla; ülser/kornea değerlendirmesi yapılır.",
+      "source_ids": [
+        "dechra-pets"
+      ]
+    },
+    {
+      "name": "IsoFlo %100 inhalasyon sıvısı",
+      "active_ingredient": "İzofluran",
+      "category": "anesthetic",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "İnhalasyon",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "şişe",
+      "notes": "%100 w/w izofluran (1000 mg/g); kalibre vaporizatörde hacim yüzdesiyle titre edilir. mg/ml veya mg/kg olarak ifade edilmez.",
+      "source_ids": [
+        "isoflo"
+      ]
+    },
+    {
+      "name": "İnsülin — enjeksiyon",
+      "active_ingredient": "İnsülin",
+      "category": "hormone",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deri altı",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "flakon",
+      "notes": "IU ile dozlanır; insülin tipi, birim/ml ve uygun enjektör doğrulanır. mg/kg hesabına uygun değildir.",
+      "source_ids": [
+        "diabetes"
+      ]
+    },
+    {
+      "name": "İnterferon omega (kedi kökenli) — enjeksiyon",
+      "active_ingredient": "Rekombinant kedi interferon omega",
+      "category": "antiviral",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deri altı",
+      "target_species": "Kedi",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "flakon",
+      "notes": "Aktivite birimleriyle dozlanır; mg/kg değeri verilmez. Yerel ruhsat ve bulunabilirlik doğrulanır.",
+      "source_ids": [
+        "antiviral"
+      ]
+    },
+    {
+      "name": "İtrakonazol — oral çözelti",
+      "active_ingredient": "İtrakonazol",
+      "category": "antifungal",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 10,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "şişe",
+      "notes": "Duyarlı mantar enfeksiyonlarında 12–24 saatte bir; oral çözelti için ürün biyoyararlanımı kontrol edilir. Kedide 5 mg/kg günde 1 kez veya 2,5 mg/kg günde 2 kez; köpek aralığı kullanılmaz.",
+      "source_ids": [
+        "azoles"
+      ]
+    },
+    {
+      "name": "Kesium 50 mg/12,5 mg çiğneme tableti",
+      "active_ingredient": "Amoksisilin, klavulanik asit",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 62.5,
+      "dose_mg_per_kg_min": 12.5,
+      "dose_mg_per_kg_max": 25,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Ceva",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "50 mg amoksisilin + 12,5 mg klavulanik asit; güç ve doz toplam etken (4:1). Günde 2 kez; üst doz hekim kararıyla. Duyarlı bakteriyel enfeksiyonlarda; tedavi süresi endikasyona göre belirlenir.",
+      "source_ids": [
+        "kesium",
+        "skin-ab"
+      ]
+    },
+    {
+      "name": "Ketamin 100 mg/ml — enjeksiyon",
+      "active_ingredient": "Ketamin",
+      "category": "anesthetic",
+      "form": "injection",
+      "concentration_mg_per_ml": 100,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 10,
+      "route": "Kas içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "flakon",
+      "notes": "Köpek/kedide dengeli anestezide kas içi tek uygulama için standart aralık; damar içi doz/infüzyon değildir.",
+      "source_ids": [
+        "anesthesia",
+        "analgesia",
+        "ketasol"
+      ]
+    },
+    {
+      "name": "Ketasol-100 100 mg/ml enjeksiyon",
+      "active_ingredient": "Ketamin",
+      "category": "anesthetic",
+      "form": "injection",
+      "concentration_mg_per_ml": 100,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 10,
+      "route": "Kas içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "VetViva Richter",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Köpek/kedide kombinasyon anestezisinde standart kas içi tek uygulama aralığı; tek ajan veya damar içi indüksiyon dozu değildir. Premedikasyon ve hasta yanıtına göre ayarlanır.",
+      "source_ids": [
+        "ketasol",
+        "anesthesia"
+      ]
+    },
+    {
+      "name": "Klindamisin — kapsül",
+      "active_ingredient": "Klindamisin",
+      "category": "antibiotic",
+      "form": "capsule",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "kapsül",
+      "notes": "Jenerik kayıt; endikasyon ve tür için uygun ürün/güç seçilir.",
+      "source_ids": [
+        "skin-ab"
+      ]
+    },
+    {
+      "name": "Klopidogrel — tablet",
+      "active_ingredient": "Klopidogrel",
+      "category": "cardio",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağız yoluyla",
+      "target_species": "Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Jenerik antitrombosit; tromboemboli riski ve kanama olasılığı değerlendirilir.",
+      "source_ids": [
+        "cardio"
+      ]
+    },
+    {
+      "name": "Klorheksidin — deri çözeltisi",
+      "active_ingredient": "Klorheksidin",
+      "category": "dermatologic",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Haricen",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "şişe",
+      "notes": "Jenerik antiseptik; deri için uygun form seçilir, göz ve kulak içine gelişigüzel uygulanmaz.",
+      "source_ids": [
+        "derm",
+        "skin-ab"
+      ]
+    },
+    {
+      "name": "Laktatlı Ringer — infüzyon",
+      "active_ingredient": "Sodyum klorür, sodyum laktat, potasyum klorür, kalsiyum klorür",
+      "category": "fluid",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "torba",
+      "notes": "Dengeli çok elektrolitli sıvı; tek bir etkenin mg/kg dozu olarak kullanılmaz.",
+      "source_ids": [
+        "fluid"
+      ]
+    },
+    {
+      "name": "Levotiroksin — tablet",
+      "active_ingredient": "Levotiroksin",
+      "category": "hormone",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Jenerik tiroid hormonu; mikrogram/miligram ayrımı ve laboratuvar izlemi önemlidir.",
+      "source_ids": [
+        "hypothyroid"
+      ]
+    },
+    {
+      "name": "Lidokain — lokal anestezik enjeksiyon",
+      "active_ingredient": "Lidokain",
+      "category": "anesthetic",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Lokal infiltrasyon",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "flakon",
+      "notes": "Lokal anestezi kaydıdır; toplam toksik doz sınırı ve kedi duyarlılığı ayrıca değerlendirilir.",
+      "source_ids": [
+        "analgesia"
+      ]
+    },
+    {
+      "name": "Marbocyl P 5 mg tablet",
+      "active_ingredient": "Marbofloksasin",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 5,
+      "dose_mg_per_kg_min": 2,
+      "dose_mg_per_kg_max": 2,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Vetoquinol",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Günde 1 kez. Duyarlı bakteriyel enfeksiyonlarda; tedavi süresi endikasyona göre belirlenir.",
+      "source_ids": [
+        "marbocyl"
+      ]
+    },
+    {
+      "name": "Marboflex 10 mg tablet",
+      "active_ingredient": "Marbofloksasin",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 10,
+      "dose_mg_per_kg_min": 2,
+      "dose_mg_per_kg_max": 2,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Teknovet",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Standart marbofloksasin dozu: günde 1 kez. Duyarlı bakteriyel enfeksiyonlarda; tedavi süresi endikasyona göre belirlenir.",
+      "source_ids": [
+        "tr-marboflex",
+        "marbocyl"
+      ]
+    },
+    {
+      "name": "Maropitant 10 mg/ml — enjeksiyon",
+      "active_ingredient": "Maropitant",
+      "category": "antiemetic",
+      "form": "injection",
+      "concentration_mg_per_ml": 10,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 1,
+      "dose_mg_per_kg_max": 1,
+      "route": "Deri altı",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "flakon",
+      "notes": "Köpek/kedide enjeksiyonla kusma kontrolünde günde 1 kez, en fazla 5 gün; yaş ve ürün kontrol edilir.",
+      "source_ids": [
+        "antiemetics",
+        "cerenia"
+      ]
+    },
+    {
+      "name": "Medetomidin 1 mg/ml — enjeksiyon",
+      "active_ingredient": "Medetomidin hidroklorür",
+      "category": "sedative",
+      "form": "injection",
+      "concentration_mg_per_ml": 1,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.01,
+      "dose_mg_per_kg_max": 0.04,
+      "route": "Kas içi",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "flakon",
+      "notes": "Köpekte kombinasyon premedikasyonunda tek uygulama; monoterapi veya kedi dozu değildir.",
+      "source_ids": [
+        "sedation",
+        "orion"
+      ]
+    },
+    {
+      "name": "Meloksikam 1,5 mg/ml — oral süspansiyon",
+      "active_ingredient": "Meloksikam",
+      "category": "nsaid",
+      "form": "suspension",
+      "concentration_mg_per_ml": 1.5,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.1,
+      "dose_mg_per_kg_max": 0.2,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "şişe",
+      "notes": "Köpekte kas-iskelet ağrısında ilk gün 0,2; sonra 0,1 mg/kg günde 1 kez. Kediye uygulanmaz.",
+      "source_ids": [
+        "nsaid",
+        "metacam"
+      ]
+    },
+    {
+      "name": "Metacam 0,5 mg/ml oral süspansiyon (kedi)",
+      "active_ingredient": "Meloksikam",
+      "category": "nsaid",
+      "form": "suspension",
+      "concentration_mg_per_ml": 0.5,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.05,
+      "dose_mg_per_kg_max": 0.1,
+      "route": "Ağızdan",
+      "target_species": "Kedi",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Kronik kas-iskelet ağrısında ilk gün 0,1; sonra 0,05 mg/kg günde 1 kez. Akut/postoperatif şema farklıdır. NSAİİ/kortikosteroid ile birlikte verilmez; hidrasyon, böbrek ve gastrointestinal risk değerlendirilir.",
+      "source_ids": [
+        "metacam"
+      ]
+    },
+    {
+      "name": "Metacam 1,5 mg/ml oral süspansiyon (köpek)",
+      "active_ingredient": "Meloksikam",
+      "category": "nsaid",
+      "form": "suspension",
+      "concentration_mg_per_ml": 1.5,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.1,
+      "dose_mg_per_kg_max": 0.2,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Kas-iskelet ağrısında ilk gün 0,2; sonra 0,1 mg/kg günde 1 kez. NSAİİ/kortikosteroid ile birlikte verilmez; hidrasyon, böbrek ve gastrointestinal risk değerlendirilir.",
+      "source_ids": [
+        "metacam"
+      ]
+    },
+    {
+      "name": "Metacam 5 mg/ml enjeksiyon",
+      "active_ingredient": "Meloksikam",
+      "category": "nsaid",
+      "form": "injection",
+      "concentration_mg_per_ml": 5,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.2,
+      "dose_mg_per_kg_max": 0.2,
+      "route": "Deri altı",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Sayısal doz köpekte perioperatif tek uygulama içindir. Kedide bu aralık kullanılmaz: ürün/protokole göre tek doz 0,3 mg/kg deri altı; oral devam kararı ayrı verilir. NSAİİ/kortikosteroid ile birlikte verilmez; hidrasyon, böbrek ve gastrointestinal risk değerlendirilir.",
+      "source_ids": [
+        "metacam"
+      ]
+    },
+    {
+      "name": "Metoklopramid — enjeksiyon",
+      "active_ingredient": "Metoklopramid",
+      "category": "antiemetic",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.1,
+      "dose_mg_per_kg_max": 0.5,
+      "route": "Kas içi / Deri altı",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "ampul",
+      "notes": "Kusma kontrolü/prokinetik etki için 6–8 saatte bir. Mekanik tıkanıklık/perforasyonda kullanılmaz; sürekli infüzyon dozu değildir.",
+      "source_ids": [
+        "antiemetics"
+      ]
+    },
+    {
+      "name": "Metrobactin 250 mg tablet",
+      "active_ingredient": "Metronidazol",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 250,
+      "dose_mg_per_kg_min": 25,
+      "dose_mg_per_kg_max": 25,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Dechra",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Etiket: 25 mg/kg günde 2 kez, 5–7 gün; Giardia/duyarlı anaerob enfeksiyonları. Her ishalde rutin kullanım için değildir; nörotoksisite izlenir.",
+      "source_ids": [
+        "metrobactin"
+      ]
+    },
+    {
+      "name": "Metronidazol 250 mg — tablet",
+      "active_ingredient": "Metronidazol",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 250,
+      "dose_mg_per_kg_min": 10,
+      "dose_mg_per_kg_max": 25,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Duyarlı anaerob enfeksiyonlarda uygulama başına standart aralık, genellikle günde 2 kez; Giardia için 25 mg/kg günde 2 kez. Her ishalde rutin kullanılmaz; nörotoksisite izlenir.",
+      "source_ids": [
+        "metrobactin"
+      ]
+    },
+    {
+      "name": "Midazolam — enjeksiyon",
+      "active_ingredient": "Midazolam",
+      "category": "sedative",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.2,
+      "dose_mg_per_kg_max": 0.2,
+      "route": "Kas içi / Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "ampul",
+      "notes": "Dengeli anestezi premedikasyonunda 0,2 mg/kg tek uygulama; diğer sedatif/analjeziklerle ve klinik izlemle.",
+      "source_ids": [
+        "sedation-doses"
+      ]
+    },
+    {
+      "name": "Milbemax 2,5 mg/25 mg tablet (küçük köpek)",
+      "active_ingredient": "Milbemisin oksim, prazikuantel",
+      "category": "antiparasitic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Elanco",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Tablet: 2,5 mg milbemisin oksim + 25 mg prazikuantel; minimum 0,5 ve 5 mg/kg. Tek uygulama, tekrar endikasyona göre; yemekle. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "milbemax"
+      ]
+    },
+    {
+      "name": "Milpro 4 mg/10 mg tablet (küçük kedi)",
+      "active_ingredient": "Milbemisin oksim, prazikuantel",
+      "category": "antiparasitic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağızdan",
+      "target_species": "Kedi",
+      "manufacturer": "Virbac",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Tablet: 4 mg milbemisin oksim + 10 mg prazikuantel; minimum 2 ve 5 mg/kg. Tek uygulama, tekrar endikasyona göre; yemekle. Köpek milbemisin dozu kullanılmaz. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "milpro"
+      ]
+    },
+    {
+      "name": "NexGard 68 mg çiğneme tableti",
+      "active_ingredient": "Afoksolaner",
+      "category": "antiparasitic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 68,
+      "dose_mg_per_kg_min": 2.7,
+      "dose_mg_per_kg_max": 7,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Pire/kene için ayda 1 kez. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "nexgard"
+      ]
+    },
+    {
+      "name": "NexGard Combo 0,9 ml spot-on (kedi)",
+      "active_ingredient": "Esafoksolaner, eprinomektin, prazikuantel",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deriye damlatma",
+      "target_species": "Kedi",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 1,
+      "pack_unit": "pipet",
+      "notes": "0,9 ml pipet: 10,8 mg esafoksolaner + 3,6 mg eprinomektin + 74,7 mg prazikuantel. 2,5–7,5 kg kedi; endikasyona göre aylık. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "nexgard-combo"
+      ]
+    },
+    {
+      "name": "NexGard Spectra 75 mg/15 mg çiğneme tableti",
+      "active_ingredient": "Afoksolaner, milbemisin oksim",
+      "category": "antiparasitic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Tablet: 75 mg afoksolaner + 15 mg milbemisin oksim; endikasyona göre aylık. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "nexgard-spectra"
+      ]
+    },
+    {
+      "name": "Ofloksasin — göz damlası",
+      "active_ingredient": "Ofloksasin",
+      "category": "ophthalmic",
+      "form": "drops",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Göze",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "şişe",
+      "notes": "Jenerik steril göz ürünü; endikasyon ve uygulama sıklığı göz muayenesiyle belirlenir.",
+      "source_ids": [
+        "ocular-ab",
+        "eye-route"
+      ]
+    },
+    {
+      "name": "Omeprazol — kapsül",
+      "active_ingredient": "Omeprazol",
+      "category": "gastro",
+      "form": "capsule",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.5,
+      "dose_mg_per_kg_max": 1,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "kapsül",
+      "notes": "Gastroduodenal ülserde standart başlangıç aralığı günde 1 kez; endikasyon ve yanıtla uyarlanır. İnfüzyon şeması değildir.",
+      "source_ids": [
+        "gastro"
+      ]
+    },
+    {
+      "name": "Ondansetron — tablet",
+      "active_ingredient": "Ondansetron",
+      "category": "antiemetic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.1,
+      "dose_mg_per_kg_max": 0.2,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "tablet",
+      "notes": "Kusma kontrolünde uygulama başına standart oral aralık, 12–24 saatte bir; damar içi doz bu kayıttan türetilmez.",
+      "source_ids": [
+        "antiemetics"
+      ]
+    },
+    {
+      "name": "Onsior 6 mg tablet (kedi)",
+      "active_ingredient": "Robenakoksib",
+      "category": "nsaid",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 6,
+      "dose_mg_per_kg_min": 1,
+      "dose_mg_per_kg_max": 2.4,
+      "route": "Ağızdan",
+      "target_species": "Kedi",
+      "manufacturer": "Elanco",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Günde 1 kez; akut kas-iskelet ağrısında etiket süresince. NSAİİ/kortikosteroid ile birlikte verilmez; hidrasyon, böbrek ve gastrointestinal risk değerlendirilir.",
+      "source_ids": [
+        "onsior"
+      ]
+    },
+    {
+      "name": "Osurnia kulak jeli",
+      "active_ingredient": "Florfenikol, terbinafin, betametazon asetat",
+      "category": "otic",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Kulak içine",
+      "target_species": "Köpek",
+      "manufacturer": "Dechra",
+      "prescription_required": 1,
+      "pack_unit": "tüp",
+      "notes": "1,2 g tek doz tüp: 10 mg florfenikol + 10 mg terbinafin + 1 mg betametazon asetat. Etkilenen kulağa bir tüp; 7 gün sonra bir kez tekrar. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "osurnia"
+      ]
+    },
+    {
+      "name": "Otomax kulak damlası",
+      "active_ingredient": "Gentamisin, betametazon, klotrimazol",
+      "category": "otic",
+      "form": "drops",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Kulak içine",
+      "target_species": "Köpek",
+      "manufacturer": "MSD Animal Health",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "1 ml: 2640 IU gentamisin + 0,88 mg betametazon + 8,8 mg klotrimazol. Otitte ağırlığa göre damla şeması, günde 2 kez, 7 gün; kulak zarı kontrol edilir. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "otomax"
+      ]
+    },
+    {
+      "name": "Panacur 100 mg/ml oral süspansiyon",
+      "active_ingredient": "Fenbendazol",
+      "category": "antiparasitic",
+      "form": "suspension",
+      "concentration_mg_per_ml": 100,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 50,
+      "dose_mg_per_kg_max": 50,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "MSD Animal Health",
+      "prescription_required": null,
+      "pack_unit": "ml",
+      "notes": "Bağırsak nematodlarında standart 50 mg/kg günde 1 kez, 3 gün. Etken/parazit, yaş ve yerel etiket şeması doğrulanır.",
+      "source_ids": [
+        "panacur"
+      ]
+    },
+    {
+      "name": "Pantoprazol — enjeksiyon",
+      "active_ingredient": "Pantoprazol",
+      "category": "gastro",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.7,
+      "dose_mg_per_kg_max": 1,
+      "route": "Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "flakon",
+      "notes": "Gastroduodenal ülserde uygulama başına, 12–24 saatte bir; ürünün sulandırma ve damar içi uygulama talimatı izlenir.",
+      "source_ids": [
+        "gastro"
+      ]
+    },
+    {
+      "name": "Pimobendan — tablet",
+      "active_ingredient": "Pimobendan",
+      "category": "cardio",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.2,
+      "dose_mg_per_kg_max": 0.3,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Köpekte kalp yetersizliğinde uygulama başına; günde 2 kez, tercihen yemekten 1 saat önce.",
+      "source_ids": [
+        "cardio"
+      ]
+    },
+    {
+      "name": "Prazikuantel — tablet",
+      "active_ingredient": "Prazikuantel",
+      "category": "antiparasitic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 5,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "tablet",
+      "notes": "Köpek/kedide duyarlı sestodlar için ağızdan tek uygulama; tekrar parazit riskine göre.",
+      "source_ids": [
+        "anthelmintics"
+      ]
+    },
+    {
+      "name": "Prednicortone 5 mg tablet",
+      "active_ingredient": "Prednizolon",
+      "category": "corticosteroid",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 5,
+      "dose_mg_per_kg_min": 0.5,
+      "dose_mg_per_kg_max": 2,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Dechra",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Antienflamatuar/immün aracılı hastalıkta uygulama başına standart aralık; genellikle günde 1 kez, endikasyona göre bölünebilir. Uzun kullanımda kademeli azaltma gerekir.",
+      "source_ids": [
+        "dechra-pets",
+        "steroids"
+      ]
+    },
+    {
+      "name": "Prednizolon 5 mg — tablet",
+      "active_ingredient": "Prednizolon",
+      "category": "corticosteroid",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 5,
+      "dose_mg_per_kg_min": 0.5,
+      "dose_mg_per_kg_max": 2,
+      "route": "Ağız yoluyla",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Köpek/kedide antienflamatuar/immün aracılı hastalıklarda uygulama başına başlangıç aralığı, genellikle günde 1 kez; hastalığa göre bölünebilir. Uzun kullanımda kademeli azaltma gerekir.",
+      "source_ids": [
+        "steroids",
+        "dechra-pets"
+      ]
+    },
+    {
+      "name": "Previcox 57 mg çiğneme tableti",
+      "active_ingredient": "Firokoksib",
+      "category": "nsaid",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 57,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 5,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Osteoartrit ağrısında günde 1 kez; tablet tablosu izlenir. NSAİİ/kortikosteroid ile birlikte verilmez; hidrasyon, böbrek ve gastrointestinal risk değerlendirilir.",
+      "source_ids": [
+        "previcox"
+      ]
+    },
+    {
+      "name": "Profender 30 mg/7,5 mg spot-on (küçük kedi)",
+      "active_ingredient": "Prazikuantel, emodepsid",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deriye damlatma",
+      "target_species": "Kedi",
+      "manufacturer": "Vetoquinol",
+      "prescription_required": 1,
+      "pack_unit": "pipet",
+      "notes": "0,35 ml pipet: 30 mg prazikuantel + 7,5 mg emodepsid; 0,5–2,5 kg kedi. Parazite göre tek uygulama/tekrar; yalanması önlenir. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "profender"
+      ]
+    },
+    {
+      "name": "Propofol 10 mg/ml — enjeksiyon",
+      "active_ingredient": "Propofol",
+      "category": "anesthetic",
+      "form": "injection",
+      "concentration_mg_per_ml": 10,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 2,
+      "dose_mg_per_kg_max": 6,
+      "route": "Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "flakon",
+      "notes": "Köpek/kedide dengeli anestezi indüksiyonunda tek indüksiyon toplam aralığı; damar içi yavaş, etkisine göre titre edilir. İnfüzyon hızı değildir.",
+      "source_ids": [
+        "anesthesia",
+        "propoven"
+      ]
+    },
+    {
+      "name": "Propoven %1 (10 mg/ml) enjeksiyon",
+      "active_ingredient": "Propofol",
+      "category": "anesthetic",
+      "form": "injection",
+      "concentration_mg_per_ml": 10,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 2,
+      "dose_mg_per_kg_max": 6,
+      "route": "Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Fresenius Kabi",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Beşeri preparat; veteriner kullanımında dengeli anestezi indüksiyonu için standart toplam doz aralığı, tek indüksiyonda etkisine göre yavaş titre edilir. İnfüzyon hızı değildir; hava yolu/solunum desteği gerekir.",
+      "source_ids": [
+        "propoven",
+        "anesthesia"
+      ]
+    },
+    {
+      "name": "Rapidexon 2 mg/ml enjeksiyon",
+      "active_ingredient": "Deksametazon",
+      "category": "corticosteroid",
+      "form": "injection",
+      "concentration_mg_per_ml": 2,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.1,
+      "dose_mg_per_kg_max": 0.1,
+      "route": "Kas içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Dechra",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Antienflamatuar tek uygulama referansı; tekrar klinik yanıta göre. Doz deksametazon eşdeğeridir, fosfat tuzu kütlesi değildir.",
+      "source_ids": [
+        "dechra-pets",
+        "steroids"
+      ]
+    },
+    {
+      "name": "Rilexine 75 mg tablet",
+      "active_ingredient": "Sefaleksin",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 75,
+      "dose_mg_per_kg_min": 15,
+      "dose_mg_per_kg_max": 15,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Virbac",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Günde 2 kez; deri ve idrar yolu enfeksiyonları. Duyarlı bakteriyel enfeksiyonlarda; tedavi süresi endikasyona göre belirlenir.",
+      "source_ids": [
+        "rilexine"
+      ]
+    },
+    {
+      "name": "Rimadyl 50 mg tablet",
+      "active_ingredient": "Karprofen",
+      "category": "nsaid",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 50,
+      "dose_mg_per_kg_min": 2,
+      "dose_mg_per_kg_max": 4,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Kas-iskelet ağrısında 4 mg/kg günde 1 kez veya 2 mg/kg günde 2 kez. NSAİİ/kortikosteroid ile birlikte verilmez; hidrasyon, böbrek ve gastrointestinal risk değerlendirilir.",
+      "source_ids": [
+        "rimadyl",
+        "nsaid"
+      ]
+    },
+    {
+      "name": "Rompun 20 mg/ml enjeksiyon (köpek ve kedi)",
+      "active_ingredient": "Ksilazin",
+      "category": "sedative",
+      "form": "injection",
+      "concentration_mg_per_ml": 20,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Kas içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Elanco",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "%2 çözelti; köpek/kedi sedasyonunda ürün ve kombinasyon protokolüne göre tek uygulama. Tür ve kombinasyona göre değişen doz burada tek aralığa indirgenmemiştir.",
+      "source_ids": [
+        "rompun",
+        "sedation"
+      ]
+    },
+    {
+      "name": "Ronaxan 20 mg tablet",
+      "active_ingredient": "Doksisiklin",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 20,
+      "dose_mg_per_kg_min": 5,
+      "dose_mg_per_kg_max": 10,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Duyarlı solunum yolu enfeksiyonlarında 10 mg/kg günde 1 kez veya 5 mg/kg günde 2 kez. Kedide kuru tablet verilmez; besin/suyla yutma sağlanır.",
+      "source_ids": [
+        "ronaxan"
+      ]
+    },
+    {
+      "name": "Semintra 4 mg/ml oral çözelti",
+      "active_ingredient": "Telmisartan",
+      "category": "cardio",
+      "form": "other",
+      "concentration_mg_per_ml": 4,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 1,
+      "dose_mg_per_kg_max": 1,
+      "route": "Ağızdan",
+      "target_species": "Kedi",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Kronik böbrek hastalığına bağlı proteinüride günde 1 kez. Hipertansiyon için 10 mg/ml sunumun protokolü farklıdır.",
+      "source_ids": [
+        "semintra"
+      ]
+    },
+    {
+      "name": "Seresto 1,25 g/0,56 g tasma (kedi)",
+      "active_ingredient": "İmidakloprid, flumetrin",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Boyun tasması",
+      "target_species": "Kedi",
+      "manufacturer": "Elanco",
+      "prescription_required": 0,
+      "pack_unit": "tasma",
+      "notes": "Tasma: 1,25 g imidakloprid + 0,56 g flumetrin; pire/kene kontrolü 7–8 ay. Yaş ve güvenli takılma talimatı izlenir. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "elanco-pets"
+      ]
+    },
+    {
+      "name": "Simparica 40 mg çiğneme tableti",
+      "active_ingredient": "Sarolaner",
+      "category": "antiparasitic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 40,
+      "dose_mg_per_kg_min": 2,
+      "dose_mg_per_kg_max": 4,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Pire/kene için ayda 1 kez. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "simparica"
+      ]
+    },
+    {
+      "name": "Simparica Trio 24 mg/0,48 mg/100 mg çiğneme tableti",
+      "active_ingredient": "Sarolaner, moksidektin, pirantel",
+      "category": "antiparasitic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Tablet: 24 mg sarolaner + 0,48 mg moksidektin + 100 mg pirantel (baz); aylık endikasyonlar. Sarolaner tekli ürün dozu kullanılmaz. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "simparica-trio"
+      ]
+    },
+    {
+      "name": "Sodyum klorür %0,9 — izotonik infüzyon",
+      "active_ingredient": "Sodyum klorür",
+      "category": "fluid",
+      "form": "other",
+      "concentration_mg_per_ml": 9,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": null,
+      "prescription_required": null,
+      "pack_unit": "torba",
+      "notes": "%0,9 w/v sodyum klorür: 9 mg/ml. İnfüzyon hacmi ve hızı hidrasyon, elektrolit ve eşlik eden hastalığa göre belirlenir; mg/kg bolus değildir.",
+      "source_ids": [
+        "fluid"
+      ]
+    },
+    {
+      "name": "Spironolakton — tablet",
+      "active_ingredient": "Spironolakton",
+      "category": "cardio",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 1,
+      "dose_mg_per_kg_max": 2,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": null,
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Kalp yetersizliğinde 1–2 mg/kg 12 saatte bir; günde tek uygulama için farklı günlük doz seçilir. Potasyum ve böbrek işlevi izlenir.",
+      "source_ids": [
+        "cardio-doses"
+      ]
+    },
+    {
+      "name": "Stronghold 45 mg spot-on (kedi)",
+      "active_ingredient": "Selamektin",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": 60,
+      "strength_mg_per_unit": 45,
+      "dose_mg_per_kg_min": 6,
+      "dose_mg_per_kg_max": 6,
+      "route": "Deriye damlatma",
+      "target_species": "Kedi",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "pipet",
+      "notes": "0,75 ml pipet; 2,6–7,5 kg kedi. En az 6 mg/kg, endikasyona göre aylık. Sayısal alan minimum hedef doz; gerçek pipet mg/kg değeri ağırlığa bağlıdır. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "stronghold"
+      ]
+    },
+    {
+      "name": "Stronghold Plus 30 mg/5 mg spot-on (kedi)",
+      "active_ingredient": "Selamektin, sarolaner",
+      "category": "antiparasitic",
+      "form": "other",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Deriye damlatma",
+      "target_species": "Kedi",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "pipet",
+      "notes": "0,5 ml pipet: 30 mg selamektin + 5 mg sarolaner; 2,5–5 kg kedi. Endikasyona göre aylık; AB marka adı Stronghold Plus. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur. Etiketteki ağırlık bandına göre bütün tablet/pipet seçilir; hesaplanan miktar için bölünmez.",
+      "source_ids": [
+        "stronghold-plus"
+      ]
+    },
+    {
+      "name": "Surolan kulak damlası",
+      "active_ingredient": "Mikonazol nitrat, polimiksin B sülfat, prednizolon asetat",
+      "category": "otic",
+      "form": "drops",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Kulak içine",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Elanco",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "1 ml: 23 mg mikonazol nitrat + 5 mg prednizolon asetat + 5500 IU polimiksin B sülfat. Otit için damla şeması; kulak zarı kontrol edilir. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "surolan"
+      ]
+    },
+    {
+      "name": "Synulox 250 mg tablet",
+      "active_ingredient": "Amoksisilin, klavulanik asit",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 250,
+      "dose_mg_per_kg_min": 12.5,
+      "dose_mg_per_kg_max": 25,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Tablet: 200 mg amoksisilin + 50 mg klavulanik asit; güç ve doz iki etkenin toplamıdır (4:1). Günde 2 kez; 25 mg/kg dirençli enfeksiyonlarda hekim kararıyla. Duyarlı bakteriyel enfeksiyonlarda; tedavi süresi endikasyona göre belirlenir.",
+      "source_ids": [
+        "synulox",
+        "skin-ab"
+      ]
+    },
+    {
+      "name": "Synulox 50 mg tablet",
+      "active_ingredient": "Amoksisilin, klavulanik asit",
+      "category": "antibiotic",
+      "form": "tablet",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 50,
+      "dose_mg_per_kg_min": 12.5,
+      "dose_mg_per_kg_max": 25,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "tablet",
+      "notes": "Tablet: 40 mg amoksisilin + 10 mg klavulanik asit; güç ve doz iki etkenin toplamıdır (4:1). Günde 2 kez; 25 mg/kg dirençli enfeksiyonlarda hekim kararıyla. Duyarlı bakteriyel enfeksiyonlarda; tedavi süresi endikasyona göre belirlenir.",
+      "source_ids": [
+        "synulox",
+        "skin-ab"
+      ]
+    },
+    {
+      "name": "Torbugesic Vet 10 mg/ml enjeksiyon",
+      "active_ingredient": "Butorfanol",
+      "category": "analgesic",
+      "form": "injection",
+      "concentration_mg_per_ml": 10,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.2,
+      "dose_mg_per_kg_max": 0.4,
+      "route": "Kas içi",
+      "target_species": "Köpek",
+      "manufacturer": "Zoetis",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Köpekte dengeli anestezi/analjezi protokolünde standart uygulama başına aralık; tek doz, gereksinim ve etki süresine göre tekrar değerlendirme. Kedi dozu ayrı seçilir.",
+      "source_ids": [
+        "torbugesic",
+        "analgesia"
+      ]
+    },
+    {
+      "name": "Vetergesic 0,3 mg/ml enjeksiyon",
+      "active_ingredient": "Buprenorfin",
+      "category": "analgesic",
+      "form": "injection",
+      "concentration_mg_per_ml": 0.3,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 0.01,
+      "dose_mg_per_kg_max": 0.02,
+      "route": "Kas içi / Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Ceva",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Perioperatif analjezide uygulama başına; köpekte genellikle 3–4 saat, kedide yaklaşık 2 saat sonra yeniden değerlendirme/etikete göre tekrar. Kontrollü opioid kaydı tutulur.",
+      "source_ids": [
+        "vetergesic"
+      ]
+    },
+    {
+      "name": "Vetmedin 2,5 mg kapsül",
+      "active_ingredient": "Pimobendan",
+      "category": "cardio",
+      "form": "capsule",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": 2.5,
+      "dose_mg_per_kg_min": 0.2,
+      "dose_mg_per_kg_max": 0.3,
+      "route": "Ağızdan",
+      "target_species": "Köpek",
+      "manufacturer": "Boehringer Ingelheim",
+      "prescription_required": 1,
+      "pack_unit": "kapsül",
+      "notes": "Kalp yetersizliğinde standart klinik aralık, uygulama başına; günde 2 kez, tercihen yemekten 1 saat önce. Günlük toplam dozla karıştırılmaz.",
+      "source_ids": [
+        "vetmedin",
+        "cardio"
+      ]
+    },
+    {
+      "name": "Zodon 25 mg/ml oral çözelti",
+      "active_ingredient": "Klindamisin",
+      "category": "antibiotic",
+      "form": "other",
+      "concentration_mg_per_ml": 25,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": 5.5,
+      "dose_mg_per_kg_max": 11,
+      "route": "Ağızdan",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Ceva",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Köpekte yara/diş enfeksiyonunda 5,5 mg/kg günde 2 kez veya 11 mg/kg günde 1 kez; kedide yara/apse için 11 mg/kg günde 1 kez. Osteomiyelit ayrı protokoldür.",
+      "source_ids": [
+        "zodon"
+      ]
+    },
+    {
+      "name": "Zoletil 50 enjeksiyon",
+      "active_ingredient": "Tiletamin, zolazepam",
+      "category": "anesthetic",
+      "form": "injection",
+      "concentration_mg_per_ml": null,
+      "strength_mg_per_unit": null,
+      "dose_mg_per_kg_min": null,
+      "dose_mg_per_kg_max": null,
+      "route": "Kas içi / Damar içi",
+      "target_species": "Köpek, Kedi",
+      "manufacturer": "Virbac",
+      "prescription_required": 1,
+      "pack_unit": "ml",
+      "notes": "Sulandırılınca 25 mg/ml tiletamin + 25 mg/ml zolazepam (toplam 50 mg/ml). Protokole göre tek indüksiyon. Birden fazla etkenin gücü tek sayıya indirgenmediği için hesaplayıcı alanları boştur.",
+      "source_ids": [
+        "zoletil"
+      ]
+    }
+  ]
+}

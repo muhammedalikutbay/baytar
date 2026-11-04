@@ -1,0 +1,286 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "ebvho-2026",
+      "title": "Eskişehir-Bilecik Bölgesi Veteriner Hekimleri Odası: 2026 hizmet tarifesi (yalnız işlem adları)",
+      "url": "https://www.ebvho.org.tr/uye-islemleri/asgari-ucret-tarifesi"
+    },
+    {
+      "id": "ibb-2026",
+      "title": "İstanbul Büyükşehir Belediyesi: veteriner hizmetleri, bakım/pansiyon (yalnız işlem adları)",
+      "url": "https://uploads.ibb.istanbul/uploads/Veteriner_Hizmetleri_Sube_Mueduerluegue_f82dca23af.pdf"
+    },
+    {
+      "id": "ivho-2026",
+      "title": "İstanbul Veteriner Hekimler Odası: 2026 ev hayvanları hizmet tarifesi (yalnız işlem adları)",
+      "url": "https://www.ivho.org.tr/assets/docs/IVHO2026tarife.pdf"
+    }
+  ],
+  "items": [
+    {
+      "name": "Acil muayene",
+      "category": "exam",
+      "notes": "Acil başvuru değerlendirmesi; ek işlemler ayrıca kaydedilir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Anal kese boşaltma",
+      "category": "other",
+      "notes": "Klinik değerlendirme sonrası anal keselerin boşaltılması.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Aşı karnesi düzenleme",
+      "category": "other",
+      "notes": "Uygulama kayıtları doğrulanarak aşı karnesi hazırlanır.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Aşı uygulaması",
+      "category": "vaccination",
+      "notes": "Uygulanan aşı, seri numarası ve tarih hasta kaydına işlenir.",
+      "source_ids": [
+        "ebvho-2026"
+      ]
+    },
+    {
+      "name": "Deri kazıntısı incelemesi",
+      "category": "lab",
+      "notes": "Örnek yeri ve mikroskobik bulgular kaydedilir.",
+      "source_ids": [
+        "ebvho-2026"
+      ]
+    },
+    {
+      "name": "Diş taşı temizliği",
+      "category": "surgery",
+      "notes": "Ağız muayenesi ve diş işlemleri ayrıca belgelenir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Dişi kısırlaştırma",
+      "category": "surgery",
+      "notes": "Tür ve cerrahi yöntem klinik kayıtta belirtilir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Doğum takibi / sezaryen",
+      "category": "surgery",
+      "notes": "Doğum değerlendirmesi; cerrahi gereksinim ve yapılan işlemler ayrıca belgelenir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Dışkı incelemesi",
+      "category": "lab",
+      "notes": "Uygulanan inceleme yöntemi ve sonuç kaydedilir.",
+      "source_ids": [
+        "ebvho-2026"
+      ]
+    },
+    {
+      "name": "Erkek kısırlaştırma",
+      "category": "surgery",
+      "notes": "Tür ve cerrahi kapsam klinik kayıtta belirtilir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Evde muayene",
+      "category": "exam",
+      "notes": "Hasta evinde gerçekleştirilen klinik değerlendirme.",
+      "source_ids": [
+        "ebvho-2026"
+      ]
+    },
+    {
+      "name": "Genel muayene",
+      "category": "exam",
+      "notes": "Klinikte genel klinik değerlendirme.",
+      "source_ids": [
+        "ebvho-2026"
+      ]
+    },
+    {
+      "name": "İdrar tahlili",
+      "category": "lab",
+      "notes": "Numune alma yöntemi ve yapılan inceleme kaydedilir.",
+      "source_ids": [
+        "ebvho-2026"
+      ]
+    },
+    {
+      "name": "İntravenöz sıvı tedavisi",
+      "category": "other",
+      "notes": "Sıvı tipi, hacim ve izlem klinik kayıtta belirtilir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Kan biyokimyası",
+      "category": "lab",
+      "notes": "Seçilen parametreler veya panel klinik kayıtta belirtilir.",
+      "source_ids": [
+        "ebvho-2026"
+      ]
+    },
+    {
+      "name": "Kontrol muayenesi",
+      "category": "exam",
+      "notes": "Önceki tedavi veya işlem sonrası değerlendirme.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Kremasyon yönlendirme",
+      "category": "other",
+      "notes": "Hasta sahibinin talebine göre hizmet sağlayıcıya yönlendirme.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Kuduz antikor titre testi (numune gönderimi)",
+      "category": "lab",
+      "notes": "Numune alınması ve yetkili laboratuvara gönderimi; laboratuvar sonucu hasta kaydına eklenir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Kulak temizliği",
+      "category": "grooming",
+      "notes": "Kulak muayenesi sonrası uygun temizlik işlemi.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Mikroçip uygulaması",
+      "category": "other",
+      "notes": "Çip numarası ve ilgili kayıt işlemleri doğrulanır.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Ortopedik muayene",
+      "category": "exam",
+      "notes": "Kas-iskelet sistemi değerlendirmesi; bulgular ve ek görüntüleme gereksinimi kaydedilir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Pansiyon",
+      "category": "boarding",
+      "notes": "Konaklama süresi ve bakım gereksinimleri belirtilir.",
+      "source_ids": [
+        "ibb-2026"
+      ]
+    },
+    {
+      "name": "Pasaport/ seyahat belgesi",
+      "category": "other",
+      "notes": "Kimlik, aşı ve seyahat koşullarına göre belge hazırlığı; resmi onay gereken işlemler ayrıca izlenir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Röntgen",
+      "category": "imaging",
+      "notes": "Bölge, pozisyonlar ve yorum hasta kaydına eklenir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Sitolojik inceleme",
+      "category": "lab",
+      "notes": "Örnek yeri ve hazırlama yöntemi belirtilir.",
+      "source_ids": [
+        "ebvho-2026"
+      ]
+    },
+    {
+      "name": "Tam kan sayımı",
+      "category": "lab",
+      "notes": "Hematolojik inceleme; sonuç hasta kaydına eklenir.",
+      "source_ids": [
+        "ebvho-2026"
+      ]
+    },
+    {
+      "name": "Tıbbi tıraş",
+      "category": "grooming",
+      "notes": "Klinik gereksinime yönelik tıraş işlemi.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Tırnak kesimi",
+      "category": "grooming",
+      "notes": "Tür ve hayvanın durumuna uygun bakım işlemi.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Ultrasonografi",
+      "category": "imaging",
+      "notes": "İncelenen bölge ve bulgular kaydedilir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Yara bakımı ve pansuman",
+      "category": "other",
+      "notes": "Yara değerlendirmesi, temizlik ve uygun pansuman.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Yara dikişi",
+      "category": "surgery",
+      "notes": "Yara kapatma işlemi; yöntem ve materyal kaydedilir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Yatarak tedavi",
+      "category": "hospitalisation",
+      "notes": "Yatış süresi, izlem ve uygulamalar ayrıca belgelenir.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    },
+    {
+      "name": "Ötanazi",
+      "category": "other",
+      "notes": "Hekim değerlendirmesi, hasta sahibi onamı ve uygulama kaydı.",
+      "source_ids": [
+        "ivho-2026"
+      ]
+    }
+  ]
+}
