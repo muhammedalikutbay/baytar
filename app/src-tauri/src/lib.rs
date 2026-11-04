@@ -1,3 +1,4 @@
+mod billing;
 mod import;
 mod settings;
 
@@ -675,7 +676,31 @@ pub fn run() {
             patient_update,
             patient_delete,
             patient_restore,
-            search
+            search,
+            billing::service_get,
+            billing::service_create,
+            billing::service_update,
+            billing::service_delete,
+            billing::service_restore,
+            billing::services_list,
+            billing::charge_get,
+            billing::charge_create,
+            billing::charge_update,
+            billing::charge_delete,
+            billing::charge_restore,
+            billing::charges_list,
+            billing::payment_get,
+            billing::payment_create,
+            billing::payment_update,
+            billing::payment_delete,
+            billing::payment_restore,
+            billing::payments_list,
+            billing::charges_by_visit,
+            billing::account_balance,
+            billing::account_statement,
+            billing::accounts_receivables,
+            billing::billing_daily_summary,
+            billing::billing_charge_sources,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Baytar");

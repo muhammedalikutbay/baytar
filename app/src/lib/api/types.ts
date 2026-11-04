@@ -234,3 +234,43 @@ export interface CommandMap {
   appointments_between: { args: { from: string; to: string }; result: CalendarAppointment[] };
   appointments_today: { args: { today: string }; result: CalendarAppointment[] };
 }
+
+// Billing uses minor units (kurus). Update commands replace every editable field.
+export type ServiceCategory = 'exam' | 'vaccination' | 'surgery' | 'lab' | 'imaging' | 'grooming' | 'boarding' | 'hospitalisation' | 'other';
+export type PaymentMethod = 'cash' | 'card' | 'transfer' | 'other';
+export interface Service extends Audit {name:string;category:ServiceCategory;priceMinor:number|null;vatRate:number|null;isBuiltin:boolean;isActive:boolean;notes:string|null}
+export type NewService = Omit<Service,keyof Audit|'isBuiltin'>;
+export interface Charge extends Audit {ownerId:number;patientId:number|null;visitId:number|null;serviceId:number|null;inventoryItemId:number|null;description:string;quantity:number;unitPriceMinor:number;discountMinor:number;vatRate:number|null;totalMinor:number;chargedOn:string;notes:string|null}
+export type NewCharge = Omit<Charge,keyof Audit|'totalMinor'>;
+export interface Payment extends Audit {ownerId:number;paidOn:string;amountMinor:number;method:PaymentMethod;notes:string|null}
+export type NewPayment = Omit<Payment,keyof Audit>;
+export interface StatementEntry {id:number;kind:'charge'|'payment';ownerId:number;ownerName:string;date:string;description:string;amountMinor:number;method:PaymentMethod|null;notes:string|null;deletedAt:string|null;runningBalanceMinor:number}
+export interface Receivable {ownerId:number;ownerName:string;phone:string|null;balanceMinor:number;oldestUnpaidOn:string;lastPaymentOn:string|null}
+export interface DailySummary {chargesMinor:number;collectionsMinor:number;collectionsByMethod:Record<PaymentMethod,number>;entries:StatementEntry[]}
+export interface ChargeSource {key:string;name:string;inventoryItemId:number|null;priceMinor:number|null}
+export interface CommandMap {
+  service_get: {args:{id:number};result:Service};
+  service_create: {args:{input:NewService};result:Service};
+  service_update: {args:{id:number;input:NewService};result:Service};
+  service_delete: {args:{id:number};result:Service};
+  service_restore: {args:{id:number};result:Service};
+  services_list: {args:{includeDeleted:boolean};result:Service[]};
+  charge_get: {args:{id:number};result:Charge};
+  charge_create: {args:{input:NewCharge};result:Charge};
+  charge_update: {args:{id:number;input:NewCharge};result:Charge};
+  charge_delete: {args:{id:number};result:Charge};
+  charge_restore: {args:{id:number};result:Charge};
+  charges_list: {args:{includeDeleted:boolean};result:Charge[]};
+  payment_get: {args:{id:number};result:Payment};
+  payment_create: {args:{input:NewPayment};result:Payment};
+  payment_update: {args:{id:number;input:NewPayment};result:Payment};
+  payment_delete: {args:{id:number};result:Payment};
+  payment_restore: {args:{id:number};result:Payment};
+  payments_list: {args:{includeDeleted:boolean};result:Payment[]};
+  charges_by_visit: {args:{visitId:number;includeDeleted:boolean};result:Charge[]};
+  account_balance: {args:{ownerId:number};result:number};
+  account_statement: {args:{ownerId:number;includeDeleted:boolean};result:StatementEntry[]};
+  accounts_receivables: {args:Record<string,never>;result:Receivable[]};
+  billing_daily_summary: {args:{from:string;to:string};result:DailySummary};
+  billing_charge_sources: {args:Record<string,never>;result:ChargeSource[]};
+}

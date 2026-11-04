@@ -112,3 +112,7 @@ export function formatAge(value: string | null | undefined, estimate = false, to
     : months > 0 ? `${months} ${tr.monthsOld}` : `${Math.floor((current - birth.getTime()) / 86400000)} ${tr.daysOld}`;
   return (estimate ? '~' : '') + age;
 }
+
+export function formatMoney(minor: number): string {
+  return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(minor / 100);
+}
