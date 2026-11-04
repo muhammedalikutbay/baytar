@@ -1,11 +1,13 @@
 <script lang="ts">
+  // Validated Input wrapper; bind value/valid, with native attributes forwarded to the control.
   import { untrack } from 'svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
   import Input from './Input.svelte';
   import { parseDecimal } from '$lib/validation';
   import { tr } from '$lib/i18n/tr';
-  let { value = $bindable(null), valid = $bindable(true), label, required = false, error, ...rest }:
-    Omit<HTMLInputAttributes, 'value'> & { value?: number | null; valid?: boolean; label: string; error?: string } = $props();
+  import { TurkishLira, type LucideIcon } from '@lucide/svelte';
+  let { icon = TurkishLira, value = $bindable(null), valid = $bindable(true), label, required = false, error, ...rest }:
+    Omit<HTMLInputAttributes, 'value'> & { icon?: LucideIcon; value?: number | null; valid?: boolean; label: string; error?: string } = $props();
   const format = (n: number | null) => n === null ? '' : new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n / 100);
   let text = $state(untrack(() => format(value)));
   let editing = $state(false);
@@ -24,8 +26,7 @@
   }
 </script>
 <div class="relative">
-  <span aria-hidden="true" class="pointer-events-none absolute left-3 top-9 text-fg-muted">₺</span>
-  <Input {...rest} {label} {required} class="pl-8" inputmode="decimal" bind:ref value={text} oninput={input}
+  <Input {...rest} {icon} {label} {required} inputmode="decimal" bind:ref value={text} oninput={input}
     onfocus={() => { editing = true; text = value === null ? '' : (value / 100).toFixed(2).replace('.', ','); }}
     onblur={() => { editing = false; touched = true; text = format(value); }} error={error || (touched ? message : '')} />
 </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { StickyNote } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { Button, Textarea } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
@@ -42,7 +43,7 @@
     {#each REMINDER_KINDS as kind (kind)}
       {@const unknown = unknownPlaceholders(templates[kind])}
       <div class="grid gap-2">
-        <Textarea label={TEMPLATE_LABELS[kind]} rows={5} bind:value={templates[kind]} error={unknown.length ? tr.remindersTemplateUnknown.replace('{tokens}', unknown.join(' ')) : undefined} />
+        <Textarea icon={StickyNote} label={TEMPLATE_LABELS[kind]} rows={5} bind:value={templates[kind]} error={unknown.length ? tr.remindersTemplateUnknown.replace('{tokens}', unknown.join(' ')) : undefined} />
         <div class="rounded-md bg-surface-muted p-3">
           <p class="type-caption text-fg-muted">{tr.remindersTemplatePreview}</p>
           <p class="mt-1 text-sm break-words whitespace-pre-wrap">{renderTemplate(templates[kind].trim() ? templates[kind] : DEFAULT_TEMPLATES[kind], sampleValues(clinic))}</p>

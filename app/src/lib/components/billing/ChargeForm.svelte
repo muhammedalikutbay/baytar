@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { List, ReceiptText, Hash, TurkishLira, Percent, StickyNote } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
-  import { Button, Input, MoneyInput, NumberInput, DateInput, Select, Textarea } from '$lib/components/ui';
+  import { Button, Input, MoneyInput, NumberInput, DateInput, Select, Textarea, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { todayDate, formatMoney } from '$lib/format';
   import { validateForm } from '$lib/validation';
@@ -54,17 +55,18 @@
   }
 </script>
 <form onsubmit={save} class="grid gap-4">
+  <RequiredNote />
   <fieldset disabled={busy} class="grid min-w-0 gap-4">
     {#if loading}<p role="status">{tr.loading}</p>{:else if failed}<p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" onclick={load}>{tr.retry}</Button>{/if}
-    <Select label={tr.billingSource} bind:value={source} onchange={selectSource} options={[
+    <Select icon={List} label={tr.billingSource} bind:value={source} onchange={selectSource} options={[
       {value:'',label:tr.billingManual}, ...services.filter(s=>s.isActive).map(s=>({value:`service-${s.id}`,label:s.name})), ...sources.map(s=>({value:s.key,label:s.name}))
     ]} />
-    <Input label={tr.billingDescription} bind:value={description} required />
-    <div class="grid gap-4 sm:grid-cols-2"><NumberInput label={tr.billingQuantity} bind:value={quantity} min={Number.MIN_VALUE} required /><MoneyInput label={tr.billingUnitPrice} bind:value={price} required /></div>
-    <div class="grid gap-4 sm:grid-cols-2"><MoneyInput label={tr.billingDiscount} bind:value={discount} required /><NumberInput label={tr.billingVat} bind:value={vat} min={0} max={100} step={1} /></div>
+    <Input icon={ReceiptText} label={tr.billingDescription} bind:value={description} required />
+    <div class="grid gap-4 sm:grid-cols-2"><NumberInput icon={Hash} label={tr.billingQuantity} bind:value={quantity} min={Number.MIN_VALUE} required /><MoneyInput icon={TurkishLira} label={tr.billingUnitPrice} bind:value={price} required /></div>
+    <div class="grid gap-4 sm:grid-cols-2"><MoneyInput icon={TurkishLira} label={tr.billingDiscount} bind:value={discount} required /><NumberInput icon={Percent} label={tr.billingVat} bind:value={vat} min={0} max={100} step={1} /></div>
     <p class="type-caption text-fg-muted">{tr.billingVatHint}</p>
     <DateInput label={tr.date} bind:value={date} required />
-    <Textarea label={tr.notes} bind:value={notes} />
+    <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />
     <div class="flex justify-between tabular-nums"><span>{tr.billingGross}: {formatMoney(gross)}</span><strong class="text-highlight">{tr.billingTotal}: {formatMoney(total)}</strong></div>
   </fieldset>
   {#if error}<p role="alert" class="text-danger">{error}</p>{/if}

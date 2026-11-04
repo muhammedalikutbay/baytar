@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { ClipboardList, Stethoscope, ClipboardCheck, HeartPulse, StickyNote, Pill, Pipette, Repeat, Hourglass, List } from '@lucide/svelte';
   import { validateForm } from '$lib/validation';
   import { onMount, untrack, tick } from 'svelte';
-  import { Button, Input, Textarea, Select, DateInput, NumberInput, Dialog } from '$lib/components/ui';
+  import { Button, Input, Textarea, Select, DateInput, NumberInput, Dialog, RequiredNote, TimeInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { isValidDate, localToday, parseDecimal } from '$lib/format';
   import * as visits from '$lib/api/visits';
@@ -153,19 +154,20 @@
 </script>
 
 <form bind:this={form} onsubmit={submit} novalidate class="grid gap-4">
+  <RequiredNote />
   <fieldset disabled={saving} class="grid min-w-0 gap-4">
     <div class="grid gap-4 sm:grid-cols-2">
-      <DateInput label={tr.date + ' *'} bind:value={visitOn} required error={errors.visitOn} />
-      <Input label={tr.time} type="time" bind:value={visitTime} error={errors.visitTime} />
+      <DateInput label={tr.date} bind:value={visitOn} required error={errors.visitOn} />
+      <TimeInput label={tr.time} optional bind:value={visitTime} error={errors.visitTime} />
     </div>
     <TemplatePicker onselect={chooseTemplate} />
-    <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapSubjective}</h3><Textarea label={tr.reason} bind:value={reason} /></section>
+    <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapSubjective}</h3><Textarea icon={ClipboardList} label={tr.reason} bind:value={reason} /></section>
     <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapObjective}</h3>
       <VitalFields species={patient?.species} bind:weightKg={() => parseDecimal(weight), n => weight = n === null ? '' : String(n)} bind:temperatureC={() => parseDecimal(temperature), n => temperature = n === null ? '' : String(n)} bind:heartRateBpm={heartRate} bind:respRateBpm={respRate} bind:bodyCondition />
-      <Textarea label={tr.findings} bind:value={findings} /></section>
-    <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapAssessment}</h3><Textarea label={tr.diagnosis} bind:value={diagnosis} /></section>
-    <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapPlan}</h3><Textarea label={tr.treatment} bind:value={treatment} /></section>
-    <Textarea label={tr.notes} bind:value={notes} />
+      <Textarea icon={Stethoscope} label={tr.findings} bind:value={findings} /></section>
+    <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapAssessment}</h3><Textarea icon={ClipboardCheck} label={tr.diagnosis} bind:value={diagnosis} /></section>
+    <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapPlan}</h3><Textarea icon={HeartPulse} label={tr.treatment} bind:value={treatment} /></section>
+    <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />
     <section class="grid gap-4 border-t border-border pt-4" aria-label={tr.prescription}>
       <h3 class="type-section">{tr.prescription}</h3>
       {#if loading}<p role="status">{tr.loading}</p>
@@ -174,17 +176,17 @@
         {#each lines as line (line.key)}
           <fieldset class="grid min-w-0 gap-4 rounded-md border border-border p-4">
             <legend class="type-caption px-1">{tr.medicationName} {lines.indexOf(line) + 1}</legend>
-            <Select label={tr.medicationCatalog} bind:value={line.medicationId} onchange={event => selectMedication(line, event)} options={[
+            <Select icon={Pill} label={tr.medicationCatalog} bind:value={line.medicationId} onchange={event => selectMedication(line, event)} options={[
               { value: '', label: tr.freeMedication },
               ...(!catalog.some(m => String(m.id) === line.medicationId) && line.medicationId ? [{ value: line.medicationId, label: line.name }] : []),
               ...catalog.map(m => ({ value: String(m.id), label: m.name }))
             ]} />
-            <Input id={`${uid}-${line.key}-name`} label={tr.medicationName + ' *'} bind:value={line.name} readonly={!!line.medicationId} required error={errors[`${line.key}-name`]} />
+            <Input icon={Pill} id={`${uid}-${line.key}-name`} label={tr.medicationName} bind:value={line.name} readonly={!!line.medicationId} required error={errors[`${line.key}-name`]} />
             <div class="grid gap-4 sm:grid-cols-2">
-              <NumberInput label={tr.doseMg} bind:value={() => parseDecimal(line.doseMg), n => line.doseMg = n === null ? '' : String(n)} error={errors[`${line.key}-mg`]} min={Number.MIN_VALUE} unit={'mg'} />
-              <NumberInput label={tr.doseMl} bind:value={() => parseDecimal(line.doseMl), n => line.doseMl = n === null ? '' : String(n)} error={errors[`${line.key}-ml`]} min={Number.MIN_VALUE} unit={'ml'} />
+              <NumberInput icon={Pill} label={tr.doseMg} bind:value={() => parseDecimal(line.doseMg), n => line.doseMg = n === null ? '' : String(n)} error={errors[`${line.key}-mg`]} min={Number.MIN_VALUE} unit={'mg'} />
+              <NumberInput icon={Pipette} label={tr.doseMl} bind:value={() => parseDecimal(line.doseMl), n => line.doseMl = n === null ? '' : String(n)} error={errors[`${line.key}-ml`]} min={Number.MIN_VALUE} unit={'ml'} />
             </div>
-            <Input label={tr.doseText} bind:value={line.doseText} />
+            <Input icon={Pill} label={tr.doseText} bind:value={line.doseText} />
             <Button variant="ghost" size="sm" onclick={() => doseLineKey = doseLineKey === line.key ? null : line.key}>{tr.doseFromLine}</Button>
             {#if doseLineKey === line.key}
               <DoseCalculator patientId={patientId} medications={catalog}
@@ -196,9 +198,9 @@
                   doseLineKey = null;
                 }} />
             {/if}
-            <Input label={tr.frequency} bind:value={line.frequency} hint={tr.frequencyHint} />
-            <NumberInput label={tr.durationDays} bind:value={() => parseDecimal(line.duration), n => line.duration = n === null ? '' : String(n)} error={errors[`${line.key}-duration`]} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} />
-            <Input label={tr.notes} bind:value={line.notes} />
+            <Input icon={Repeat} label={tr.frequency} bind:value={line.frequency} hint={tr.frequencyHint} />
+            <NumberInput icon={Hourglass} label={tr.durationDays} bind:value={() => parseDecimal(line.duration), n => line.duration = n === null ? '' : String(n)} error={errors[`${line.key}-duration`]} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} />
+            <Input icon={StickyNote} label={tr.notes} bind:value={line.notes} />
             {#if line.fresh && line.medicationId}<StockDeduction bind:this={stockRefs[line.key]} medicationId={Number(line.medicationId)} />{/if}
             <Button variant="secondary" size="sm" onclick={() => removeLine(line)}>{tr.removeLine}</Button>
           </fieldset>
@@ -209,7 +211,7 @@
     <section class="grid gap-3 border-t border-border pt-4" aria-label={tr.clinicalFiles}>
       <h3 class="type-section text-accent">{tr.clinicalFiles}</h3>
       {#if initial}<PatientAttachments {patientId} visitId={initial.id} allowDrop={false} />{/if}
-      <Select label={tr.clinicalKind} bind:value={fileKind} options={[
+      <Select icon={List} label={tr.clinicalKind} bind:value={fileKind} options={[
         { value: 'document', label: tr.clinicalKindDocument }, { value: 'photo', label: tr.clinicalKindPhoto }, { value: 'lab', label: tr.clinicalKindLab }, { value: 'imaging', label: tr.clinicalKindImaging }, { value: 'other', label: tr.clinicalKindOther }
       ]} />
       <p class="type-caption text-fg-muted">{tr.clinicalVisitFilesHint} {tr.clinicalFileLimit}</p>

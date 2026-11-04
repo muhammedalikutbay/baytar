@@ -79,7 +79,7 @@ and an actions snippet for a see-all link. StatTile has a large tabular value, l
 IconChip has accent, highlight, neutral, danger and success tones. All are shown in /design in both themes.
 
 Buttons have primary, secondary, ghost and destructive variants; danger remains an alias for existing callers.
-Default controls are at least 44 px high; small buttons are 36 px. Controls retain explicit focus-visible
+Default form controls are 40 px high; default buttons are 44 px and small buttons are 36 px. Controls retain explicit focus-visible
 outlines. Disabled buttons use surface-muted and fg-subtle. No low-opacity text.
 
 Use a 4 px spacing base, with 6 and 10 px micro gaps. Page groups are 32 px apart; card padding is
@@ -89,7 +89,7 @@ Use hairline shadows for tiny raised controls, float shadows for dialogs and pop
 ## Shell, brand and theme
 
 The custom title bar is 40 px tall and spans the whole window. It contains the 24 px logo and Baytar,
-a page breadcrumb, centered global search with Ctrl+K, and three 46 px wide window controls. Close has
+centered global search (up to 560 px) with Ctrl+K, and three 46 px wide window controls. Close has
 a red hover fill with a white icon. Drag regions exclude inputs and buttons; double-click toggles maximize.
 Browser preview shows the controls without native actions. Maximize/restore tracks native resize events.
 On macOS native traffic lights remain, custom buttons hide, and the bar reserves 78 px on the left.
@@ -195,3 +195,18 @@ elevation, all primitives, disabled/error/mixed states, dialogs and undo toasts.
 Hover and keyboard focus can be inspected interactively.
 The route rejects production access with 404 through its development-only load guard.
 Review the shell at 1440 px and below 1100 px, then switch light/dark and use the settings reset to verify live OS theme changes.
+
+## Form controls and selection
+
+Labels use text-sm font-medium text-fg with a 6 px gap. Controls use 14 px text,
+40 px minimum height and 12 px horizontal padding. Hints and errors remain type-caption.
+Textareas begin at three rows. Optional leading lucide icons are 16 px, muted, and decorative;
+PhoneInput retains its country button and EmailInput defaults to Mail. Date inputs retain native icons.
+Required labels show a danger asterisk hidden from assistive technology; native required semantics remain.
+Place RequiredNote once at the top of forms containing required fields.
+
+Combobox binds the item value while showing its label, filters Turkish-folded labels and hints,
+and supports keyboard selection, grouped results, optional custom text and clearing. TimeInput binds
+HH:MM or an empty string, normalizes shorthand on blur and offers quarter-hour choices.
+RecordPicker binds owner/patient records and delegates creation to the parent. Small directories start
+expanded; larger directories start collapsed, and searches expand matches with all their pets.

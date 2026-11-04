@@ -413,3 +413,9 @@ export interface CommandMap {
   reminders_overview: { args: { query: RemindersQuery }; result: RemindersOverview };
   reminders_record_contact: { args: { input: NewReminderContact }; result: ReminderContact };
 }
+
+export interface Directory { total: number; owners: OwnerDetail[] }
+export interface RecordSelection { owner: Owner; patient?: Patient }
+export interface CommandMap {
+  directory_list: { args: { query: string; limit: number }; result: Directory };
+}

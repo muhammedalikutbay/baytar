@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { Pill, FlaskConical, Hash, Syringe, StickyNote } from '@lucide/svelte';
   import { validateForm } from '$lib/validation';
   import { onMount, tick, untrack } from 'svelte';
-  import { Button, Input, Select, Textarea, NumberInput } from '$lib/components/ui';
+  import { Button, Input, Select, Textarea, NumberInput, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { parseDecimal } from '$lib/format';
   import * as medications from '$lib/api/medications';
@@ -56,15 +57,16 @@
 </script>
 
 <form onsubmit={submit} novalidate class="grid gap-4">
+  <RequiredNote />
   <fieldset disabled={saving} class="grid min-w-0 gap-4">
-    <Input label={tr.medicationName + ' *'} bind:value={name} bind:ref={first} required error={errors.name} />
-    <Input label={tr.activeIngredient} bind:value={activeIngredient} error={errors.activeIngredient} />
-    <Select label={tr.medicationForm} bind:value={form} options={formOptions} error={errors.form} />
+    <Input icon={Pill} label={tr.medicationName} bind:value={name} bind:ref={first} required error={errors.name} />
+    <Input icon={FlaskConical} label={tr.activeIngredient} bind:value={activeIngredient} error={errors.activeIngredient} />
+    <Select icon={Pill} label={tr.medicationForm} bind:value={form} options={formOptions} error={errors.form} />
     {#each numericFields as field (field.key)}
-      <NumberInput label={field.label} bind:value={() => parseDecimal(numbers[field.key]), n => numbers[field.key] = n === null ? '' : String(n)} error={errors[field.key]} min={Number.MIN_VALUE} unit={field.key === 'concentrationMgPerMl' ? 'mg/ml' : field.key === 'strengthMgPerUnit' ? 'mg' : 'mg/kg'} />
+      <NumberInput icon={Hash} label={field.label} bind:value={() => parseDecimal(numbers[field.key]), n => numbers[field.key] = n === null ? '' : String(n)} error={errors[field.key]} min={Number.MIN_VALUE} unit={field.key === 'concentrationMgPerMl' ? 'mg/ml' : field.key === 'strengthMgPerUnit' ? 'mg' : 'mg/kg'} />
     {/each}
-    <Input label={tr.medicationRoute} bind:value={route} error={errors.route} />
-    <Textarea label={tr.medicationNote} bind:value={notes} error={errors.notes} />
+    <Input icon={Syringe} label={tr.medicationRoute} bind:value={route} error={errors.route} />
+    <Textarea icon={StickyNote} label={tr.medicationNote} bind:value={notes} error={errors.notes} />
   </fieldset>
   {#if errors.formError}<p role="alert" class="text-danger">{errors.formError}</p>{/if}
   <div class="mt-2 flex justify-end gap-2">

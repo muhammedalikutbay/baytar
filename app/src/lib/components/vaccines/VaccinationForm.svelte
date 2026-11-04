@@ -1,6 +1,7 @@
 ﻿<script lang="ts">
+  import { Syringe, ScanLine, StickyNote } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
-  import { Button, Input, Textarea, Select, DateInput, Checkbox } from '$lib/components/ui';
+  import { Button, Input, Textarea, Combobox, DateInput, Checkbox, RequiredNote, TimeInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { todayDate, parseDate } from '$lib/format';
   import * as vaccinations from '$lib/api/vaccinations';
@@ -86,18 +87,19 @@
 {:else if loadError}<p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" onclick={load}>{tr.retry}</Button>
 {:else}
 <form onsubmit={submit} class="grid gap-4">
+  <RequiredNote />
   <VaccinePatientPicker bind:selected locked={!!initial.patientId || !!appointmentId} />
   {#if selected}
-    <Select label={tr.vaccineName} bind:value={typeId} required disabled={!!appointmentId} placeholder={tr.vaccineChoose} options={available.map(t => ({ value: String(t.id), label: t.name }))} />
+    <Combobox icon={Syringe} label={tr.vaccineName} bind:value={typeId} required disabled={!!appointmentId} placeholder={tr.vaccineChoose} items={available.map(t => ({ value: String(t.id), label: t.name }))} />
     <p class="type-caption text-fg-muted">{available.length ? tr.vaccineCatalogHint : tr.vaccineNoCatalog}</p>
     {#if vaccineName && !vaccine}<p class="type-caption text-fg-muted">{vaccineName} · {tr.vaccineUntypedPlan}</p>{/if}
   {/if}
   <DateInput label={mode === 'give' ? tr.givenOn : tr.date} bind:value={date} required max={mode === 'give' ? todayDate() : '9999-12-31'} />
   {#if mode === 'plan'}
     <DateChips bind:value={date} />
-    <Input label={tr.appointmentTime} type="time" bind:value={time} hint={tr.appointmentTimeHint} />
+    <TimeInput label={tr.appointmentTime} optional bind:value={time} hint={tr.appointmentTimeHint} />
   {:else}
-    <Input label={tr.batchNo} bind:value={batchNo} />
+    <Input icon={ScanLine} label={tr.batchNo} bind:value={batchNo} />
     <DateInput label={tr.nextDueOn} bind:value={nextDueOn} oninput={manualDue} />
     <p class="type-caption text-fg-muted">{tr.vaccineSuggestionHint}</p>
     {#if suggesting}<p role="status">{tr.loading}</p>{/if}
@@ -105,7 +107,7 @@
     <Checkbox label={tr.vaccinePlanNext} bind:checked={planNext} disabled={!nextDueOn} />
     {#if vaccine}<StockDeduction bind:this={stock} vaccineTypeId={vaccine.id} />{/if}
   {/if}
-  <Textarea label={tr.notes} bind:value={notes} />
+  <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />
   {#if error}<p role="alert" class="text-danger">{error}</p>{/if}
   <div class="flex justify-end gap-2"><Button variant="secondary" disabled={saving} onclick={() => savedId !== null ? onsaved() : oncancel()}>{tr.cancel}</Button><Button type="submit" disabled={saving || suggesting || !selected || !vaccine}>{saving ? tr.saving : tr.save}</Button></div>
 </form>

@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { Clock } from '@lucide/svelte';
   import { onMount, untrack } from 'svelte';
   import { Lock } from '@lucide/svelte';
-  import { Card, Badge, Dialog, Input, Select, Checkbox } from '$lib/components/ui';
+  import { Card, Badge, Dialog, Input, Select, Checkbox, RequiredNote } from '$lib/components/ui';
   import { buttonStyles } from '$lib/components/ui/button';
   import { tr } from '$lib/i18n/tr';
   import * as api from '$lib/api/lock';
@@ -68,7 +69,7 @@
   {#key syncKey}<Checkbox label={tr.lockEnable} checked={enabled} onCheckedChange={toggle} />{/key}
   {#if enabled}
     <div class="mt-4 grid max-w-xs gap-1">
-      <Select label={tr.lockIdleLabel} options={idleOptions} value={idle} onchange={(e) => void setIdle((e.currentTarget as HTMLSelectElement).value)} />
+      <Select icon={Clock} label={tr.lockIdleLabel} options={idleOptions} value={idle} onchange={(e) => void setIdle((e.currentTarget as HTMLSelectElement).value)} />
       <p class="type-caption text-fg-muted">{tr.lockIdleHint}</p>
     </div>
     <div class="mt-4 flex flex-wrap gap-2">
@@ -83,14 +84,15 @@
 <Dialog bind:open title={mode === 'disable' ? tr.lockDisableTitle : mode === 'change' ? tr.lockChangePin : tr.lockSetPin}
   description={mode === 'disable' ? tr.lockDisableDescription : tr.lockPinDialogDescription}>
   <form onsubmit={submit} class="grid gap-4" autocomplete="off">
+  <RequiredNote />
     {#if mode !== 'set'}
-      <Input label={tr.lockCurrentPin} type="password" inputmode="numeric" autocomplete="off" maxlength={8}
+      <Input icon={Lock} label={tr.lockCurrentPin} type="password" inputmode="numeric" autocomplete="off" maxlength={8}
         bind:value={current} oninput={() => current = digitsOnly(current)} required />
     {/if}
     {#if mode !== 'disable'}
-      <Input label={tr.lockNewPin} type="password" inputmode="numeric" autocomplete="off" maxlength={8} hint={tr.lockPinHint}
+      <Input icon={Lock} label={tr.lockNewPin} type="password" inputmode="numeric" autocomplete="off" maxlength={8} hint={tr.lockPinHint}
         bind:value={next} oninput={() => next = digitsOnly(next)} required />
-      <Input label={tr.lockConfirmPin} type="password" inputmode="numeric" autocomplete="off" maxlength={8}
+      <Input icon={Lock} label={tr.lockConfirmPin} type="password" inputmode="numeric" autocomplete="off" maxlength={8}
         bind:value={confirm} oninput={() => confirm = digitsOnly(confirm)} required />
     {/if}
     {#if error}<p role="alert" class="text-danger">{error}</p>{/if}

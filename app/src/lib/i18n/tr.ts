@@ -570,6 +570,17 @@ export const tr = {
   remindersDefaultAppointment: 'Merhaba {sahip}, {hasta} için {tarih} tarihindeki randevunuzu hatırlatmak isteriz. Saat: {saat}. Gelemeyecekseniz önceden haber verirseniz seviniriz. Görüşmek üzere.\n{klinik} {telefon}',
   remindersDefaultDebt: 'Merhaba {sahip}, kliniğimizdeki hesabınızda {tutar} açık bakiye bulunmaktadır. Uygun olduğunuzda ödeme yapmanızı rica ederiz. Teşekkür eder, iyi günler dileriz.\n{klinik} {telefon}',
   remindersDefaultFollowup: 'Merhaba {sahip}, {hasta} için {tarih} tarihinde kontrol muayenesi planlanmış durumda. Saat: {saat}. Bir değişiklik olursa lütfen bize haber verin. Sağlıklı günler dileriz.\n{klinik} {telefon}',
+  // Shared selection and form controls (bay-ux1).
+  formRequiredNote: '* ile işaretli alanlar zorunludur.',
+  comboboxCustom: '“{text}” olarak kullan', comboboxClear: 'Seçimi temizle',
+  timeInvalid: 'Geçerli bir saat girin (SS:DD)', timeAllDay: 'Saat yok / tüm gün', timePlaceholder: 'SS:DD',
+  directorySearch: 'Sahip, telefon veya hasta ara', directoryNewOwner: 'Yeni sahip',
+  directoryAddOwner: 'Yeni sahip ekle', directoryNewPatient: 'Bu sahibe yeni hasta',
+  directoryEmpty: 'Henüz sahip kaydı yok.', directoryChange: 'Değiştir', directoryDeceased: 'Vefat',
+  directoryLimit: 'Daha fazla kayıt için aramayı daraltın.',
+  directoryPetCount: '{count} hasta', directoryAge: '{age} yaş', directoryLabel: 'Sahip ve hastalar',
+  gallerySelection: 'Aranabilir seçimler', galleryVaccineRabies: 'Kuduz aşısı', galleryVaccineMixed: 'Karma aşı',
+  city: 'İl', district: 'İlçe', nationalId: 'TCKN / VKN',
 } as const satisfies Record<string, string>;
 
 export type TranslationKey = keyof typeof tr;

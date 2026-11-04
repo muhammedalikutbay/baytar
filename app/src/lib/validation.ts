@@ -44,3 +44,18 @@ export function validateForm(form: HTMLFormElement): boolean {
   invalid.reportValidity();
   return false;
 }
+
+// Accept compact and punctuated local times; null marks invalid input, empty stays optional.
+export function parseTime(raw: string): string | null {
+  const text = raw.trim();
+  if (!text) return '';
+  let hour: string, minute: string;
+  const separated = /^(\d{1,2})[:.](\d{1,2})$/.exec(text);
+  if (separated) { hour = separated[1]; minute = separated[2].padEnd(2, '0'); }
+  else if (/^\d{1,4}$/.test(text)) {
+    hour = text.length <= 2 ? text : text.slice(0, -2);
+    minute = text.length <= 2 ? '00' : text.slice(-2);
+  } else return null;
+  if (Number(hour) > 23 || Number(minute) > 59) return null;
+  return hour.padStart(2, '0') + ':' + minute;
+}

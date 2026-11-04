@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { Syringe, ScanLine, Hourglass, List, StickyNote } from '@lucide/svelte';
   import { validateForm } from '$lib/validation';
   import { untrack, tick } from 'svelte';
-  import { Button, Input, Textarea, Select, DateInput, NumberInput } from '$lib/components/ui';
+  import { Button, Input, Textarea, Select, DateInput, NumberInput, RequiredNote, TimeInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { isValidDate, parseDecimal } from '$lib/format';
   import * as vaccinations from '$lib/api/vaccinations';
@@ -43,19 +44,20 @@
   }
 </script>
 <form bind:this={form} onsubmit={submit} novalidate class="grid gap-4">
+  <RequiredNote />
   <fieldset disabled={saving} class="grid min-w-0 gap-4">
-    <Input label={(vaccine ? tr.vaccineName : tr.appointmentTitle) + ' *'} bind:value={name} required error={errors.name} />
-    <DateInput label={tr.date + ' *'} bind:value={date} required error={errors.date} />
+    <Input icon={Syringe} label={(vaccine ? tr.vaccineName : tr.appointmentTitle)} bind:value={name} required error={errors.name} />
+    <DateInput label={tr.date} bind:value={date} required error={errors.date} />
     {#if vaccine}
       <DateInput label={tr.nextDue} bind:value={nextDue} error={errors.nextDue} />
-      <Input label={tr.batchNo} bind:value={batch} />
+      <Input icon={ScanLine} label={tr.batchNo} bind:value={batch} />
     {:else}
-      <Input label={tr.time} type="time" bind:value={time} error={errors.time} />
-      <NumberInput label={tr.durationMin} bind:value={() => parseDecimal(duration), n => duration = n === null ? '' : String(n)} error={errors.duration} min={1} max={2147483647} step={1} unit={tr.inputMinuteUnit} />
-      <Select label={tr.appointmentKind} bind:value={kind} options={(['visit', 'vaccine', 'reminder', 'other'] as AppointmentKind[]).map(value => ({value, label: value === 'vaccine' ? tr.vaccination : tr[value]}))} />
-      <Select label={tr.appointmentStatus} bind:value={status} options={(['planned', 'done', 'cancelled'] as AppointmentStatus[]).map(value => ({value, label: tr[value]}))} />
+      <TimeInput label={tr.time} optional bind:value={time} error={errors.time} />
+      <NumberInput icon={Hourglass} label={tr.durationMin} bind:value={() => parseDecimal(duration), n => duration = n === null ? '' : String(n)} error={errors.duration} min={1} max={2147483647} step={1} unit={tr.inputMinuteUnit} />
+      <Select icon={List} label={tr.appointmentKind} bind:value={kind} options={(['visit', 'vaccine', 'reminder', 'other'] as AppointmentKind[]).map(value => ({value, label: value === 'vaccine' ? tr.vaccination : tr[value]}))} />
+      <Select icon={List} label={tr.appointmentStatus} bind:value={status} options={(['planned', 'done', 'cancelled'] as AppointmentStatus[]).map(value => ({value, label: tr[value]}))} />
     {/if}
-    <Textarea label={tr.notes} bind:value={notes} />
+    <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />
   </fieldset>
   {#if errors.form}<p role="alert" class="text-danger">{errors.form}</p>{/if}
   <div class="flex justify-end gap-2"><Button variant="secondary" disabled={saving} onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving}>{saving ? tr.saving : tr.save}</Button></div>

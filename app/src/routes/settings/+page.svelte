@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { ExternalLink, Settings2, Moon, Stethoscope, ShieldCheck, Import, RefreshCw, Info } from '@lucide/svelte';
-  import { PageHeader, IconChip, Card, EmailInput } from '$lib/components/ui';
+  import { User, Building2, IdCard, MapPin, ExternalLink, Settings2, Moon, Stethoscope, ShieldCheck, Import, RefreshCw, Info } from '@lucide/svelte';
+  import { PageHeader, IconChip, Card, EmailInput, Input, Textarea } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { theme } from '$lib/theme.svelte';
   import { updater } from '$lib/updater.svelte';
@@ -74,13 +74,13 @@
     <form class="grid gap-4 sm:grid-cols-2" onsubmit={(e) => { e.preventDefault(); if (validateForm(e.currentTarget)) void saveClinic(); }}>
       <fieldset disabled={!clinicReady || clinicBusy} class="contents">
       {#each [['clinic_name', tr.settingsClinicName], ['vet_name', tr.settingsVetName], ['clinic_title', tr.documentsVetTitle], ['clinic_registry_no', tr.documentsRegistry], ['clinic_tax_office', tr.documentsTaxOffice], ['clinic_tax_no', tr.documentsTaxNo]] as [key, label]}
-        <label class="grid gap-1 text-sm">{label}<input class="min-h-11 rounded-md border border-border-control bg-surface px-3 text-fg" bind:value={clinic[key as keyof typeof clinic]} /></label>
+        <Input {label} icon={key === 'vet_name' ? User : key === 'clinic_name' || key === 'clinic_tax_office' ? Building2 : IdCard} bind:value={clinic[key as keyof typeof clinic]} />
       {/each}
       <PhoneInput label={tr.settingsPhone} bind:value={clinic.clinic_phone} />
       <EmailInput label={tr.email} bind:value={clinic.clinic_email} />
-      <label class="grid gap-1 text-sm sm:col-span-2">{tr.settingsAddress}<textarea class="min-h-22 rounded-md border border-border-control bg-surface p-3 text-fg" bind:value={clinic.clinic_address}></textarea></label>
+      <div class="sm:col-span-2"><Textarea label={tr.settingsAddress} icon={MapPin} bind:value={clinic.clinic_address} /></div>
       <div class="grid gap-3 sm:col-span-2">
-        <label class="grid gap-2 text-sm">{tr.documentsLogo}<input type="file" accept="image/png,image/jpeg,image/webp" disabled={logoBusy} onchange={selectLogo} /></label>
+        <label class="grid gap-1.5 text-sm font-medium text-fg">{tr.documentsLogo}<input type="file" accept="image/png,image/jpeg,image/webp" disabled={logoBusy} onchange={selectLogo} /></label>
         <p class="text-sm text-fg-muted">{tr.documentsLogoHint}</p>
         {#if api.safeClinicLogo(clinic.clinic_logo)}<img src={api.safeClinicLogo(clinic.clinic_logo)} alt={tr.documentsLogo} class="h-20 w-36 rounded-sm border border-border bg-surface object-contain" /><button type="button" disabled={logoBusy} class={buttonStyles('secondary')} onclick={() => clinic.clinic_logo = ''}>{tr.documentsRemoveLogo}</button>{/if}
       </div>

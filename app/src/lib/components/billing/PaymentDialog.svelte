@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { TurkishLira, Wallet, StickyNote } from '@lucide/svelte';
   import { untrack } from 'svelte';
-  import { Button, Dialog, MoneyInput, DateInput, Select, Textarea } from '$lib/components/ui';
+  import { Button, Dialog, MoneyInput, DateInput, Select, Textarea, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { todayDate, formatMoney } from '$lib/format';
   import { validateForm } from '$lib/validation';
@@ -31,12 +32,13 @@
 </script>
 <Dialog bind:open title={tr.billingCollect} description={tr.billingPaymentDescription}>
   <form onsubmit={save} class="grid gap-4">
+  <RequiredNote />
     <fieldset disabled={busy} class="grid min-w-0 gap-4">
       <p class="text-fg-muted">{tr.billingBalance}: <span class="tabular-nums">{formatMoney(balance)}</span></p>
-      <MoneyInput label={tr.billingAmount} bind:value={amount} required />
+      <MoneyInput icon={TurkishLira} label={tr.billingAmount} bind:value={amount} required />
       <DateInput label={tr.date} bind:value={date} required />
-      <Select label={tr.billingMethod} bind:value={method} options={methodOptions} />
-      <Textarea label={tr.notes} bind:value={notes} />
+      <Select icon={Wallet} label={tr.billingMethod} bind:value={method} options={methodOptions} />
+      <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />
       {#if (amount ?? 0) > balance}<p class="type-caption text-accent">{tr.billingOverpayment}</p>{/if}
     </fieldset>
     {#if error}<p role="alert" class="text-danger">{error}</p>{/if}

@@ -1,6 +1,6 @@
 ﻿<script lang="ts">
   import { untrack } from 'svelte';
-  import { Button, DateInput } from '$lib/components/ui';
+  import { Button, DateInput, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { todayDate, parseDate } from '$lib/format';
   import { postponeVaccine } from '$lib/api/appointments';
@@ -20,6 +20,7 @@
   }
 </script>
 <form onsubmit={submit} class="grid gap-4">
+  <RequiredNote />
   <p class="font-medium">{row.patientName} · {row.vaccineName}</p>
   <DateInput label={tr.date} bind:value={date} required />
   <DateChips bind:value={date} base={row.dueOn > todayDate() ? row.dueOn : todayDate()} />
