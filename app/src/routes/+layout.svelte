@@ -10,6 +10,8 @@
   import { navigation, settingsNavigation } from '$lib/navigation';
   import ThemeSwitch from '$lib/components/ThemeSwitch.svelte';
   import TitleBar from '$lib/components/layout/TitleBar.svelte';
+  import { lock } from '$lib/lock.svelte';
+  import LockScreen from '$lib/components/lock/LockScreen.svelte';
 
   let { children }: { children: Snippet } = $props();
   let version = $state<string | null>(null);
@@ -24,13 +26,15 @@
     if (pathname === '/print') return;
     const disposeTheme = theme.init();
     const disposeUpdater = updater.init();
+    void lock.init();
+    const disposeLock = lock.watch();
     if ('__TAURI_INTERNALS__' in window) {
       import('@tauri-apps/api/core')
         .then(({ invoke }) => invoke<string>('app_version'))
         .then(value => version = value)
         .catch((error: unknown) => console.error('Failed to fetch application version', error));
     }
-    return () => { disposeTheme(); disposeUpdater(); };
+    return () => { disposeTheme(); disposeUpdater(); disposeLock(); };
   });
 </script>
 
@@ -46,6 +50,9 @@
 {:else}
 <a href="#main-content" class="skip-link">{tr.skipToContent}</a>
 <TitleBar {title} />
+{#if lock.locked}
+  <LockScreen />
+{:else if lock.ready}
 <div class="app-shell">
   <aside class="sidebar">
     <p class="sidebar-label type-caption px-5 pt-7 pb-3 text-fg-subtle">{tr.navWorkspace}</p>
@@ -95,6 +102,7 @@
     </main>
   </div>
 </div>
+{/if}
 
 {/if}
 

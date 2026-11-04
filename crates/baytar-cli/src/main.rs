@@ -47,6 +47,53 @@ enum Commands {
         #[command(subcommand)]
         command: BackupCommand,
     },
+    /// Remove a forgotten app-lock PIN. Records are not touched.
+    Unlock {
+        /// The Baytar data folder (contains baytar.db).
+        #[arg(long)]
+        data: PathBuf,
+        /// Skip the confirmation prompt.
+        #[arg(long)]
+        yes: bool,
+    },
+}
+
+/// Deletes the stored PIN hash. Returns false when the user declined or no lock was set.
+fn run_unlock(data: &Path, confirm: impl FnOnce() -> anyhow::Result<bool>) -> anyhow::Result<bool> {
+    let db_path = data.join("baytar.db");
+    anyhow::ensure!(
+        db_path.is_file(),
+        "database does not exist: {}",
+        db_path.display()
+    );
+    let database = Database::open(&db_path, &data.join("backups"))?;
+    let enabled: i64 = database.conn().query_row(
+        "SELECT COUNT(*) FROM settings WHERE key = 'lock_pin_hash'",
+        [],
+        |row| row.get(0),
+    )?;
+    if enabled == 0 {
+        println!("The app lock is not enabled.");
+        return Ok(false);
+    }
+    if !confirm()? {
+        println!("Cancelled. Nothing was changed.");
+        return Ok(false);
+    }
+    database
+        .conn()
+        .execute("DELETE FROM settings WHERE key = 'lock_pin_hash'", [])?;
+    println!("The app lock PIN was removed. Records were not touched.");
+    Ok(true)
+}
+
+fn confirm_on_terminal() -> anyhow::Result<bool> {
+    use std::io::Write;
+    print!("Remove the app lock PIN? Patient records are not changed. Type yes to continue: ");
+    std::io::stdout().flush()?;
+    let mut answer = String::new();
+    std::io::stdin().read_line(&mut answer)?;
+    Ok(answer.trim().eq_ignore_ascii_case("yes"))
 }
 
 #[derive(Subcommand)]
@@ -157,6 +204,9 @@ fn main() -> anyhow::Result<()> {
             json,
             show_values,
         } => run_import(&legacy, &db, dry_run, json, show_values)?,
+        Commands::Unlock { data, yes } => {
+            run_unlock(&data, || if yes { Ok(true) } else { confirm_on_terminal() })?;
+        }
         Commands::Backup { command } => match command {
             BackupCommand::Create { db } => {
                 // A mistyped source path must not create an empty database.
@@ -254,5 +304,49 @@ fn print_report(report: &baytar_core::legacy::inspect::InspectReport) {
         if let Some(count) = details.duplicate_looking_owners {
             println!("  Owners with duplicate-looking normalized phones: {count}");
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn data_dir_with_pin() -> tempfile::TempDir {
+        let dir = tempfile::tempdir().unwrap();
+        let db =
+            Database::open(&dir.path().join("baytar.db"), &dir.path().join("backups")).unwrap();
+        db.conn()
+            .execute(
+                "INSERT INTO settings(key, value) VALUES ('lock_pin_hash', '$argon2id$synthetic'), ('clinic_name', 'Synthetic clinic')",
+                [],
+            )
+            .unwrap();
+        dir
+    }
+    fn count(dir: &Path, key: &str) -> i64 {
+        let db = Database::open(&dir.join("baytar.db"), &dir.join("backups")).unwrap();
+        db.conn()
+            .query_row("SELECT COUNT(*) FROM settings WHERE key = ?1", [key], |r| {
+                r.get(0)
+            })
+            .unwrap()
+    }
+
+    #[test]
+    fn unlock_removes_only_the_pin_hash_after_confirmation() {
+        let dir = data_dir_with_pin();
+        assert!(run_unlock(dir.path(), || Ok(true)).unwrap());
+        assert_eq!(count(dir.path(), "lock_pin_hash"), 0);
+        assert_eq!(count(dir.path(), "clinic_name"), 1);
+    }
+
+    #[test]
+    fn unlock_declined_changes_nothing_and_missing_database_fails() {
+        let dir = data_dir_with_pin();
+        assert!(!run_unlock(dir.path(), || Ok(false)).unwrap());
+        assert_eq!(count(dir.path(), "lock_pin_hash"), 1);
+        let empty = tempfile::tempdir().unwrap();
+        assert!(run_unlock(empty.path(), || Ok(true)).is_err());
+        assert!(!empty.path().join("baytar.db").exists());
     }
 }

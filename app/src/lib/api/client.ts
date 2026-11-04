@@ -6,6 +6,7 @@ import { createVaccineMock } from './vaccinations-mock';
 import { createInventoryMock } from './inventory-mock';
 import { createAttachmentsMock } from './attachments-mock';
 import { createTemplatesMock } from './templates-mock';
+import { createLockMock } from './lock-mock';
 import { calculateMock } from './dose-mock';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import type { ImportPreview, ImportReport, ApiError, CommandMap, ListQuery, NewOwner, NewPatient, Owner, OwnerPatch, Patient, PatientPatch, SearchHit } from './types';
@@ -126,6 +127,7 @@ const vaccines = createVaccineMock({ clinical, patients, patientGet, ownerGet, f
 const inventory = createInventoryMock({ now, fold, fail, catalog: clinical.call });
 const files = createAttachmentsMock({ patientGet, visitGet: id => clinical.call('visit_get', { id }) as import('./types').Visit, fail, now });
 const templates = createTemplatesMock({ fail, now });
+const lockMock = createLockMock({ fail });
 
 // Synthetic vaccination examples, relative to the local day for useful previews.
 const demoDate = (offset: number) => {
@@ -197,6 +199,7 @@ function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['arg
     return patientUpdate(id, { deceasedOn: date });
   }
   if (clinical.has(command)) return clinical.call(command, args);
+  if (lockMock.has(command)) return lockMock.call(command, args);
   switch (command) {
     case 'settings_get_all': return settingValues;
     case 'settings_set': { const { key, value } = args as { key: string; value: string }; settingValues[key] = value; return null; }
