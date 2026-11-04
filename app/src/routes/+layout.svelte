@@ -5,6 +5,8 @@
   import { PawPrint, ShieldCheck } from '@lucide/svelte';
   import { tr } from '$lib/i18n/tr';
   import { theme } from '$lib/theme.svelte';
+  import { updater } from '$lib/updater.svelte';
+  import { buttonStyles } from '$lib/components/ui/button';
   import { navigation, settingsNavigation } from '$lib/navigation';
   import ThemeSwitch from '$lib/components/ThemeSwitch.svelte';
   import GlobalSearch from '$lib/components/patients/GlobalSearch.svelte';
@@ -20,13 +22,14 @@
 
   onMount(() => {
     const disposeTheme = theme.init();
+    const disposeUpdater = updater.init();
     if ('__TAURI_INTERNALS__' in window) {
       import('@tauri-apps/api/core')
         .then(({ invoke }) => invoke<string>('app_version'))
         .then(value => version = value)
         .catch((error: unknown) => console.error('Failed to fetch application version', error));
     }
-    return disposeTheme;
+    return () => { disposeTheme(); disposeUpdater(); };
   });
 </script>
 
@@ -74,6 +77,20 @@
       <div class="breadcrumb"><span class="text-fg-subtle">{tr.appName}</span><span class="text-border-control" aria-hidden="true">/</span><span class="font-medium">{title}</span></div>
       <GlobalSearch />
     </header>
+    {#if updater.banner}
+      <section class="border-b border-border bg-surface px-4 py-3 sm:px-8" aria-label={tr.settingsUpdates}>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p class="font-medium">{tr.updateReady.replace('{version}', updater.version)}</p>
+          <div class="flex flex-wrap gap-2">
+            <button class={buttonStyles('secondary', 'sm')} disabled={updater.busy || updater.checking} onclick={() => void updater.install()}>{updater.actionLabel}</button>
+            <button class={buttonStyles('ghost', 'sm')} disabled={updater.busy} onclick={() => updater.dismiss()}>{tr.updateLater}</button>
+          </div>
+        </div>
+        {#if updater.notes}<p class="mt-2 max-w-prose whitespace-pre-wrap break-words text-sm text-fg-muted">{updater.notes}</p>{/if}
+        {#if updater.progress}<p role="status" class="mt-2 text-sm text-fg-muted">{updater.progress}</p>{/if}
+        {#if updater.error}<p role="alert" class="mt-2 text-sm text-danger">{updater.error}</p>{/if}
+      </section>
+    {/if}
     <main id="main-content" tabindex="-1" class="content">
       {@render children()}
     </main>

@@ -107,6 +107,29 @@ pub fn backup_create(
     .map_err(|_| internal())
 }
 #[tauri::command]
+pub fn backup_before_update(
+    app: tauri::AppHandle,
+    state: State<'_, AppDatabase>,
+) -> Result<BackupRow, String> {
+    let (_, _, dir) = paths(&app)?;
+    create_pre_update_backup(&state, &dir)
+}
+
+fn create_pre_update_backup(state: &AppDatabase, dir: &Path) -> Result<BackupRow, String> {
+    let guard = state.database.lock().map_err(|_| internal())?;
+    backup::create(
+        guard.as_ref().ok_or_else(internal)?,
+        dir,
+        backup::BackupKind::PreUpdate,
+    )
+    .map(Into::into)
+    .map_err(|_| {
+        log::error!("Pre-update backup failed; update must not be installed.");
+        internal()
+    })
+}
+
+#[tauri::command]
 pub fn backup_export(
     app: tauri::AppHandle,
     state: State<'_, AppDatabase>,
@@ -172,4 +195,58 @@ pub fn open_whatsapp(app: tauri::AppHandle, url: String) -> Result<(), String> {
     app.opener()
         .open_url(url, None::<&str>)
         .map_err(|_| internal())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn pre_update_backup_preserves_current_database_and_returns_metadata() {
+        let dir = tempfile::tempdir().unwrap();
+        let state = AppDatabase::initialize(dir.path());
+        state
+            .database
+            .lock()
+            .unwrap()
+            .as_ref()
+            .unwrap()
+            .conn()
+            .execute(
+                "INSERT INTO settings(key, value) VALUES ('clinic_name', 'Synthetic clinic')",
+                [],
+            )
+            .unwrap();
+
+        let row = create_pre_update_backup(&state, &dir.path().join("backups")).unwrap();
+        assert_eq!(row.kind, "pre-update");
+        assert!(row.size_bytes > 0);
+        assert!(chrono::DateTime::parse_from_rfc3339(&row.created_at).is_ok());
+        let snapshot = rusqlite::Connection::open_with_flags(
+            row.path,
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+        )
+        .unwrap();
+        baytar_core::db::check_integrity(&snapshot).unwrap();
+        let value: String = snapshot
+            .query_row(
+                "SELECT value FROM settings WHERE key = 'clinic_name'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(value, "Synthetic clinic");
+    }
+
+    #[test]
+    fn pre_update_backup_reports_failure_without_changing_live_data() {
+        let dir = tempfile::tempdir().unwrap();
+        let state = AppDatabase::initialize(dir.path());
+        let blocked = dir.path().join("blocked");
+        fs::write(&blocked, "synthetic file").unwrap();
+        assert!(create_pre_update_backup(&state, &blocked).is_err());
+        let guard = state.database.lock().unwrap();
+        baytar_core::db::check_integrity(guard.as_ref().unwrap().conn()).unwrap();
+        assert!(create_pre_update_backup(&AppDatabase::failed(None), dir.path()).is_err());
+    }
 }

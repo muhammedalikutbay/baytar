@@ -298,7 +298,24 @@ export const tr = {
   settingsBackupNow: 'Şimdi yedekle', settingsExport: 'Yedeği başka bir klasöre kaydet', settingsRestore: 'Bu yedeğe dön',
   settingsRestoreTitle: 'Yedek geri yüklensin mi?', settingsRestoreDescription: 'Önce mevcut verilerinizin yedeği alınır. Geri yüklemeden sonra uygulama yeniden başlatılır.',
   settingsRestoreDone: 'Yedek geri yüklendi. Uygulamayı yeniden başlatın.', settingsDaily: 'Günlük', settingsManual: 'Elle', settingsPreUpdate: 'Güncelleme öncesi', settingsPreImport: 'İçe aktarma öncesi', settingsPreRestore: 'Geri yükleme öncesi', settingsPreMigration: 'Migrasyon öncesi',
-  settingsLegacy: 'Eski verileri aktar', settingsUpdates: 'Güncellemeler', settingsUpdateCheck: 'Açılışta yeni sürüm kontrol edilsin', settingsAbout: 'Hakkında', settingsLicense: 'Ücretsiz ve açık kaynak (GPL-3.0)', settingsOpenFolder: 'Klasörü aç', settingsSaved: 'Bilgiler kaydedildi.', settingsExportFolder: 'Yedek klasörünü seç', settingsError: 'Ayarlar kaydedilemedi. Yeniden deneyin.', settingsRestoreError: 'Yedek geri yüklenemedi. Verileriniz korunuyor.', settingsBackupError: 'Yedekleme tamamlanamadı. Yeniden deneyin.', settingsBackupExported: 'Yedek dışa aktarıldı.'
+  settingsLegacy: 'Eski verileri aktar', settingsUpdates: 'Güncellemeler', settingsUpdateCheck: 'Açılışta yeni sürüm kontrol edilsin', settingsAbout: 'Hakkında', settingsLicense: 'Ücretsiz ve açık kaynak (GPL-3.0)', settingsOpenFolder: 'Klasörü aç', settingsSaved: 'Bilgiler kaydedildi.', settingsExportFolder: 'Yedek klasörünü seç', settingsError: 'Ayarlar kaydedilemedi. Yeniden deneyin.', settingsRestoreError: 'Yedek geri yüklenemedi. Verileriniz korunuyor.', settingsBackupError: 'Yedekleme tamamlanamadı. Yeniden deneyin.', settingsBackupExported: 'Yedek dışa aktarıldı.',
+  updateCheckNow: 'Şimdi denetle',
+  updateChecking: 'Güncellemeler denetleniyor…',
+  updateCurrent: 'Baytar güncel.',
+  updateAvailable: 'Yeni sürüm: {version}',
+  updateReady: 'Baytar {version} hazır.',
+  updateNow: 'Şimdi güncelle',
+  updateLater: 'Sonra',
+  updateCheckError: 'Güncelleme denetlenemedi. İnternet bağlantınızı kontrol edin.',
+  updateBackingUp: 'Güncelleme öncesi yedek alınıyor…',
+  updateDownloading: 'Güncelleme indiriliyor…',
+  updateDownloadingPercent: 'Güncelleme indiriliyor… %{percent}',
+  updateInstalling: 'Güncelleme kuruluyor…',
+  updateRestarting: 'Baytar yeniden başlatılıyor…',
+  updateRestart: 'Yeniden başlat',
+  updateBackupError: 'Güncelleme öncesi yedek alınamadı. Güncelleme kurulmadı. Boş disk alanını ve yedek klasörünün izinlerini kontrol edip yeniden deneyin.',
+  updateInstallError: 'Güncelleme kurulamadı. İnternet bağlantınızı kontrol edip yeniden deneyin.',
+  updateRestartError: 'Güncelleme kuruldu. Baytar yeniden başlatılamadı. Yeniden başlatmayı deneyin veya uygulamayı kapatıp açın.',
 } as const satisfies Record<string, string>;
 
 export type TranslationKey = keyof typeof tr;

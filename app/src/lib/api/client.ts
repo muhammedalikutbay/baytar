@@ -177,6 +177,7 @@ function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['arg
     case 'settings_set': { const { key, value } = args as { key: string; value: string }; settingValues[key] = value; return null; }
     case 'backups_list': return mockBackups;
     case 'backup_create': { const row = { path: '/demo/baytar-manual-20261104-120000Z.db', createdAt: new Date().toISOString(), kind: 'manual' as const, sizeBytes: 204800 }; mockBackups.unshift(row); return row; }
+    case 'backup_before_update': { const row = { path: '/demo/baytar-pre-update-20261104-120000Z.db', createdAt: new Date().toISOString(), kind: 'pre-update' as const, sizeBytes: 204800 }; mockBackups.unshift(row); return row; }
     case 'backup_export': return (args as { path: string }).path + '/baytar-manual-20261104-120000Z.db';
     case 'backup_restore': return null;
     case 'app_info': return { version: '0.2.0', dataFolder: '/demo/Baytar', backupsFolder: '/demo/Baytar/backups', databaseSizeBytes: 204800 };

@@ -3,6 +3,7 @@
   import { ExternalLink } from '@lucide/svelte';
   import { tr } from '$lib/i18n/tr';
   import { theme, type ThemePreference } from '$lib/theme.svelte';
+  import { updater } from '$lib/updater.svelte';
   import * as api from '$lib/api/settings';
   import type { AppInfo, BackupInfo } from '$lib/api/types';
   import Dialog from '$lib/components/ui/Dialog.svelte';
@@ -64,7 +65,23 @@
     <ul class="mt-4 divide-y divide-border">{#each backups as backup (backup.path)}<li class="flex flex-wrap items-center justify-between gap-3 py-3"><div><span class="tabular-nums">{date(backup.createdAt)}</span><span class="mx-2 text-fg-muted">· {kinds[backup.kind]}</span><span class="text-fg-muted">{size(backup.sizeBytes)}</span></div><button class={buttonStyles('secondary')} onclick={() => { restoreTarget = backup; restoreDialogOpen = true; }}>{tr.settingsRestore}</button></li>{:else}<li class="py-3 text-fg-muted">—</li>{/each}</ul>
   </section>
   <section class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section">{tr.settingsLegacy}</h2><a class="mt-3 inline-block text-accent underline" href="/import">{tr.importTitle}</a></section>
-  <section class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section">{tr.settingsUpdates}</h2><label class="mt-3 flex min-h-11 items-center gap-3"><input type="checkbox" class="size-5 accent-ink" checked={updateEnabled} onchange={setUpdates} />{tr.settingsUpdateCheck}</label></section>
+  <section class="rounded-lg border border-border bg-surface p-5 sm:p-6">
+    <h2 class="type-section">{tr.settingsUpdates}</h2>
+    <label class="mt-3 flex min-h-11 items-center gap-3"><input type="checkbox" class="size-5 accent-ink" checked={updateEnabled} onchange={setUpdates} />{tr.settingsUpdateCheck}</label>
+    <div class="mt-3 flex flex-wrap gap-2">
+      <button class={buttonStyles('secondary')} disabled={updater.checking || updater.busy} onclick={() => void updater.check({ silent: false })}>{tr.updateCheckNow}</button>
+      {#if updater.version}<button class={buttonStyles('primary')} disabled={updater.checking || updater.busy} onclick={() => void updater.install()}>{updater.actionLabel}</button>{/if}
+    </div>
+    <div class="mt-3 text-sm" role="status">
+      {#if updater.checking}<p class="text-fg-muted">{tr.updateChecking}</p>
+      {:else if updater.result === 'current'}<p>{tr.updateCurrent}</p>
+      {:else if updater.result === 'available'}<p>{tr.updateAvailable.replace('{version}', updater.version)}</p>
+      {:else if updater.result === 'error'}<p class="text-danger">{tr.updateCheckError}</p>{/if}
+      {#if updater.notes}<p class="mt-2 max-w-prose whitespace-pre-wrap break-words text-fg-muted">{updater.notes}</p>{/if}
+      {#if updater.progress}<p class="mt-2 text-fg-muted">{updater.progress}</p>{/if}
+    </div>
+    {#if updater.error}<p role="alert" class="mt-2 text-sm text-danger">{updater.error}</p>{/if}
+  </section>
   <section class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section">{tr.settingsAbout}</h2><p class="mt-3">{tr.version}: {info?.version ?? '—'}</p><p class="mt-1 text-fg-muted">{tr.settingsLicense}</p><a class="mt-2 inline-flex items-center gap-2 text-accent underline" href="https://github.com/muhammedalikutbay/baytar" target="_blank" rel="noreferrer"><ExternalLink size={16} />GitHub</a><p class="mt-4">{tr.localData}</p><p class="break-all text-sm text-fg-muted">{info?.dataFolder ?? '—'}</p><button class={`${buttonStyles('secondary')} mt-3`} onclick={() => void api.openDataFolder()}>{tr.settingsOpenFolder}</button></section>
 </main>
 

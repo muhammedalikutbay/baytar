@@ -6,6 +6,7 @@ export const getAll = () => call('settings_get_all', {});
 export const set = (key: string, value: string) => call('settings_set', { key, value });
 export const backups = () => call('backups_list', {});
 export const createBackup = () => call('backup_create', {});
+export const backupBeforeUpdate = () => call('backup_before_update', {});
 export const restoreBackup = (path: string) => call('backup_restore', { path });
 export const info = () => call('app_info', {});
 export const openDataFolder = () => call('open_data_folder', {});

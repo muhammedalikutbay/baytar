@@ -29,6 +29,7 @@ export interface CommandMap {
   settings_set: { args: { key: string; value: string }; result: null };
   backups_list: { args: Record<string, never>; result: BackupInfo[] };
   backup_create: { args: Record<string, never>; result: BackupInfo };
+  backup_before_update: { args: Record<string, never>; result: BackupInfo };
   backup_export: { args: { path: string }; result: string };
   backup_restore: { args: { path: string }; result: null };
   app_info: { args: Record<string, never>; result: AppInfo };
