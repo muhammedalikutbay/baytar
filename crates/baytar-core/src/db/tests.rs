@@ -175,3 +175,18 @@ fn invalid_migration_list_is_rejected() {
         .unwrap();
     assert!(matches!(err, DbError::InvalidMigrations(_)));
 }
+
+#[test]
+fn foreign_sqlite_file_is_refused_and_untouched() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("legacy.db");
+    {
+        let c = Connection::open(&path).unwrap();
+        c.execute_batch("CREATE TABLE PatientOwner (Id INTEGER PRIMARY KEY, OwnerName TEXT);")
+            .unwrap();
+    }
+    let before = std::fs::read(&path).unwrap();
+    let err = Database::open_with(&path, &dir.path().join("backups"), &[M1, M2_OK]).err();
+    assert!(matches!(err, Some(DbError::NotBaytarDatabase)));
+    assert_eq!(std::fs::read(&path).unwrap(), before);
+}

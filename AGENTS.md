@@ -13,7 +13,7 @@ Planning notes (Turkish) live in the owner's Obsidian vault:
 - Tailwind CSS v4 with design tokens (`docs/design-language.md`), bits-ui primitives, `@lucide/svelte` icons.
 - Rust Cargo workspace: `crates/baytar-core` (pure logic, all data access), `crates/baytar-cli` (dev CLI),
   `app/src-tauri` (thin command layer over `baytar-core`).
-- SQLite via `rusqlite` (`bundled`), schema versions with `PRAGMA user_version` and `rusqlite_migration`.
+- SQLite via `rusqlite` (`bundled`), schema versions with `PRAGMA user_version` and our own migration runner (`baytar-core::db`).
 
 ## Layout
 ```

@@ -54,6 +54,8 @@ pub enum DbError {
     Backup(String),
     #[error("invalid migration list: {0}")]
     InvalidMigrations(String),
+    #[error("not a Baytar database: it has tables but no schema version")]
+    NotBaytarDatabase,
 }
 
 pub struct Database {
@@ -98,6 +100,11 @@ impl Database {
             log::error!("database at schema v{found} is newer than supported v{supported}");
             return Err(DbError::NewerSchema { found, supported });
         }
+        if found == 0 && has_user_tables(&conn)? {
+            // A foreign SQLite file (e.g. a legacy PatientsCare database) must never be migrated in place.
+            log::error!("refusing to migrate a database with tables but no schema version");
+            return Err(DbError::NotBaytarDatabase);
+        }
         configure(&conn)?;
         if found < supported {
             if found > 0 {
@@ -138,6 +145,15 @@ impl Database {
 
 fn read_version(conn: &Connection) -> Result<u32, DbError> {
     Ok(conn.query_row("PRAGMA user_version", [], |r| r.get(0))?)
+}
+
+fn has_user_tables(conn: &Connection) -> Result<bool, DbError> {
+    let n: i64 = conn.query_row(
+        "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'",
+        [],
+        |r| r.get(0),
+    )?;
+    Ok(n > 0)
 }
 
 fn configure(conn: &Connection) -> Result<(), DbError> {
