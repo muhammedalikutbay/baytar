@@ -2,17 +2,14 @@
   import '../app.css';
   import { onMount, type Snippet } from 'svelte';
   import { page } from '$app/state';
-  import { PawPrint, Search, ShieldCheck } from '@lucide/svelte';
+  import { PawPrint, ShieldCheck } from '@lucide/svelte';
   import { tr } from '$lib/i18n/tr';
   import { theme } from '$lib/theme.svelte';
   import { navigation, settingsNavigation } from '$lib/navigation';
   import ThemeSwitch from '$lib/components/ThemeSwitch.svelte';
-  import { Dialog, Input, Kbd } from '$lib/components/ui';
+  import GlobalSearch from '$lib/components/patients/GlobalSearch.svelte';
 
   let { children }: { children: Snippet } = $props();
-  let searchInput = $state<HTMLInputElement | null>(null);
-  let query = $state('');
-  let searchOpen = $state(false);
   let version = $state<string | null>(null);
   const extraTitles: Record<string, string> = { '/import': tr.importTitle, '/design': tr.galleryTitle };
   const pathname = $derived(page.url.pathname.replace(/\/$/, '') || '/');
@@ -20,15 +17,6 @@
     : extraTitles[pathname] ?? [...navigation, settingsNavigation].find(item => item.href !== '/'
         && (pathname === item.href || pathname.startsWith(`${item.href}/`)))?.title
       ?? (pathname === '/' ? tr.home : tr.appName));
-
-  function focusSearch(event: KeyboardEvent) {
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k' && !event.altKey) {
-      // An open dialog owns keyboard focus until it closes.
-      if (document.querySelector('[role="dialog"]')) return;
-      event.preventDefault();
-      searchInput?.focus();
-    }
-  }
 
   onMount(() => {
     const disposeTheme = theme.init();
@@ -46,7 +34,6 @@
   <title>{title} · {tr.appName}</title>
   <meta name="description" content={tr.tagline} />
 </svelte:head>
-<svelte:window onkeydown={focusSearch} />
 
 <a href="#main-content" class="skip-link">{tr.skipToContent}</a>
 <div class="app-shell">
@@ -85,12 +72,7 @@
   <div class="min-w-0">
     <header class="topbar">
       <div class="breadcrumb"><span class="text-fg-subtle">{tr.appName}</span><span class="text-border-control" aria-hidden="true">/</span><span class="font-medium">{title}</span></div>
-      <form role="search" class="search-form" onsubmit={(event) => { event.preventDefault(); searchOpen = true; }}>
-        <Search size={17} class="search-icon text-fg-muted" aria-hidden="true" />
-        <Input label={tr.search} labelClass="sr-only" type="search" bind:ref={searchInput} bind:value={query}
-          placeholder={tr.search} aria-keyshortcuts="Control+k Meta+k" class="search-input pl-10 pr-16" />
-        <span class="search-shortcut pointer-events-none" aria-hidden="true"><Kbd>{tr.shortcutSearch}</Kbd></span>
-      </form>
+      <GlobalSearch />
     </header>
     <main id="main-content" tabindex="-1" class="content">
       {@render children()}
@@ -98,7 +80,6 @@
   </div>
 </div>
 
-<Dialog bind:open={searchOpen} title={tr.searchUnavailable} description={tr.searchHint} />
 
 <style>
   .app-shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100dvh; }
@@ -112,9 +93,6 @@
   .theme-area { padding: 0 8px; }
   .topbar { display: flex; min-height: 88px; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--color-border); background: var(--color-surface); padding: 16px 32px; }
   .breadcrumb { display: flex; align-items: center; gap: 12px; white-space: nowrap; font-size: 13px; }
-  .search-form { position: relative; width: min(100%, 400px); }
-  .search-form :global(.search-icon) { position: absolute; z-index: 1; top: 50%; left: 14px; transform: translateY(-50%); pointer-events: none; }
-  .search-shortcut { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); }
   .content { width: 100%; max-width: 1264px; margin: 0 auto; padding: 36px 32px; }
   .skip-link { position: fixed; z-index: 60; top: 12px; left: 12px; transform: translateY(-200%); border-radius: var(--radius-sm); background: var(--color-ink); padding: 12px 16px; color: var(--color-ink-fg); }
   .skip-link:focus { transform: none; }
@@ -131,9 +109,6 @@
   }
   @media (max-width: 639px) {
     .topbar { align-items: stretch; flex-direction: column; gap: 12px; padding: 16px; }
-    .search-form { width: 100%; }
     .content { padding: 24px 16px; }
-    .search-shortcut { display: none; }
-    .search-form :global(.search-input) { padding-right: 12px; }
   }
 </style>
