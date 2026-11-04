@@ -67,6 +67,7 @@ export const tr = {
   medicationInjection: 'Enjeksiyon', medicationSuspension: 'Süspansiyon', medicationDrops: 'Damla',
   medicationOintment: 'Merhem', medicationOther: 'Diğer',
   doseTitle: 'Doz hesaplayıcı', doseMedication: 'İlaç', doseManual: 'Değerleri elle gir',
+  doseFromLine: 'Doz hesapla', doseApply: 'Satıra aktar',
   doseWeight: 'Ağırlık (kg)', doseWeightDate: 'Son tartım', doseNoWeight: 'Kayıtlı tartım yok; ağırlığı girin.',
   doseWeightError: '0’dan büyük, en çok 1.500 kg bir ağırlık girin.',
   dosePositiveError: '0’dan büyük, sonlu bir sayı girin.', doseRangeError: 'En çok değeri en az değerinden küçük olamaz.',

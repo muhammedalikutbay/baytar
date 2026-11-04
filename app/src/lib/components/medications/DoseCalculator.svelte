@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { Card, Input, Select, Button } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { formatDate, formatNumber, formatUnits, parseDecimal } from '$lib/format';
@@ -8,7 +9,10 @@
   import type { DoseInput, DoseRange, DoseResult, LatestWeight, Medication } from '$lib/api/types';
 
   // Supply patientId from a visit; medications may be supplied by the host or loaded here.
-  let { patientId, medications: supplied }: { patientId?: number; medications?: Medication[] } = $props();
+  let { patientId, medications: supplied, initialMedicationId, initialWeightKg, onapply }: {
+    patientId?: number; medications?: Medication[]; initialMedicationId?: number; initialWeightKg?: number | null;
+    onapply?: (dose: { mg: number; ml: number | null; units: number | null; unit: string }) => void;
+  } = $props();
   let loaded = $state<Medication[]>([]);
   let loadError = $state(false);
   let reload = $state(0);
@@ -16,8 +20,8 @@
   let weightError = $state(false);
   let weightLoading = $state(false);
   let recorded = $state<LatestWeight | null>(null);
-  let selectedId = $state('');
-  let weight = $state('');
+  let selectedId = $state(untrack(() => initialMedicationId === undefined ? '' : String(initialMedicationId)));
+  let weight = $state(untrack(() => initialWeightKg == null ? '' : String(initialWeightKg).replace('.', ',')));
   let minimum = $state('');
   let maximum = $state('');
   let concentration = $state('');
@@ -45,8 +49,8 @@
   $effect(() => {
     const id = patientId; weightReload;
     let cancelled = false;
-    weight = ''; recorded = null; weightError = false; weightLoading = id !== undefined;
-    if (id !== undefined) {
+    weight = initialWeightKg == null ? '' : String(initialWeightKg).replace('.', ','); recorded = null; weightError = false; weightLoading = id !== undefined && initialWeightKg == null;
+    if (id !== undefined && initialWeightKg == null) {
       latestWeight(id).then(value => {
         if (!cancelled) { recorded = value; if (value) weight = String(value.weightKg).replace('.', ','); }
       }).catch(() => { if (!cancelled) weightError = true; })
@@ -54,6 +58,12 @@
     }
     return () => { cancelled = true; };
   });
+  function applyDose() {
+    if (!result || !onapply) return;
+    onapply({ mg: Number(formatNumber(result.mg.min, 2).replace(',', '.')),
+      ml: result.ml ? Number(formatNumber(result.ml.min, 2).replace(',', '.')) : null,
+      units: result.units ? Number(formatUnits(result.units.min).replace(',', '.')) : null, unit });
+  }
   const input = $derived<DoseInput>({ weightKg: parseDecimal(weight) ?? NaN, mgPerKgMin: parseDecimal(minimum) ?? NaN,
     mgPerKgMax: parseDecimal(maximum), concentrationMgPerMl: parseDecimal(concentration), strengthMgPerUnit: parseDecimal(strength) });
   const errors = $derived.by(() => {
@@ -117,6 +127,7 @@
       {:else}<p class="text-fg-muted">{tr.dosePrompt}</p>{/if}
     </div>
     <p class="type-caption text-fg-muted">{tr.doseRounded}</p>
+    {#if onapply}<Button disabled={!result || calculating} onclick={applyDose}>{tr.doseApply}</Button>{/if}
     {#if result}<details class="type-caption text-fg-muted"><summary class="cursor-pointer">{tr.doseExact}</summary><p class="mt-2 break-all tabular-nums">{exact(result.mg)} mg{#if result.ml}{' → '}{exact(result.ml)} ml{/if}{#if result.units}{' → '}{exact(result.units)} {unit}{/if}</p></details>{/if}
   </div>
 </Card>

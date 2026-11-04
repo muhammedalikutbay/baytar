@@ -7,6 +7,8 @@
   import * as prescriptions from '$lib/api/prescriptions';
   import * as medications from '$lib/api/medications';
   import type { Visit, Medication, PrescriptionItem } from '$lib/api/types';
+  import DoseCalculator from '$lib/components/medications/DoseCalculator.svelte';
+  import { formatUnits } from '$lib/format';
 
   let { patientId, visit, onsaved, oncancel }: {
     patientId: number; visit?: Visit; onsaved: (visit: Visit) => void; oncancel: () => void;
@@ -29,6 +31,7 @@
   }
   let nextKey = 0;
   let lines = $state<Line[]>([]);
+  let doseLineKey = $state<number | null>(null);
   let removed: number[] = [];
   let catalog = $state<Medication[]>([]);
   let loading = $state(true);
@@ -56,6 +59,7 @@
     if (medication) line.name = medication.name;
   }
   function removeLine(line: Line) {
+    if (doseLineKey === line.key) doseLineKey = null;
     if (line.id !== undefined) removed.push(line.id);
     lines = lines.filter(l => l.key !== line.key);
   }
@@ -134,6 +138,17 @@
               <Input label={tr.doseMl} inputmode="decimal" bind:value={line.doseMl} error={errors[`${line.key}-ml`]} />
             </div>
             <Input label={tr.doseText} bind:value={line.doseText} />
+            <Button variant="ghost" size="sm" onclick={() => doseLineKey = doseLineKey === line.key ? null : line.key}>{tr.doseFromLine}</Button>
+            {#if doseLineKey === line.key}
+              <DoseCalculator patientId={patientId} medications={catalog}
+                initialMedicationId={line.medicationId ? Number(line.medicationId) : undefined}
+                initialWeightKg={parseDecimal(weight)} onapply={dose => {
+                  line.doseMg = String(dose.mg).replace('.', ',');
+                  line.doseMl = dose.ml === null ? '' : String(dose.ml).replace('.', ',');
+                  if (dose.units !== null) line.doseText = `${formatUnits(dose.units)} ${dose.unit}`;
+                  doseLineKey = null;
+                }} />
+            {/if}
             <Input label={tr.frequency} bind:value={line.frequency} hint={tr.frequencyHint} />
             <Input label={tr.durationDays} inputmode="numeric" bind:value={line.duration} error={errors[`${line.key}-duration`]} />
             <Input label={tr.notes} bind:value={line.notes} />
