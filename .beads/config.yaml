@@ -73,3 +73,8 @@
 
 sync:
     remote: "git+https://github.com/muhammedalikutbay/baytar.git"
+export:
+    auto: true
+    interval: 1s
+
+no-push: true
