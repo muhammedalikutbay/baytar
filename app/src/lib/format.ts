@@ -48,10 +48,7 @@ export function formatPhone(value: string | null | undefined): string {
   const normalized = toE164(value);
   const phone = normalized ? parsePhoneNumberFromString(normalized) : undefined;
   if (!phone) return value;
-  if (phone.country === 'TR') {
-    const d = '0' + phone.nationalNumber;
-    return d.slice(0, 4) + ' ' + d.slice(4, 7) + ' ' + d.slice(7, 9) + ' ' + d.slice(9);
-  }
+  // Turkish numbers read "+90 555 111 22 33"; other countries use their international grouping.
   return phone.formatInternational();
 }
 

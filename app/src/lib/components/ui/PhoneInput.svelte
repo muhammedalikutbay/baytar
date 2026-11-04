@@ -23,37 +23,49 @@
   const countries = [...common, ...getCountries().filter(c => !common.includes(c)).sort((a, b) => (names.of(a) ?? a).localeCompare(names.of(b) ?? b, 'tr'))];
   const filtered = $derived(countries.filter(c => `${names.of(c)} ${c} +${getCountryCallingCode(c)}`.toLocaleLowerCase('tr').includes(query.toLocaleLowerCase('tr'))));
   const flag = (c: string) => [...c].map(letter => String.fromCodePoint(127397 + letter.charCodeAt(0))).join('');
+  // Works on the full international number; the field shows it without the dial code (the button shows that),
+  // so a Turkish number reads "555 111 22 33" next to "+90", never with the trunk 0.
   function format(raw: string, limit = true) {
-    let input = raw.trim().replace(/^00/, '+').replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
-    // Preserve the previous text when adding digits beyond the selected numbering plan.
-    const digitCount = input.replace(/\D/g, '').length;
-    // Block extra digits once the number is complete, as well as anything the numbering plan calls too long.
-    const completeBefore = !!accepted && !!toE164(accepted, country) && digitCount > accepted.replace(/\D/g, '').length && !toE164(input, country);
-    if (limit && (digitCount > 15 || completeBefore || validatePhoneNumberLength(input, country) === 'TOO_LONG')) {
-      text = accepted;
+    const input = raw.trim().replace(/^00/, '+').replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
+    let full = '';
+    if (input.startsWith('+')) full = input;
+    else {
+      const digits = input.replace(/^0/, '');
+      full = digits ? '+' + getCountryCallingCode(country) + digits : '';
+    }
+    const digitCount = full.replace(/\D/g, '').length;
+    // Block extra digits once the number is complete, and anything the numbering plan calls too long.
+    const completeBefore = !!accepted && !!toE164(accepted) && digitCount > accepted.replace(/\D/g, '').length && !toE164(full);
+    if (limit && full && (digitCount > 17 || completeBefore || validatePhoneNumberLength(full) === 'TOO_LONG')) {
+      text = display(accepted);
       return;
     }
-    const formatter = new AsYouType(country);
-    const display = formatter.input(input);
-    if (input.startsWith('+')) {
+    if (full.length > 1) {
+      const formatter = new AsYouType();
+      formatter.input(full);
       const inferred = formatter.getCountry() ?? countries.find(c => getCountryCallingCode(c) === formatter.getCallingCode());
       if (inferred) country = inferred;
     }
-    text = display || input;
-    accepted = text;
-    value = toE164(input, country);
+    text = display(full);
+    accepted = full;
+    value = toE164(full);
     lastBound = value;
+  }
+  function display(full: string) {
+    if (!full) return '';
+    const formatted = new AsYouType().input(full);
+    // While only "+" or a dial code is typed, keep it visible so the user can finish the code.
+    return formatted.replace(/^\+\d+\s*/, '') || full;
   }
   untrack(() => format(value, false));
   $effect(() => { if (value !== lastBound) untrack(() => format(value, false)); });
-  const message = $derived(!text ? (required ? tr.requiredField : '') : !toE164(text, country) ? tr.inputPhoneInvalid : '');
+  const message = $derived(!text ? (required ? tr.requiredField : '') : !value ? tr.inputPhoneInvalid : '');
   $effect(() => { valid = !message; ref?.setCustomValidity(message); });
   // The inner Input binds `text` first; format on the next microtask so the accepted text wins.
   function input(event: Event) { const raw = (event.currentTarget as HTMLInputElement).value; queueMicrotask(() => format(raw)); }
   async function toggle() { open = !open; query = ''; if (open) { await tick(); searchRef?.focus(); } }
   function select(c: CountryCode) {
-    const current = new AsYouType(country); current.input(text);
-    const national = current.getNumber()?.nationalNumber ?? text.replace(/\D/g, '').replace(/^0/, '');
+    const national = text.replace(/\D/g, '');
     country = c; open = false;
     format(national ? '+' + getCountryCallingCode(c) + national : '', false);
     ref?.focus();

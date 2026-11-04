@@ -59,7 +59,8 @@ Money is stored as INTEGER minor units (kuruş) in `*_minor` columns. All new us
 shared audit columns (`id`, `created_at`, `updated_at`, `deleted_at`) and STRICT, like v1.
 
 **Species** (patients.species and vaccine_types.species CHECK, table rebuild with `PRAGMA defer_foreign_keys`):
-`cat, dog, bird, rabbit, rodent, ferret, reptile, horse, cattle, sheep, goat, other`.
+`cat, dog, bird, rabbit, rodent, ferret, reptile, other`. Baytar is a pet clinic app: no food animals. Any other
+animal is `other` plus the free-text `species_note` (the form offers previously used notes as suggestions).
 
 **Changed tables**
 - `owners`: `phone` and `phone_alt` now hold E.164 (`+905551112233`). Migration converts `^0\d{10}$` to
@@ -73,8 +74,7 @@ shared audit columns (`id`, `created_at`, `updated_at`, `deleted_at`) and STRICT
 - `medications`: new `is_builtin INTEGER 0/1 NOT NULL DEFAULT 0`, `category TEXT CHECK` (`antibiotic, nsaid,
   analgesic, antiparasitic, anesthetic, sedative, corticosteroid, antiemetic, gastro, cardio, dermatologic,
   ophthalmic, otic, vitamin, fluid, hormone, antifungal, antiviral, other`), `manufacturer TEXT`,
-  `target_species TEXT` (display text, e.g. "Köpek, Kedi"), `withdrawal_note TEXT` (food-animal withdrawal
-  period), `prescription_required INTEGER 0/1/NULL`, `pack_unit TEXT`.
+  `target_species TEXT` (display text, e.g. "Köpek, Kedi"), `prescription_required INTEGER 0/1/NULL`, `pack_unit TEXT`.
 - `appointments`: new `vaccine_type_id INTEGER FK vaccine_types`, `vaccination_id INTEGER FK vaccinations`
   (set when a planned vaccination is given).
 
@@ -111,15 +111,13 @@ The legacy importer must write E.164 phones from now on (`legacy::normalize`).
 Built-in rows (`is_builtin = 1`), inserted only where no non-deleted row with the same `lower(name)` exists,
 so user entries are never duplicated or overwritten. Users can edit, deactivate or delete built-ins.
 - Vaccines: about 40 entries covering dogs (combined DHPPi/L, leptospirosis, rabies, kennel cough, corona,
-  leishmania), cats (FVRCP, FeLV, rabies, chlamydia), rabbits (RHD, myxomatosis), ferrets and the main food
-  animal programmes in Turkey (foot-and-mouth, brucellosis, sheep and goat pox, PPR, enterotoxaemia, lumpy skin
-  disease, anthrax, IBR/BVD, theileriosis). Brand names as sold in Turkey where known, plus generic entries.
+  leishmania), cats (FVRCP, FeLV, rabies, chlamydia), rabbits (RHD, myxomatosis), and ferrets. No food-animal vaccines. Brand names as sold in Turkey where known, plus generic entries.
 - Medicines: about 120 entries across the categories above, active ingredient, form, typical concentration or
   strength, typical mg/kg range only where it is a standard textbook value, route, target species,
-  prescription flag and withdrawal note for food-animal products. When unsure of a value, leave it NULL: the
+  prescription flag. Pet (companion and exotic) products only. When unsure of a value, leave it NULL: the
   dose calculator already refuses to calculate without hekim-entered bounds.
 - Services: about 25 common services without prices (examination, vaccination, microchip, neutering, dental
-  scaling, blood test, x-ray, ultrasound, wound care, home visit, farm visit, boarding...).
+  scaling, blood test, x-ray, ultrasound, wound care, home visit, boarding...).
 - Source data lives in `crates/baytar-core/catalog/*.json` with a `sources` field; a small script
   (`tools/catalog/build.py`) generates the migration SQL so the data stays reviewable.
 
