@@ -1,5 +1,7 @@
 # Baytar
 
+[![CI](https://github.com/muhammedalikutbay/baytar/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/muhammedalikutbay/baytar/actions/workflows/ci.yml)
+
 Free, open-source, offline-first patient records for independent veterinarians and small clinics.
 Owners, patients, visits, vaccinations, medications with a dose calculator, and an appointment book.
 Runs on Windows, macOS and Linux. Your data stays on your computer.
