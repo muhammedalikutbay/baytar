@@ -1,4 +1,5 @@
 mod billing;
+mod clinical;
 mod import;
 mod inventory;
 mod settings;
@@ -727,7 +728,24 @@ pub fn run() {
             inventory::inventory_low_stock,
             inventory::inventory_expiring,
             inventory::inventory_expired,
-            inventory::inventory_alerts
+            inventory::inventory_alerts,
+            clinical::visit_templates_list,
+            clinical::visit_template_get,
+            clinical::visit_template_create,
+            clinical::visit_template_update,
+            clinical::visit_template_delete,
+            clinical::visit_template_restore,
+            clinical::attachments_list,
+            clinical::attachment_add_from_path,
+            clinical::attachment_rename,
+            clinical::attachment_delete,
+            clinical::attachment_restore,
+            clinical::attachment_read_bytes,
+            clinical::attachment_thumbnail,
+            clinical::attachment_open,
+            clinical::attachment_export,
+            clinical::patient_photo,
+            clinical::patient_mark_deceased
         ])
         .run(tauri::generate_context!())
         .expect("error while running Baytar");

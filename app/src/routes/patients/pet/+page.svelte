@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { PawPrint } from '@lucide/svelte';
-  import { Button, Card, Dialog, EmptyState, Toast } from '$lib/components/ui';
+  import { PawPrint, TriangleAlert } from '@lucide/svelte';
+  import { Button, Card, Dialog, EmptyState, Toast, Badge, DateInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { formatAge, formatDate } from '$lib/format';
   import * as patients from '$lib/api/patients';
@@ -9,6 +9,8 @@
   import type { Patient, Owner } from '$lib/api/types';
   import PatientForm from '$lib/components/patients/PatientForm.svelte';
   import PatientVisits from '$lib/components/patients/PatientVisits.svelte';
+  import PatientAvatar from '$lib/components/patients/PatientAvatar.svelte';
+  import PatientAttachments from '$lib/components/patients/PatientAttachments.svelte';
   import VisitForm from '$lib/components/visits/VisitForm.svelte';
   let patient = $state<Patient | null>(null);
   let owner = $state<Owner | null>(null);
@@ -23,6 +25,21 @@
   let actionError = $state('');
   let toast = $state('');
   let toastOpen = $state(false);
+  let tab = $state<'history' | 'files'>('history');
+  let deceasedOpen = $state(false), deceasedDate = $state(''), deceasedError = $state('');
+  const today = () => new Date().toLocaleDateString('sv-SE');
+  async function markDeceased() {
+    if (!patient || busy) return;
+    if (!deceasedDate || deceasedDate > today() || (patient.birthDate && deceasedDate < patient.birthDate)) { deceasedError = tr.clinicalInvalidDeceased; return; }
+    busy = true; deceasedError = '';
+    try { patient = await patients.markDeceased(patient.id, deceasedDate); deceasedOpen = false; }
+    catch { deceasedError = tr.actionError; } finally { busy = false; }
+  }
+  async function clearDeceased() {
+    if (!patient || busy) return;
+    busy = true; actionError = '';
+    try { patient = await patients.update(patient.id, { deceasedOn: null }); } catch { actionError = tr.actionError; } finally { busy = false; }
+  }
   let deletedId = $state<number | null>(null);
   $effect(() => {
     const id = Number(page.url.searchParams.get('id')); refresh;
@@ -56,16 +73,18 @@
   {#if loading}<p role="status">{tr.loading}</p>
   {:else if patient && owner}
     <div class="flex flex-wrap items-start justify-between gap-4">
-      <div><h1 class="type-page break-words">{patient.name}</h1><p class="mt-2 text-fg-muted">{tr[patient.species]}{patient.speciesNote ? ` · ${patient.speciesNote}` : ''}{patient.breed ? ` · ${patient.breed}` : ''}</p></div>
-      <div class="flex flex-wrap gap-2"><Button variant="secondary" onclick={() => { actionError = ''; confirm = true; }}>{tr.deletePatient}</Button><Button variant="secondary" onclick={() => edit = true}>{tr.edit}</Button><Button onclick={() => addVisit = true}>{tr.addVisit}</Button></div>
+      <div class="flex items-start gap-4"><PatientAvatar patientId={patient.id} species={patient.species} name={patient.name} large revision={historyRevision} /><div><h1 class={`type-page break-words ${patient.deceasedOn ? 'text-fg-muted' : ''}`}>{patient.name} {#if patient.deceasedOn}<Badge>{tr.clinicalDeceased} · {formatDate(patient.deceasedOn)}</Badge>{/if}</h1><p class="mt-2 text-fg-muted">{tr[patient.species]}{patient.speciesNote ? ` · ${patient.speciesNote}` : ''}{patient.breed ? ` · ${patient.breed}` : ''}</p></div></div>
+      <div class="flex flex-wrap gap-2">{#if patient.deceasedOn}<Button variant="secondary" disabled={busy} onclick={clearDeceased}>{tr.clinicalClearDeceased}</Button>{:else}<Button variant="secondary" onclick={() => { deceasedDate = today(); deceasedError = ''; deceasedOpen = true; }}>{tr.clinicalMarkDeceased}</Button>{/if}<Button variant="secondary" onclick={() => { actionError = ''; confirm = true; }}>{tr.deletePatient}</Button><Button variant="secondary" onclick={() => edit = true}>{tr.edit}</Button><Button onclick={() => addVisit = true}>{tr.addVisit}</Button></div>
     </div>
+    {#if patient.alerts?.trim()}<div role="alert" class="flex items-start gap-3 rounded-md border border-highlight p-4 text-highlight"><TriangleAlert size={20} aria-hidden="true" class="mt-0.5 shrink-0" /><div><p class="type-caption">{tr.clinicalAlerts}</p><p class="whitespace-pre-wrap break-words">{patient.alerts}</p></div></div>{/if}
     <Card><dl class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       <div><dt class="type-caption text-fg-muted">{tr.owner}</dt><dd class="mt-2"><a class="text-accent underline" href={`/patients/owner?id=${owner.id}`}>{owner.fullName}</a></dd></div>
       {#each [{label:tr.sex,value:tr[patient.sex]}, {label:tr.neutered,value:patient.neutered == null ? tr.unknown : patient.neutered ? tr.yes : tr.no}, {label:tr.age,value:formatAge(patient.birthDate,patient.birthDateIsEstimate)}, {label:tr.birthDate,value:patient.birthDate ? (patient.birthDateIsEstimate ? '~' : '') + formatDate(patient.birthDate) : tr.unknown}, {label:tr.microchip,value:patient.microchip ?? tr.unknown}, {label:tr.color,value:patient.color ?? tr.unknown}] as field}
         <div><dt class="type-caption text-fg-muted">{field.label}</dt><dd class="mt-2 break-words">{field.value}</dd></div>
       {/each}
     </dl>{#if patient.notes}<div class="mt-6 border-t border-border pt-5"><h2 class="type-caption text-fg-muted">{tr.notes}</h2><p class="mt-2 whitespace-pre-wrap break-words">{patient.notes}</p></div>{/if}</Card>
-    {#key patient.id}<PatientVisits patientId={patient.id} revision={historyRevision} />{/key}
+    <div role="tablist" class="flex gap-2 border-b border-border">{#each [['history', tr.clinicalHistoryTab], ['files', tr.clinicalFiles]] as [key, label]}<button type="button" role="tab" aria-selected={tab === key} class={`min-h-11 px-4 ${tab === key ? 'border-b-2 border-accent text-accent' : 'text-fg-muted'}`} onclick={() => tab = key as 'history' | 'files'}>{label}</button>{/each}</div>
+    {#key patient.id}{#if tab === 'history'}<PatientVisits patientId={patient.id} revision={historyRevision} />{:else}<PatientAttachments patientId={patient.id} onchange={() => historyRevision++} />{/if}{/key}
   {:else}<Card><EmptyState icon={PawPrint} title={failed ? tr.loadError : tr.recordMissing} description={tr.recordMissingDescription}>
     {#snippet action()}{#if failed}<Button variant="secondary" onclick={() => refresh++}>{tr.retry}</Button>{/if}{/snippet}
   </EmptyState></Card>{/if}
@@ -77,6 +96,10 @@
 <Dialog bind:open={edit} title={tr.edit} description={tr.patientFormDescription}>
   {#if edit && patient}<PatientForm {patient} ownerId={patient.ownerId} onsaved={() => { edit = false; refresh++; }} oncancel={() => edit = false} />{/if}
   {#snippet footer()}{/snippet}
+</Dialog>
+<Dialog bind:open={deceasedOpen} title={tr.clinicalMarkDeceased} description={tr.clinicalDeceasedDescription}>
+  <DateInput label={tr.clinicalDeceasedDate} bind:value={deceasedDate} max={today()} error={deceasedError} />
+  {#snippet footer()}<Button variant="secondary" onclick={() => deceasedOpen = false}>{tr.cancel}</Button><Button disabled={busy} onclick={markDeceased}>{tr.save}</Button>{/snippet}
 </Dialog>
 <Dialog bind:open={confirm} title={tr.deletePatient} description={tr.deletePatientDescription}>
   {#if actionError}<p role="alert" class="text-danger">{actionError}</p>{/if}

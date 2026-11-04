@@ -10,6 +10,7 @@
   import type { OwnerDetail, Owner } from '$lib/api/types';
   import OwnerForm from '$lib/components/patients/OwnerForm.svelte';
   import SpeciesIcon from '$lib/components/patients/SpeciesIcon.svelte';
+  import PatientStatus from '$lib/components/patients/PatientStatus.svelte';
   let query = $state('');
   let offset = $state(0);
   let rows = $state<OwnerDetail[]>([]);
@@ -57,7 +58,7 @@
         <li><a href={`/patients/owner?id=${owner.id}`} class="flex min-h-16 flex-wrap items-center gap-x-6 gap-y-2 px-5 py-3 hover:bg-surface-muted">
           <span class="min-w-40 flex-1 font-medium">{owner.fullName}</span>
           <span class="min-w-36 text-fg-muted tabular-nums">{formatPhone(owner.phone ?? owner.phoneRaw)}</span>
-          <span class="flex flex-1 flex-wrap gap-2">{#each patients as pet (pet.id)}<Badge><SpeciesIcon species={pet.species} /><span class="sr-only">{tr[pet.species]}</span>{pet.name}</Badge>{/each}</span>
+          <span class="flex flex-1 flex-wrap gap-2">{#each patients as pet (pet.id)}<Badge><SpeciesIcon species={pet.species} /><span class="sr-only">{tr[pet.species]}</span>{pet.name}<PatientStatus alerts={pet.alerts} deceasedOn={null} /></Badge>{/each}</span>
         </a></li>
       {/each}
     </ul>{/if}

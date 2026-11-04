@@ -8,7 +8,8 @@
   import { search } from '$lib/api/search';
   import { detail } from '$lib/api/owners';
   import type { OwnerDetail } from '$lib/api/types';
-  import SpeciesIcon from './SpeciesIcon.svelte';
+  import PatientAvatar from './PatientAvatar.svelte';
+  import PatientStatus from './PatientStatus.svelte';
   let input = $state<HTMLInputElement | null>(null);
   let query = $state('');
   let focused = $state(false);
@@ -20,8 +21,8 @@
   let refresh = $state(0);
   const uid = $props.id();
   const options = $derived(hits.flatMap(hit => [
-    { href: `/patients/owner?id=${hit.owner.id}`, label: hit.owner.fullName, detail: formatPhone(hit.owner.phone ?? hit.owner.phoneRaw), species: null },
-    ...hit.patients.map(pet => ({ href: `/patients/pet?id=${pet.id}`, label: pet.name, detail: hit.owner.fullName, species: pet.species }))
+    { href: `/patients/owner?id=${hit.owner.id}`, label: hit.owner.fullName, detail: formatPhone(hit.owner.phone ?? hit.owner.phoneRaw), species: null, id: null, alerts: null, deceasedOn: null },
+    ...hit.patients.map(pet => ({ href: `/patients/pet?id=${pet.id}`, label: pet.name, detail: hit.owner.fullName, species: pet.species, id: pet.id, alerts: pet.alerts, deceasedOn: pet.deceasedOn }))
   ]));
   const allHref = $derived(`/patients?q=${encodeURIComponent(query.trim())}`);
   $effect(() => { page.url.href; open = false; });
@@ -84,8 +85,8 @@
           <a id={`${uid}-${i}`} role="option" aria-selected={active === i} tabindex="-1" href={option.href}
             onclick={() => open = false} onpointermove={() => active = i}
             class={`flex min-h-11 items-center gap-2 rounded-sm px-3 py-2 ${active === i ? 'bg-surface-muted' : ''}`}>
-            {#if option.species}<SpeciesIcon species={option.species} />{/if}
-            <span class="min-w-0"><span class="block break-words font-medium">{option.label}</span><span class="type-caption block text-fg-muted">{option.detail}</span></span>
+            {#if option.species && option.id !== null}<PatientAvatar patientId={option.id} species={option.species} name={option.label} />{/if}
+            <span class="min-w-0"><span class="block break-words font-medium">{option.label}</span><span class="type-caption block text-fg-muted">{option.detail}</span></span>{#if option.species}<PatientStatus alerts={option.alerts} deceasedOn={option.deceasedOn} />{/if}
           </a>
         {/each}
         <a id={`${uid}-${options.length}`} role="option" aria-selected={active === options.length} tabindex="-1" href={allHref}

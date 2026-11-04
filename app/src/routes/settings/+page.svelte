@@ -8,6 +8,7 @@
   import * as api from '$lib/api/settings';
   import type { AppInfo, BackupInfo } from '$lib/api/types';
   import { PhoneInput } from '$lib/components/ui';
+  import VisitTemplatesCard from '$lib/components/visits/VisitTemplatesCard.svelte';
   import { validateForm } from '$lib/validation';
   import Dialog from '$lib/components/ui/Dialog.svelte';
   import { buttonStyles } from '$lib/components/ui/button';
@@ -85,6 +86,7 @@
       </fieldset>
     </form>
   </Card>
+  <VisitTemplatesCard />
   <section class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section flex items-center gap-3"><IconChip icon={ShieldCheck} tone="accent" size="sm" />{tr.settingsBackups}</h2>
     <p class="mt-2 text-fg-muted">{tr.settingsBackupPolicy}</p>
     <div class="mt-4 flex flex-wrap gap-2"><button class={buttonStyles('primary')} disabled={busy} onclick={() => void backupNow()}>{tr.settingsBackupNow}</button><button class={buttonStyles('secondary')} onclick={() => void exportBackup()}>{tr.settingsExport}</button></div>

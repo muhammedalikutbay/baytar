@@ -1,4 +1,34 @@
 export type Species = 'cat' | 'dog' | 'bird' | 'rabbit' | 'rodent' | 'ferret' | 'reptile' | 'other';
+export type AttachmentKind = 'photo' | 'lab' | 'imaging' | 'document' | 'other';
+export interface Attachment extends Audit {
+  patientId: number; visitId: number | null; kind: AttachmentKind; title: string | null;
+  fileName: string; mime: string; sizeBytes: number; sha256: string;
+}
+export interface VisitTemplate extends Audit {
+  name: string; reason: string | null; findings: string | null; diagnosis: string | null;
+  treatment: string | null; notes: string | null;
+}
+export type NewVisitTemplate = Pick<VisitTemplate, 'name'> & Partial<Omit<VisitTemplate, keyof Audit | 'name'>>;
+export type VisitTemplatePatch = Partial<NewVisitTemplate>;
+export interface CommandMap {
+  visit_templates_list: { args: { includeDeleted: boolean }; result: VisitTemplate[] };
+  visit_template_get: { args: { id: number }; result: VisitTemplate };
+  visit_template_create: { args: { input: NewVisitTemplate }; result: VisitTemplate };
+  visit_template_update: { args: { id: number; patch: VisitTemplatePatch }; result: VisitTemplate };
+  visit_template_delete: { args: { id: number }; result: VisitTemplate };
+  visit_template_restore: { args: { id: number }; result: VisitTemplate };
+  attachments_list: { args: { patientId: number; visitId: number | null; includeDeleted: boolean }; result: Attachment[] };
+  attachment_add_from_path: { args: { patientId: number; visitId: number | null; kind: AttachmentKind; path: string }; result: Attachment };
+  attachment_rename: { args: { id: number; title: string | null }; result: Attachment };
+  attachment_delete: { args: { id: number }; result: Attachment };
+  attachment_restore: { args: { id: number }; result: Attachment };
+  attachment_read_bytes: { args: { id: number }; result: number[] };
+  attachment_thumbnail: { args: { id: number }; result: string | null };
+  attachment_open: { args: { id: number }; result: null };
+  attachment_export: { args: { id: number; path: string }; result: null };
+  patient_photo: { args: { patientId: number }; result: string | null };
+  patient_mark_deceased: { args: { id: number; date: string }; result: Patient };
+}
 export type MedicationCategory = 'antibiotic' | 'nsaid' | 'analgesic' | 'antiparasitic' | 'anesthetic' | 'sedative' | 'corticosteroid' | 'antiemetic' | 'gastro' | 'cardio' | 'dermatologic' | 'ophthalmic' | 'otic' | 'vitamin' | 'fluid' | 'hormone' | 'antifungal' | 'antiviral' | 'other';
 export type Sex = 'male' | 'female' | 'unknown';
 export interface Audit { id: number; createdAt: string; updatedAt: string; deletedAt: string | null }

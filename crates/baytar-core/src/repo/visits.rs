@@ -211,14 +211,14 @@ fn prepare(conn: &Connection, input: &mut NewVisit, id: Option<i64>) -> Result<(
     super::active_patient(conn, input.patient_id)?;
     if let Some(id) = id {
         let conflicts: bool = conn.query_row(
-            "SELECT EXISTS(SELECT 1 FROM vaccinations WHERE visit_id = ?1 AND patient_id != ?2)",
+            "SELECT EXISTS(SELECT 1 FROM vaccinations WHERE visit_id = ?1 AND patient_id != ?2 UNION ALL SELECT 1 FROM attachments WHERE visit_id = ?1 AND patient_id != ?2)",
             params![id, input.patient_id],
             |r| r.get(0),
         )?;
         if conflicts {
             return Err(super::invalid(
                 "patientId",
-                "must match linked vaccinations",
+                "must match linked vaccinations and attachments",
             ));
         }
     }

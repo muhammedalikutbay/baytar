@@ -6,3 +6,4 @@ export const create = (input: NewPatient) => call('patient_create', { input });
 export const update = (id: number, patch: PatientPatch) => call('patient_update', { id, patch });
 export const softDelete = (id: number) => call('patient_delete', { id });
 export const restore = (id: number) => call('patient_restore', { id });
+export const markDeceased = (id: number, date: string) => call('patient_mark_deceased', { id, date });
