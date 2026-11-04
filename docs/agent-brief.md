@@ -8,6 +8,9 @@ an issue ID, the files you may touch, and acceptance criteria.
   If you must touch another file, keep the change minimal and say so in your report.
 - Do not run `bd`, `git push`, `git rebase`, `git merge` or anything that changes other branches.
 - Do not install global tools. Project dependencies via `cargo` and `npm` are fine.
+- Windows shell notes: PowerShell script execution is disabled, so call `npm.cmd` and `npx.cmd` (not `npm`/`npx`).
+  Run cargo from PowerShell (MSVC linker). Keep the `CARGO_TARGET_DIR` you were given; it is shared by all workers,
+  so a "Blocking waiting for file lock" message just means waiting. Never kill processes by image name.
 - Run the checks your task lists (usually `cargo test -p baytar-core`, `npm run check` in `app/`). Fix what fails.
 - Finish with exactly one commit on your branch: `<type>(<scope>): <summary>` in English, e.g.
   `feat(core): schema v1 and migration runner`. Add the line `Refs: <issue>`.
