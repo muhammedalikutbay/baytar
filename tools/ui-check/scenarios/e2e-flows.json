@@ -1,0 +1,44 @@
+{
+  "name": "e2e-flows",
+  "description": "Clicks through the v0.3 usability fixes in the real window against an empty data folder (BAYTAR_DATA_DIR): new owner -> add pet follow-up, search returns all pets of a matching owner, plan a vaccine with the record picker and the vaccine combobox, an appointment with the time input, the pet page tabs, and the directory command.",
+  "steps": [
+    { "type": "localStorage.clear" },
+    { "type": "reload" },
+    { "type": "wait", "text": "hoş geldiniz", "timeout": 60000 },
+
+    { "type": "eval", "expr": "(async () => { const wait = ms => new Promise(r => setTimeout(r, ms)); const btn = t => [...document.querySelectorAll('button')].find(b => b.textContent.trim() === t && b.offsetParent); window.__wait = wait; window.__btn = btn; window.__dlg = () => [...document.querySelectorAll('[role=dialog]')].pop(); window.__set = (el, v) => { el.focus(); el.value = v; el.dispatchEvent(new InputEvent('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); }; return typeof btn; })()", "expect": "function" },
+
+    { "type": "click", "text": "Hastalar" },
+    { "type": "wait", "text": "Yeni sahip", "timeout": 15000 },
+    { "type": "eval", "expr": "(async () => { __btn('Yeni sahip').click(); await __wait(600); const d = __dlg(); const name = [...d.querySelectorAll('input')].find(i => i.autocomplete === 'name'); __set(name, 'Deneme Yılmaz'); const tel = d.querySelector('input[type=tel]'); __set(tel, '5551112233'); await __wait(200); [...d.querySelectorAll('button')].find(b => /Kaydet/.test(b.textContent)).click(); await __wait(1200); return __dlg().innerText.includes('Bu sahibe hasta eklemek ister misiniz'); })()", "expect": true },
+    { "type": "eval", "expr": "(async () => { [...__dlg().querySelectorAll('button')].find(b => /Hasta ekle/.test(b.textContent)).click(); await __wait(700); const d = __dlg(); const title = (document.getElementById(d.getAttribute('aria-labelledby') || '') ?? d.querySelector('h2,h1,[data-dialog-title]'))?.textContent.trim(); const name = [...d.querySelectorAll('input')].find(i => i.offsetParent && i.type === 'text' || i.type === '' ); __set([...d.querySelectorAll('input')].find(i => i.offsetParent), 'Zeytin'); const sp = d.querySelector('select'); sp.value = 'dog'; sp.dispatchEvent(new Event('change', { bubbles: true })); await __wait(200); [...d.querySelectorAll('button')].find(b => /Kaydet/.test(b.textContent)).click(); await __wait(1200); return [title, __dlg().innerText.includes('Zeytin kaydedildi')]; })()", "expect": ["Yeni hasta", true] },
+    { "type": "eval", "expr": "(async () => { [...__dlg().querySelectorAll('button')].find(b => /Kapat/.test(b.textContent)).click(); await __wait(400); const inv = window.__TAURI_INTERNALS__.invoke; const o = (await inv('owners_list', { query: { includeDeleted: false, limit: 50, offset: 0 } })).find(x => x.fullName === 'Deneme Yılmaz'); window.__owner = o; return o.phone; })()", "expect": "+905551112233" },
+
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('search', { query: 'deneme', limit: 20 }).then(h => h.map(x => [x.owner.fullName, x.patients.map(p => p.name)]))", "expect": [["Deneme Yılmaz", ["Zeytin"]]] },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('directory_list', { query: '', limit: 50 }).then(r => [r.total, r.owners.map(o => [o.owner.fullName, o.patients.map(p => p.name)])])", "expect": [1, [["Deneme Yılmaz", ["Zeytin"]]]] },
+
+    { "type": "click", "text": "Aşılar" },
+    { "type": "wait", "text": "Aşı planla", "timeout": 15000 },
+    { "type": "eval", "expr": "(async () => { __btn('Aşı planla').click(); await __wait(800); const d = __dlg(); const pet = [...d.querySelectorAll('[role=tree] button')].find(b => /Zeytin/.test(b.textContent) && !/Deneme/.test(b.textContent)); if (!pet) return 'Zeytin row missing: ' + d.innerText.slice(0, 300); pet.click(); await __wait(600); const cb = [...d.querySelectorAll('[role=combobox]')].find(c => !/SS:DD/.test(c.placeholder || '')); cb.click(); __set(cb, 'kuduz'); await __wait(400); const opts = [...document.querySelectorAll('[role=option]')].filter(o => o.offsetParent).map(o => o.textContent.trim()); return opts.length > 0 && opts.every(t => /kuduz|rabi/i.test(t)); })()", "expect": true },
+    { "type": "eval", "expr": "(async () => { const opt = [...document.querySelectorAll('[role=option]')].find(o => o.offsetParent); (opt.querySelector('button') ?? opt).click(); await __wait(300); const d = __dlg(); const chip = [...d.querySelectorAll('button')].find(b => b.textContent.trim() === '+1 hafta'); chip.click(); const t = d.querySelector('[placeholder=\"SS:DD\"]'); t.click(); await __wait(300); const listed = [...document.querySelectorAll('[role=listbox] [role=option]')].length; __set(t, '930'); t.dispatchEvent(new Event('blur')); await __wait(200); const val = t.value; [...d.querySelectorAll('button')].find(b => /Kaydet/.test(b.textContent)).click(); await __wait(1200); return [listed > 20, val, !document.querySelector('[role=dialog]') || !__dlg().innerText.includes('Aşı planla')]; })()", "expect": [true, "09:30", true] },
+    { "type": "eval", "expr": "(async () => { const inv = window.__TAURI_INTERNALS__.invoke; const today = new Date(); const from = today.toLocaleDateString('sv-SE'); const to = new Date(today.getTime() + 14 * 864e5).toLocaleDateString('sv-SE'); const a = await inv('appointments_between', { from, to }); return a.filter(x => x.appointment.kind === 'vaccine').map(x => [x.appointment.startsTime, x.appointment.title.endsWith('— Zeytin'), x.appointment.vaccineTypeId !== null]); })()", "expect": [["09:30", true, true]] },
+    { "type": "screenshot", "path": "flows-01-vaccines.png" },
+
+    { "type": "click", "text": "Ajanda" },
+    { "type": "wait", "text": "Randevu ekle", "timeout": 15000 },
+    { "type": "eval", "expr": "(async () => { __btn('Randevu ekle').click(); await __wait(800); const d = __dlg(); const firstLabel = [...d.querySelectorAll('legend,label')].map(l => l.textContent.trim()).filter(Boolean)[0]; const pet = [...d.querySelectorAll('[role=tree] button')].find(b => /Zeytin/.test(b.textContent) && !/Deneme/.test(b.textContent)); pet.click(); await __wait(500); const t = d.querySelector('[placeholder=\"SS:DD\"]'); __set(t, '14'); t.dispatchEvent(new Event('blur')); await __wait(200); [...d.querySelectorAll('button')].find(b => /Kaydet/.test(b.textContent)).click(); await __wait(1200); return [firstLabel, t.value]; })()", "expect": ["Hasta", "14:00"] },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('appointments_today', { today: new Date().toLocaleDateString('sv-SE') }).then(a => a.map(x => [x.appointment.startsTime, x.appointment.title]))", "expect": [["14:00", "Muayene — Zeytin"]] },
+    { "type": "screenshot", "path": "flows-02-agenda.png" },
+
+    { "type": "eval", "expr": "(async () => { const inv = window.__TAURI_INTERNALS__.invoke; const pets = await inv('patients_by_owner', { ownerId: __owner.id }); location.hash = ''; history.pushState({}, '', '/patients/pet?id=' + pets[0].id); window.dispatchEvent(new PopStateEvent('popstate')); return pets[0].name; })()", "expect": "Zeytin" },
+    { "type": "reload" },
+    { "type": "wait", "text": "Klinik geçmiş", "timeout": 20000 },
+    { "type": "eval", "expr": "[...document.querySelectorAll('[role=tab]')].map(t => t.textContent.trim())", "expect": ["Klinik geçmiş", "Aşılar", "Randevular", "Dosyalar"] },
+    { "type": "eval", "expr": "(() => { [...document.querySelectorAll('[role=tab]')].find(t => t.textContent.trim() === 'Aşılar').click(); return true; })()", "expect": true },
+    { "type": "wait", "text": "Aşı programı", "timeout": 10000 },
+    { "type": "screenshot", "path": "flows-03-pet-vaccines.png" },
+    { "type": "eval", "expr": "(() => { [...document.querySelectorAll('[role=tab]')].find(t => t.textContent.trim() === 'Randevular').click(); return true; })()", "expect": true },
+    { "type": "wait", "text": "Muayene — Zeytin", "timeout": 10000 },
+    { "type": "screenshot", "path": "flows-04-pet-appointments.png" }
+  ]
+}

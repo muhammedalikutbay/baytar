@@ -17,7 +17,7 @@
     Promise.all([visits.listByPatient(id), appointments.between(todayDate(), '9999-12-31'), mergedDue({ patientId: id })]).then(([encounters, calendar, due]) => {
       if (cancelled) return;
       history = encounters.filter(v => isPastClinicalRecord(v.visitOn, v.visitTime));
-      next = calendar.map(c => c.appointment).filter(a => a.patientId === id && a.status === 'planned' && !a.deletedAt && (a.startsOn > todayDate() || !a.startsTime || !isPastClinicalRecord(a.startsOn, a.startsTime)))
+      next = calendar.map(c => c.appointment).filter(a => a.patientId === id && a.kind !== 'vaccine' && a.status === 'planned' && !a.deletedAt && (a.startsOn > todayDate() || !a.startsTime || !isPastClinicalRecord(a.startsOn, a.startsTime)))
         .sort((a,b) => a.startsOn.localeCompare(b.startsOn) || (a.startsTime ?? '').localeCompare(b.startsTime ?? '') || a.id - b.id)[0] ?? null;
       vaccine = due.slice().sort((a,b) => a.dueOn.localeCompare(b.dueOn))[0] ?? null;
     }).catch(() => { if (!cancelled) failed = true; }).finally(() => { if (!cancelled) loading = false; });

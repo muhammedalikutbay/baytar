@@ -86,7 +86,7 @@
   {#if actionError}<p role="alert" class="text-danger">{actionError}</p>{/if}
   {#if loading}<p role="status">{tr.loading}</p>
   {:else if patient && owner}
-    <PageHeader title={patient.name} subtitle={[tr[patient.species], patient.breed, formatAge(patient.birthDate, patient.birthDateIsEstimate)].filter(Boolean).join(' · ')} icon={PawPrint}>
+    <PageHeader title={patient.name} subtitle={[tr[patient.species], patient.breed, patient.birthDate ? formatAge(patient.birthDate, patient.birthDateIsEstimate) : null].filter(Boolean).join(' · ')} icon={PawPrint}>
       {#snippet actions()}
         <Button disabled={!!patient?.deceasedOn} onclick={() => addVisit = true}>{tr.addVisit}</Button>
         <Button variant="secondary" disabled={!!patient?.deceasedOn} onclick={() => giveVaccine = true}>{tr.vaccineGive}</Button>

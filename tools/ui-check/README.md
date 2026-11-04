@@ -21,7 +21,8 @@ environment variable so a scenario never touches real records in `%APPDATA%\com.
 $env:BAYTAR_DATA_DIR = "$env:TEMPaytar-e2e"; node tools/ui-check/run.mjs --scenario e2e-v2 --exe <target>/debug/baytar-app.exe
 ```
 
-`e2e-v2` covers the v2 features (import with E.164 phones, catalog, vaccines, billing, reports, reminders and a
+`e2e-flows` clicks through the usability flows (new owner → add pet, record picker, vaccine combobox, time input,
+pet tabs). `e2e-v2` covers the v2 features (import with E.164 phones, catalog, vaccines, billing, reports, reminders and a
 screenshot of every screen). The `e2e-import` scenario expects an empty folder and
 the synthetic file path written in the scenario; edit the path for your machine.
 
