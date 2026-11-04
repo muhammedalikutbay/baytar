@@ -3,6 +3,7 @@ mod clinical;
 mod import;
 mod inventory;
 mod lock;
+mod reminders;
 mod reports;
 mod settings;
 mod vaccines;
@@ -755,7 +756,9 @@ pub fn run() {
             lock::lock_set_idle,
             reports::reports_overview,
             reports::reports_export_csv,
-            reports::reports_export_all
+            reports::reports_export_all,
+            reminders::reminders_overview,
+            reminders::reminders_record_contact
         ])
         .run(tauri::generate_context!())
         .expect("error while running Baytar");

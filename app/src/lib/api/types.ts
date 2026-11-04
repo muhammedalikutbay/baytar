@@ -397,3 +397,19 @@ export interface CommandMap {
   reports_export_csv: { args: { table: ExportTable; path: string }; result: string };
   reports_export_all: { args: { dir: string; today: string }; result: string[] };
 }
+export type ReminderKind = 'vaccine' | 'appointment' | 'debt' | 'followup';
+export type ContactChannel = 'whatsapp' | 'phone' | 'other';
+export interface ReminderContact { id: number; kind: ReminderKind; refKey: string; ownerId: number; channel: ContactChannel; contactedAt: string; note: string | null }
+export interface NewReminderContact { kind: ReminderKind; refKey: string; ownerId: number; channel: ContactChannel; note?: string | null }
+export interface ReminderItem {
+  kind: ReminderKind; refKey: string; ownerId: number; ownerName: string; phone: string | null;
+  patientId: number | null; patientName: string | null; species: Species | null;
+  reason: string; date: string; time: string | null; amountMinor: number | null; lastVisitOn: string | null;
+  lastContact: ReminderContact | null;
+}
+export interface RemindersQuery { today: string; vaccineDays: number; debtDays: number; followupDays: number }
+export interface RemindersOverview { vaccines: ReminderItem[]; appointments: ReminderItem[]; debts: ReminderItem[]; followups: ReminderItem[] }
+export interface CommandMap {
+  reminders_overview: { args: { query: RemindersQuery }; result: RemindersOverview };
+  reminders_record_contact: { args: { input: NewReminderContact }; result: ReminderContact };
+}

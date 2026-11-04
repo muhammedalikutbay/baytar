@@ -37,6 +37,11 @@ static MIGRATIONS: &[Migration] = &[
         name: "catalog_seed",
         sql: include_str!("migrations/0003_catalog_seed.sql"),
     },
+    Migration {
+        version: 4,
+        name: "reminders",
+        sql: include_str!("migrations/0004_reminders.sql"),
+    },
 ];
 
 /// Ordered list of all known migrations.
