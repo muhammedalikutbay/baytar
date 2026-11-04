@@ -108,8 +108,8 @@ function search(query: string, limit: number): SearchHit[] {
 const first = ownerCreate({ fullName: 'Çağrı Şimşek', phone: '0532 111 22 33' });
 const second = ownerCreate({ fullName: 'İpek Öztürk', phone: '0544 222 33 44' });
 const third = ownerCreate({ fullName: 'Ayşe Işık' });
-patientCreate({ ownerId: first.id, name: 'Pamuk', species: 'cat', breed: 'Ankara kedisi', sex: 'female' });
-patientCreate({ ownerId: first.id, name: 'Şimşek', species: 'dog', sex: 'male' });
+patientCreate({ ownerId: first.id, name: 'Pamuk', species: 'cat', breed: 'Ankara kedisi', sex: 'female', neutered: true, birthDate: '2022-04-12', color: 'Beyaz', microchip: '900108001234567' });
+patientCreate({ ownerId: first.id, name: 'Şimşek', species: 'dog', breed: 'Golden retriever', sex: 'male', neutered: false, birthDate: '2024-09-01', birthDateIsEstimate: true, color: 'Sarı' });
 patientCreate({ ownerId: second.id, name: 'Boncuk', species: 'bird' });
 patientCreate({ ownerId: third.id, name: 'Fındık', species: 'rabbit' });
 
