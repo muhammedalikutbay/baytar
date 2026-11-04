@@ -20,6 +20,9 @@ mod tests {
     #[test]
     fn exposes_application_identity() {
         assert_eq!(super::APP_NAME, "Baytar");
-        assert_eq!(super::version(), "0.2.0");
+        // The release script bumps the version; only its shape is checked here.
+        let parts: Vec<&str> = super::version().split('.').collect();
+        assert_eq!(parts.len(), 3);
+        assert!(parts.iter().all(|part| part.parse::<u32>().is_ok()));
     }
 }

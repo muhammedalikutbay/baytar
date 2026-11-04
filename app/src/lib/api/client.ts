@@ -217,7 +217,7 @@ function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['arg
     case 'backup_before_update': { const row = { path: '/demo/baytar-pre-update-20261104-120000Z.db', createdAt: new Date().toISOString(), kind: 'pre-update' as const, sizeBytes: 204800 }; mockBackups.unshift(row); return row; }
     case 'backup_export': return (args as { path: string }).path + '/baytar-manual-20261104-120000Z.db';
     case 'backup_restore': return null;
-    case 'app_info': return { version: '0.2.0', dataFolder: '/demo/Baytar', backupsFolder: '/demo/Baytar/backups', databaseSizeBytes: 204800 };
+    case 'app_info': return { version: 'dev', dataFolder: '/demo/Baytar', backupsFolder: '/demo/Baytar/backups', databaseSizeBytes: 204800 };
     case 'open_data_folder': return null;
     case 'open_whatsapp': return null;
     case 'dose_calculate': return calculateMock((args as CommandMap['dose_calculate']['args']).input);

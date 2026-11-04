@@ -5,7 +5,7 @@
 
 <!-- Brand artwork intentionally uses the canonical SVG palette in both themes. -->
 <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 1024 1024" aria-hidden="true">
-  <defs><linearGradient id={uid + '-tile'} x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse"><stop stop-color="#2DD4BF"/><stop offset="1" stop-color="#0F766E"/></linearGradient><linearGradient id={uid + '-plus'} x1="424" y1="580" x2="600" y2="756" gradientUnits="userSpaceOnUse"><stop stop-color="#F59E0B"/><stop offset="1" stop-color="#EA580C"/></linearGradient></defs>
+  <defs><linearGradient id={uid + '-tile'} x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse"><stop stop-color="#2DD4BF"/><stop offset="1" stop-color="#0F766E"/></linearGradient></defs>
   <rect x="40" y="40" width="944" height="944" rx="224" fill={'url(#' + uid + '-tile)'}/>
   <g fill="#fff">
     <ellipse cx="288" cy="416" rx="76" ry="106" transform="rotate(-28 288 416)"/>
@@ -14,5 +14,4 @@
     <ellipse cx="736" cy="416" rx="76" ry="106" transform="rotate(28 736 416)"/>
     <path d="M512 488C428 488 400 540 350 590C306 634 252 666 260 728C268 796 336 830 406 808C478 786 546 786 618 808C688 830 756 796 764 728C772 666 718 634 674 590C624 540 596 488 512 488Z"/>
   </g>
-  <path d="M496 580H528Q540 580 540 592V640H588Q600 640 600 652V684Q600 696 588 696H540V744Q540 756 528 756H496Q484 756 484 744V696H436Q424 696 424 684V652Q424 640 436 640H484V592Q484 580 496 580Z" fill={'url(#' + uid + '-plus)'}/>
 </svg>

@@ -76,7 +76,7 @@
         <p class="type-caption flex items-center gap-2 text-fg-muted"><ShieldCheck size={14} aria-hidden="true" />{tr.localData}</p>
       </div>
       <div class="theme-area">
-        <span class="sidebar-label type-caption tabular text-fg-subtle">{tr.version} {version ?? '0.2.0'}</span>
+        <span class="sidebar-label type-caption tabular text-fg-subtle">{version ? `${tr.version} ${version}` : ''}</span>
         <ThemeSwitch />
       </div>
     </div>
