@@ -469,6 +469,20 @@ export const tr = {
   clinicalDeceasedDescription: 'Hasta geçmişi korunur; aşı hatırlatmalarından çıkarılır.', clinicalClearDeceased: 'Vefat bilgisini kaldır',
   clinicalInvalidDeceased: 'Doğum tarihi ile bugün arasında bir tarih girin.', clinicalPatientInfo: 'Hasta bilgileri',
   clinicalHistoryTab: 'Klinik geçmiş', clinicalDemoLab: 'Örnek hemogram sonucu', clinicalDemoDocument: 'Örnek bakım planı',
+  cockpitMorning: 'Günaydın', cockpitDay: 'İyi günler', cockpitEvening: 'İyi akşamlar',
+  cockpitSummaryAppointments: 'Bugün {n} randevu', cockpitSummaryNoAppointments: 'Bugün randevu yok',
+  cockpitSummaryOverdue: '{n} geciken aşı', cockpitSummaryClear: 'geciken aşı yok',
+  cockpitQuickActions: 'Hızlı işlemler', cockpitNewVisit: 'Yeni muayene', cockpitGiveVaccine: 'Aşı uygula',
+  cockpitCollect: 'Tahsilat al', cockpitAddAppointment: 'Randevu ekle',
+  cockpitPickPatient: 'Hasta seçin', cockpitPickPatientDescription: 'Muayene kaydı açılacak hastayı arayın.',
+  cockpitPickOwner: 'Sahip seçin', cockpitPickOwnerDescription: 'Tahsilat alınacak sahibi arayın.',
+  cockpitToday: 'Bugün', cockpitNoAppointments: 'Bugün için randevu yok.', cockpitAddFirst: 'Randevu ekle',
+  cockpitAllDay: 'Gün boyu', cockpitAttention: 'Dikkat', cockpitAllClear: 'Şu an dikkat gerektiren bir şey yok.',
+  cockpitOverdueVaccines: 'Geciken aşılar', cockpitDebts: 'Borçlu hesaplar', cockpitDebtTotal: 'Toplam alacak',
+  cockpitStockAlerts: 'Stok uyarıları', cockpitLowStock: 'Düşük stok', cockpitExpiring: 'SKT yaklaşıyor (60 gün)',
+  cockpitExpired: 'SKT geçmiş', cockpitUpcoming: 'Yaklaşan aşılar (7 gün)', cockpitNoUpcoming: 'Önümüzdeki 7 gün için aşı yok.',
+  cockpitMonth: 'Bu ay', cockpitNewOwners: 'Yeni sahip', cockpitRevenue: 'Ciro', cockpitCollections: 'Tahsilat',
+  cockpitMore: '+{n} daha',
 } as const satisfies Record<string, string>;
 
 export type TranslationKey = keyof typeof tr;

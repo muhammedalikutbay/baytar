@@ -16,6 +16,7 @@
   import VisitCharges from '$lib/components/billing/VisitCharges.svelte';
   import DoseCalculator from '$lib/components/medications/DoseCalculator.svelte';
   import { formatUnits } from '$lib/format';
+  import StockDeduction from '$lib/components/inventory/StockDeduction.svelte';
 
   let { patientId, visit, onsaved, oncancel }: {
     patientId: number; visit?: Visit; onsaved: (visit: Visit) => void; oncancel: () => void;
@@ -62,8 +63,11 @@
   interface Line {
     key: number; id?: number; medicationId: string; name: string; doseMg: string; doseMl: string;
     doseText: string; frequency: string; duration: string; notes: string;
+    /** True for lines created in this form: stock deduction applies until it succeeds. */
+    fresh: boolean;
   }
   let nextKey = 0;
+  let stockRefs = $state<Record<number, { consumeAfterSave: (table: 'vaccinations' | 'prescription_items', id: number) => Promise<void> } | undefined>>({});
   let lines = $state<Line[]>([]);
   let doseLineKey = $state<number | null>(null);
   let removed: number[] = [];
@@ -77,7 +81,7 @@
   function draft(item?: PrescriptionItem): Line {
     return { key: nextKey++, id: item?.id, medicationId: String(item?.medicationId ?? ''), name: item?.medicationName ?? '',
       doseMg: String(item?.doseMg ?? '').replace('.', ','), doseMl: String(item?.doseMl ?? '').replace('.', ','),
-      doseText: item?.doseText ?? '', frequency: item?.frequency ?? '', duration: String(item?.durationDays ?? ''), notes: item?.notes ?? '' };
+      doseText: item?.doseText ?? '', frequency: item?.frequency ?? '', duration: String(item?.durationDays ?? ''), notes: item?.notes ?? '', fresh: !item };
   }
   async function load() {
     loading = true; loadFailed = false;
@@ -131,6 +135,10 @@
           durationDays: parseDecimal(line.duration), notes: line.notes.trim() || null };
         const saved = line.id === undefined ? await prescriptions.create(input) : await prescriptions.update(line.id, input);
         line.id = saved.id;
+        if (line.fresh) {
+          await stockRefs[line.key]?.consumeAfterSave('prescription_items', saved.id);
+          line.fresh = false;
+        }
       }
       while (removed.length) { await prescriptions.softDelete(removed[0]); removed.shift(); }
       while (pendingFiles.length) {
@@ -191,6 +199,7 @@
             <Input label={tr.frequency} bind:value={line.frequency} hint={tr.frequencyHint} />
             <NumberInput label={tr.durationDays} bind:value={() => parseDecimal(line.duration), n => line.duration = n === null ? '' : String(n)} error={errors[`${line.key}-duration`]} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} />
             <Input label={tr.notes} bind:value={line.notes} />
+            {#if line.fresh && line.medicationId}<StockDeduction bind:this={stockRefs[line.key]} medicationId={Number(line.medicationId)} />{/if}
             <Button variant="secondary" size="sm" onclick={() => removeLine(line)}>{tr.removeLine}</Button>
           </fieldset>
         {/each}

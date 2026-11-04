@@ -21,6 +21,7 @@ const KEYS: &[&str] = &[
     "clinic_tax_no",
     "clinic_logo",
     "update_check_enabled",
+    "inventory_deduct_default",
 ];
 
 fn paths(app: &tauri::AppHandle) -> Result<(PathBuf, PathBuf, PathBuf), String> {

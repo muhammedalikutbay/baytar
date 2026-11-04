@@ -11,6 +11,7 @@
   import type { VaccineType, Patient, Owner, ApiError } from '$lib/api/types';
   import VaccinePatientPicker from './VaccinePatientPicker.svelte';
   import DateChips from './DateChips.svelte';
+  import StockDeduction from '$lib/components/inventory/StockDeduction.svelte';
   let { patientId, vaccineTypeId = null, vaccineName = '', appointmentId = null, mode = 'give', initialDate = todayDate(), onsaved, oncancel }: {
     patientId?: number; vaccineTypeId?: number | null; vaccineName?: string; appointmentId?: number | null;
     mode?: 'give' | 'plan'; initialDate?: string; onsaved: () => void; oncancel: () => void;
@@ -32,6 +33,8 @@
   let saving = $state(false);
   let error = $state('');
   let revision = 0;
+  let savedId: number | null = null;
+  let stock = $state<{ consumeAfterSave: (table: 'vaccinations' | 'prescription_items', id: number) => Promise<void> } | undefined>();
   const available = $derived(types.filter(t => t.isActive && !t.deletedAt && selected && (!t.species || t.species === selected.patient.species)));
   const vaccine = $derived(available.find(t => t.id === Number(typeId)));
   async function load() {
@@ -69,9 +72,13 @@
     saving = true;
     try {
       if (mode === 'plan') await planVaccine({ patientId: selected.patient.id, vaccineTypeId: vaccine.id, startsOn: date, startsTime: time || null, notes: notes.trim() || null });
-      else await vaccinations.give({ vaccination: { patientId: selected.patient.id, vaccineTypeId: vaccine.id, vaccineName: vaccine.name, givenOn: date, nextDueOn: nextDueOn || null, batchNo: batchNo.trim() || null, notes: notes.trim() || null }, appointmentId, planNext });
+      else {
+        // Keep the saved id so a retry after a failed stock deduction never gives the vaccine twice.
+        if (savedId === null) savedId = (await vaccinations.give({ vaccination: { patientId: selected.patient.id, vaccineTypeId: vaccine.id, vaccineName: vaccine.name, givenOn: date, nextDueOn: nextDueOn || null, batchNo: batchNo.trim() || null, notes: notes.trim() || null }, appointmentId, planNext })).id;
+        await stock?.consumeAfterSave('vaccinations', savedId);
+      }
       onsaved();
-    } catch (e) { error = (e as ApiError)?.kind === 'invalid' ? tr.invalidField : tr.saveError; }
+    } catch (e) { error = savedId !== null ? tr.inventoryConsumeSavedError : (e as ApiError)?.kind === 'invalid' ? tr.invalidField : tr.saveError; }
     finally { saving = false; }
   }
 </script>
@@ -96,9 +103,10 @@
     {#if suggesting}<p role="status">{tr.loading}</p>{/if}
     {#if suggestionError}<p role="alert" class="text-danger">{tr.suggestionError}</p>{/if}
     <Checkbox label={tr.vaccinePlanNext} bind:checked={planNext} disabled={!nextDueOn} />
+    {#if vaccine}<StockDeduction bind:this={stock} vaccineTypeId={vaccine.id} />{/if}
   {/if}
   <Textarea label={tr.notes} bind:value={notes} />
   {#if error}<p role="alert" class="text-danger">{error}</p>{/if}
-  <div class="flex justify-end gap-2"><Button variant="secondary" disabled={saving} onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving || suggesting || !selected || !vaccine}>{saving ? tr.saving : tr.save}</Button></div>
+  <div class="flex justify-end gap-2"><Button variant="secondary" disabled={saving} onclick={() => savedId !== null ? onsaved() : oncancel()}>{tr.cancel}</Button><Button type="submit" disabled={saving || suggesting || !selected || !vaccine}>{saving ? tr.saving : tr.save}</Button></div>
 </form>
 {/if}
