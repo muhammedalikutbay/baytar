@@ -9,3 +9,5 @@ export const setStatus = (id: number, status: AppointmentStatus) => call('appoin
 export const createSeries = (base: NewAppointment, count: number, everyDays: number) => call('appointment_create_series', { base, count, everyDays });
 export const between = (from: string, to: string) => call('appointments_between', { from, to });
 export const today = (today: string) => call('appointments_today', { today });
+export const planVaccine = (input: import('./types').PlanVaccination) => call('vaccines_plan', { input });
+export const postponeVaccine = (appointmentId: number | null, vaccinationId: number | null, on: string) => call('vaccines_postpone', { appointmentId, vaccinationId, on });

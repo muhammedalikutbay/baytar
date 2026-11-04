@@ -1,91 +1,104 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { onMount, untrack } from 'svelte';
-  import { Button, Input, Textarea } from '$lib/components/ui';
+  import { Button, Input, Textarea, Select, DateInput, Checkbox } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
-  import { todayDate, daysUntil, dateAfterMonths } from '$lib/format';
+  import { todayDate, parseDate } from '$lib/format';
   import * as vaccinations from '$lib/api/vaccinations';
+  import { planVaccine } from '$lib/api/appointments';
   import * as vaccineTypes from '$lib/api/vaccine_types';
-  import type { Vaccination, VaccineType, ApiError } from '$lib/api/types';
-  let { patientId, vaccineName = '', vaccineTypeId = null, onsaved, oncancel }: {
-    patientId: number; vaccineName?: string; vaccineTypeId?: number | null;
-    onsaved: (record: Vaccination) => void; oncancel: () => void;
+  import * as patients from '$lib/api/patients';
+  import * as owners from '$lib/api/owners';
+  import type { VaccineType, Patient, Owner, ApiError } from '$lib/api/types';
+  import VaccinePatientPicker from './VaccinePatientPicker.svelte';
+  import DateChips from './DateChips.svelte';
+  let { patientId, vaccineTypeId = null, vaccineName = '', appointmentId = null, mode = 'give', initialDate = todayDate(), onsaved, oncancel }: {
+    patientId?: number; vaccineTypeId?: number | null; vaccineName?: string; appointmentId?: number | null;
+    mode?: 'give' | 'plan'; initialDate?: string; onsaved: () => void; oncancel: () => void;
   } = $props();
-  const initial = untrack(() => ({ vaccineName, vaccineTypeId }));
-  const uid = $props.id();
-  let name = $state(initial.vaccineName);
-  let givenOn = $state(todayDate());
+  const initial = untrack(() => ({ patientId, vaccineTypeId, initialDate }));
+  let selected = $state<{ patient: Patient; owner: Owner } | null>(null);
+  let typeId = $state(initial.vaccineTypeId ? String(initial.vaccineTypeId) : '');
+  let date = $state(initial.initialDate);
   let nextDueOn = $state('');
   let batchNo = $state('');
   let notes = $state('');
+  let time = $state('');
+  let planNext = $state(true);
   let types = $state<VaccineType[]>([]);
-  let loaded = $state(false);
+  let loading = $state(true);
   let loadError = $state(false);
-  let suggestionError = $state(false);
   let suggesting = $state(false);
+  let suggestionError = $state(false);
   let saving = $state(false);
-  let errors = $state<Record<string, string>>({});
-  let first = $state<HTMLInputElement | null>(null);
+  let error = $state('');
   let revision = 0;
-  const selected = $derived(types.find(type => type.name.trim().toLocaleLowerCase('tr-TR') === name.trim().toLocaleLowerCase('tr-TR'))
-    ?? (name === initial.vaccineName ? types.find(type => type.id === initial.vaccineTypeId) : undefined));
+  const available = $derived(types.filter(t => t.isActive && !t.deletedAt && selected && (!t.species || t.species === selected.patient.species)));
+  const vaccine = $derived(available.find(t => t.id === Number(typeId)));
   async function load() {
-    loadError = false;
-    try { types = (await vaccineTypes.list()).filter(type => type.isActive || type.id === initial.vaccineTypeId); loaded = true; }
-    catch { loadError = true; }
+    loading = true; loadError = false;
+    try {
+      types = await vaccineTypes.list();
+      if (initial.patientId) {
+        const patient = await patients.get(initial.patientId);
+        selected = { patient, owner: await owners.get(patient.ownerId) };
+      }
+    } catch { loadError = true; }
+    finally { loading = false; }
   }
-  onMount(() => { first?.focus(); void load(); });
+  onMount(() => { void load(); });
   $effect(() => {
-    const type = selected, date = givenOn;
-    if (!loaded) return;
+    const patient = selected?.patient.id, type = vaccine?.id, on = date;
     const request = ++revision;
-    suggestionError = false;
-    suggesting = false;
-    if (!type || daysUntil(date) === null) { nextDueOn = ''; return; }
-    nextDueOn = '';
+    nextDueOn = ''; suggestionError = false; suggesting = false;
+    if (mode !== 'give' || !patient || !type || !parseDate(on)) return;
     suggesting = true;
-    vaccinations.suggestNextDue(type.id, date).then(value => {
-      if (request === revision) nextDueOn = value ?? '';
-    }).catch(() => { if (request === revision) suggestionError = true; })
-      .finally(() => { if (request === revision) suggesting = false; });
+    vaccinations.suggestForPatient(patient, type, on).then(value => {
+      if (revision === request) nextDueOn = value ?? '';
+    }).catch(() => { if (revision === request) suggestionError = true; })
+      .finally(() => { if (revision === request) suggesting = false; });
     return () => { revision++; };
   });
-  function manualDate() { revision++; suggestionError = false; suggesting = false; }
-  function quick(months: number) { manualDate(); nextDueOn = dateAfterMonths(givenOn, months); }
+  function manualDue() { revision++; suggesting = false; suggestionError = false; }
   async function submit(event: SubmitEvent) {
-    event.preventDefault(); if (saving || suggesting || (!loaded && !loadError)) return;
-    errors = {};
-    if (!name.trim()) errors.vaccineName = tr.requiredField;
-    if (daysUntil(givenOn) === null || givenOn > todayDate()) errors.givenOn = tr.invalidDate;
-    if (nextDueOn && daysUntil(nextDueOn) === null) errors.nextDueOn = tr.invalidField;
-    if (Object.keys(errors).length) return;
+    event.preventDefault(); if (saving || suggesting || loading) return;
+    error = '';
+    if (!selected) { error = tr.vaccineChoosePatient; return; }
+    if (!vaccine) { error = tr.vaccineChoose; return; }
+    if (!parseDate(date) || (mode === 'give' && date > todayDate())) { error = tr.invalidDate; return; }
+    if (mode === 'give' && nextDueOn && (!parseDate(nextDueOn) || nextDueOn <= date)) { error = tr.vaccineNextAfterGiven; return; }
     saving = true;
     try {
-      onsaved(await vaccinations.create({ patientId, vaccineTypeId: selected?.id ?? null,
-        vaccineName: name.trim(), givenOn, nextDueOn: nextDueOn || null,
-        batchNo: batchNo.trim() || null, notes: notes.trim() || null }));
-    } catch (error) {
-      const e = error as ApiError;
-      errors = e?.field && ['vaccineName', 'givenOn', 'nextDueOn', 'batchNo', 'notes'].includes(e.field)
-        ? { [e.field]: tr.invalidField } : { form: tr.saveError };
-    } finally { saving = false; }
+      if (mode === 'plan') await planVaccine({ patientId: selected.patient.id, vaccineTypeId: vaccine.id, startsOn: date, startsTime: time || null, notes: notes.trim() || null });
+      else await vaccinations.give({ vaccination: { patientId: selected.patient.id, vaccineTypeId: vaccine.id, vaccineName: vaccine.name, givenOn: date, nextDueOn: nextDueOn || null, batchNo: batchNo.trim() || null, notes: notes.trim() || null }, appointmentId, planNext });
+      onsaved();
+    } catch (e) { error = (e as ApiError)?.kind === 'invalid' ? tr.invalidField : tr.saveError; }
+    finally { saving = false; }
   }
 </script>
-<form onsubmit={submit} class="grid gap-4" novalidate>
-  <Input label={tr.vaccineName + ' *'} hint={tr.vaccineNameHint} list={uid} bind:value={name} bind:ref={first} required error={errors.vaccineName} />
-  <datalist id={uid}>{#each types as type (type.id)}<option value={type.name}></option>{/each}</datalist>
-  {#if !loaded && !loadError}<p role="status" class="text-fg-muted">{tr.loading}</p>{/if}
-  {#if loadError}<p role="alert" class="text-danger">{tr.loadError}</p><Button size="sm" variant="secondary" onclick={load}>{tr.retry}</Button>{/if}
-  <Input label={tr.givenOn + ' *'} type="date" bind:value={givenOn} max={todayDate()} required error={errors.givenOn} />
-  <Input label={tr.nextDueOn} type="date" bind:value={nextDueOn} oninput={manualDate} error={errors.nextDueOn} />
-  {#if suggesting}<p role="status" class="text-fg-muted">{tr.loading}</p>{/if}
-  <div class="flex flex-wrap gap-2">
-    <Button size="sm" variant="secondary" onclick={() => quick(1)}>{tr.plusMonth}</Button>
-    <Button size="sm" variant="secondary" onclick={() => quick(3)}>{tr.plusThreeMonths}</Button>
-    <Button size="sm" variant="secondary" onclick={() => quick(12)}>{tr.plusYear}</Button>
-  </div>
-  {#if suggestionError}<p role="alert" class="text-danger">{tr.suggestionError}</p>{/if}
-  <Input label={tr.batchNo} bind:value={batchNo} error={errors.batchNo} />
-  <Textarea label={tr.notes} bind:value={notes} error={errors.notes} />
-  {#if errors.form}<p role="alert" class="text-danger">{errors.form}</p>{/if}
-  <div class="flex justify-end gap-2"><Button variant="secondary" onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving || suggesting || (!loaded && !loadError)}>{saving ? tr.saving : tr.save}</Button></div>
+{#if loading}<p role="status">{tr.loading}</p>
+{:else if loadError}<p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" onclick={load}>{tr.retry}</Button>
+{:else}
+<form onsubmit={submit} class="grid gap-4">
+  <VaccinePatientPicker bind:selected locked={!!initial.patientId || !!appointmentId} />
+  {#if selected}
+    <Select label={tr.vaccineName} bind:value={typeId} required disabled={!!appointmentId} placeholder={tr.vaccineChoose} options={available.map(t => ({ value: String(t.id), label: t.name }))} />
+    <p class="type-caption text-fg-muted">{available.length ? tr.vaccineCatalogHint : tr.vaccineNoCatalog}</p>
+    {#if vaccineName && !vaccine}<p class="type-caption text-fg-muted">{vaccineName} · {tr.vaccineUntypedPlan}</p>{/if}
+  {/if}
+  <DateInput label={mode === 'give' ? tr.givenOn : tr.date} bind:value={date} required max={mode === 'give' ? todayDate() : '9999-12-31'} />
+  {#if mode === 'plan'}
+    <DateChips bind:value={date} />
+    <Input label={tr.appointmentTime} type="time" bind:value={time} hint={tr.appointmentTimeHint} />
+  {:else}
+    <Input label={tr.batchNo} bind:value={batchNo} />
+    <DateInput label={tr.nextDueOn} bind:value={nextDueOn} oninput={manualDue} />
+    <p class="type-caption text-fg-muted">{tr.vaccineSuggestionHint}</p>
+    {#if suggesting}<p role="status">{tr.loading}</p>{/if}
+    {#if suggestionError}<p role="alert" class="text-danger">{tr.suggestionError}</p>{/if}
+    <Checkbox label={tr.vaccinePlanNext} bind:checked={planNext} disabled={!nextDueOn} />
+  {/if}
+  <Textarea label={tr.notes} bind:value={notes} />
+  {#if error}<p role="alert" class="text-danger">{error}</p>{/if}
+  <div class="flex justify-end gap-2"><Button variant="secondary" disabled={saving} onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving || suggesting || !selected || !vaccine}>{saving ? tr.saving : tr.save}</Button></div>
 </form>
+{/if}

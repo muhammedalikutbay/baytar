@@ -1,5 +1,6 @@
 mod import;
 mod settings;
+mod vaccines;
 
 use baytar_core::{
     backup,
@@ -675,7 +676,13 @@ pub fn run() {
             patient_update,
             patient_delete,
             patient_restore,
-            search
+            search,
+            vaccines::vaccines_due_list,
+            vaccines::vaccines_give,
+            vaccines::vaccines_plan,
+            vaccines::vaccines_suggest,
+            vaccines::vaccines_calendar,
+            vaccines::vaccines_postpone
         ])
         .run(tauri::generate_context!())
         .expect("error while running Baytar");

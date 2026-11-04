@@ -9,3 +9,7 @@ export const listByPatient = (patientId: number) => call('vaccinations_by_patien
 export const suggestNextDue = (typeId: number, givenOn: string) => call('vaccination_suggest_next_due', { typeId, givenOn });
 export const dueBetween = (from: string, to: string) => call('vaccinations_due_between', { from, to });
 export const overdue = (today: string) => call('vaccinations_overdue', { today });
+export const mergedDue = (query: import('./types').VaccineDueQuery = {}) => call('vaccines_due_list', { query });
+export const give = (input: import('./types').GiveVaccination) => call('vaccines_give', { input });
+export const suggestForPatient = (patientId: number, typeId: number, givenOn: string) => call('vaccines_suggest', { patientId, typeId, givenOn });
+export const calendar = (from: string, to: string) => call('vaccines_calendar', { from, to });

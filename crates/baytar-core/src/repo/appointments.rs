@@ -155,7 +155,7 @@ pub fn create(conn: &Connection, mut input: NewAppointment) -> Result<Appointmen
     tx.commit()?;
     Ok(result)
 }
-fn insert(conn: &Connection, input: NewAppointment) -> Result<Appointment> {
+pub(crate) fn insert(conn: &Connection, input: NewAppointment) -> Result<Appointment> {
     conn.execute("INSERT INTO appointments (patient_id, owner_id, title, starts_on, starts_time, duration_min, kind, status, series_id, notes, vaccine_type_id, vaccination_id, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)", params![input.patient_id, input.owner_id, input.title, input.starts_on, input.starts_time, input.duration_min, input.kind, input.status, input.series_id, input.notes, input.vaccine_type_id, input.vaccination_id, now()])?;
     get(conn, conn.last_insert_rowid())
 }
