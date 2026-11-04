@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { House, CalendarDays, Syringe, TriangleAlert, Plus, UserRoundPlus, Search } from '@lucide/svelte';
-  import { Button, Card, Dialog, EmptyState, Badge, buttonStyles } from '$lib/components/ui';
+  import { PageHeader, StatTile, Button, Card, Dialog, EmptyState, Badge, buttonStyles } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { addDateDays, formatAgendaDate, formatDate, formatPhone, todayDate } from '$lib/format';
   import * as appointments from '$lib/api/appointments';
@@ -68,7 +68,7 @@
   const startupMessage = $derived(status && (status.ready === false || status.code === 'backup_failed')
     ? startupMessages[status.code ?? ''] ?? tr.homeStartupOther : '');
   const overdueCount = $derived(overdueRows.length + overdueAppointments.length);
-  function focusSearch() { document.querySelector<HTMLInputElement>('.topbar input[type="search"]')?.focus(); }
+  function focusSearch() { document.querySelector<HTMLInputElement>('.window-search input[type="search"]')?.focus(); }
   async function setDone(id: number) {
     if (busy) return;
     busy = true;
@@ -79,16 +79,17 @@
 </script>
 
 <div class="grid gap-8">
-  <header class="flex flex-wrap items-end justify-between gap-4">
-    <div><h1 class="type-page">{tr.homeDate}</h1><p class="mt-2 text-fg-muted tabular-nums">{formatAgendaDate(today)}</p></div>
-    {#if !loading && ownersCount !== null && ownersCount > 0 && status?.ready}
-      <div class="flex flex-wrap gap-2">
+  <PageHeader title={tr.homeDate} subtitle={formatAgendaDate(today)} icon={House}>
+    {#snippet actions()}
+      {#if !loading && ownersCount !== null && ownersCount > 0 && status?.ready}
         <Button size="sm" variant="secondary" onclick={() => dialog = 'owner'}><UserRoundPlus size={16} aria-hidden="true" />{tr.homeNewOwner}</Button>
-        <Button size="sm" variant="secondary" onclick={() => dialog = 'appointment'}><Plus size={16} aria-hidden="true" />{tr.homeAddAppointment}</Button>
+        <Button size="sm" onclick={() => dialog = 'appointment'}><Plus size={16} aria-hidden="true" />{tr.homeAddAppointment}</Button>
         <Button size="sm" variant="secondary" onclick={focusSearch}><Search size={16} aria-hidden="true" />{tr.homeFindPatient}</Button>
-      </div>
-    {/if}
-  </header>
+      {:else if !loading && ownersCount === 0 && status?.ready}
+        <Button onclick={() => dialog = 'owner'}><UserRoundPlus size={16} aria-hidden="true" />{tr.homeNewOwner}</Button>
+      {/if}
+    {/snippet}
+  </PageHeader>
 
   {#if loading}<p role="status" class="text-fg-muted">{tr.loading}</p>
   {:else if status?.ready === false}<Card><p role="alert" class="text-fg-muted">{startupMessage}</p></Card>
@@ -99,9 +100,14 @@
     </EmptyState></Card>
   {:else}
     {#if status?.code === 'backup_failed'}<Card><p role="status" class="text-fg-muted">{startupMessage}</p></Card>{/if}
+    <div class="grid gap-4 md:grid-cols-3">
+      <StatTile icon={CalendarDays} value={todayRows.length} label={tr.homeAppointments} hint={formatAgendaDate(today)} />
+      <StatTile icon={Syringe} value={upcomingRows.length} label={tr.homeUpcomingVaccines} hint={tr.upcoming} />
+      <StatTile icon={TriangleAlert} tone="highlight" value={overdueCount} label={tr.homeOverdue} hint={tr.homeOverdueHint} />
+    </div>
     <div class="grid gap-5 xl:grid-cols-2">
-      <section aria-labelledby="today-appointments"><Card>
-        <div class="mb-3 flex items-center justify-between gap-3"><h2 id="today-appointments" class="type-section flex items-center gap-2"><CalendarDays size={18} class="text-fg-muted" aria-hidden="true" />{tr.homeAppointments}</h2><a class="type-caption text-accent underline" href="/agenda">{tr.homeAll}</a></div>
+      <section aria-labelledby="today-appointments"><Card title={tr.homeAppointments} icon={CalendarDays} count={todayRows.length} tone="accent" headingId="today-appointments">
+        {#snippet actions()}<a class="type-caption text-accent underline" href="/agenda">{tr.homeAll}</a>{/snippet}
         {#if !todayRows.length}<p class="text-fg-muted">{tr.homeNoAppointments}</p>
         {:else}<ul class="divide-y divide-border">{#each todayRows.slice(0, 5) as row (row.appointment.id)}<li class="flex flex-wrap items-center gap-3 py-3">
           <span class="w-12 tabular-nums text-fg-muted">{row.appointment.startsTime ?? tr.agendaAllDay}</span><div class="min-w-0 flex-1"><p class="font-medium break-words">{row.appointment.title}</p><p class="type-caption text-fg-muted">{row.patientName ?? ''}{row.patientName && row.ownerName ? ' · ' : ''}{row.ownerName ?? ''}</p></div>
@@ -109,14 +115,14 @@
         </li>{/each}</ul>{/if}
       </Card></section>
 
-      <section aria-labelledby="upcoming-vaccines"><Card>
-        <div class="mb-3 flex items-center justify-between gap-3"><h2 id="upcoming-vaccines" class="type-section flex items-center gap-2"><Syringe size={18} class="text-fg-muted" aria-hidden="true" />{tr.homeUpcomingVaccines}</h2><a class="type-caption text-accent underline" href="/vaccines">{tr.homeAll}</a></div>
+      <section aria-labelledby="upcoming-vaccines"><Card title={tr.homeUpcomingVaccines} icon={Syringe} count={upcomingRows.length} tone="accent" headingId="upcoming-vaccines">
+        {#snippet actions()}<a class="type-caption text-accent underline" href="/vaccines">{tr.homeAll}</a>{/snippet}
         {#if !upcomingRows.length}<p class="text-fg-muted">{tr.homeNoVaccines}</p>
         {:else}<ul class="divide-y divide-border">{#each upcomingRows.slice(0, 5) as row (row.vaccination.id)}<li class="flex flex-wrap items-center gap-x-4 gap-y-1 py-3"><div class="min-w-28 flex-1"><p class="font-medium">{row.patientName}</p><p class="type-caption text-fg-muted">{row.ownerName}{row.phone ? ` · ${formatPhone(row.phone)}` : ''}</p></div><span class="min-w-24 flex-1">{row.vaccination.vaccineName}</span><span class="type-caption tabular-nums">{formatDate(row.vaccination.nextDueOn)}</span></li>{/each}</ul>{/if}
       </Card></section>
 
-      <section aria-labelledby="overdue-items" class="xl:col-span-2"><Card>
-        <div class="mb-3 flex items-center justify-between gap-3"><h2 id="overdue-items" class="type-section flex items-center gap-2"><TriangleAlert size={18} class="text-highlight" aria-hidden="true" />{tr.homeOverdue}<Badge variant="highlight">{overdueCount}</Badge></h2><a class="type-caption text-accent underline" href="/agenda">{tr.homeAll}</a></div>
+      <section aria-labelledby="overdue-items" class="xl:col-span-2"><Card title={tr.homeOverdue} icon={TriangleAlert} count={overdueCount} tone="highlight" headingId="overdue-items">
+        {#snippet actions()}<a class="type-caption text-accent underline" href="/agenda">{tr.homeAll}</a>{/snippet}
         {#if overdueCount === 0}<p class="text-fg-muted">{tr.homeNoOverdue}</p>
         {:else}<ul class="divide-y divide-border">
           {#each overdueRows.slice(0, 5) as row (row.vaccination.id)}<li class="flex flex-wrap items-center gap-3 py-3"><Badge variant="highlight">{tr.vaccination}</Badge><div class="min-w-0 flex-1"><p class="font-medium">{row.patientName} · {row.vaccination.vaccineName}</p><p class="type-caption text-fg-muted">{row.ownerName}{row.phone ? ` · ${formatPhone(row.phone)}` : ''}</p></div><span class="type-caption tabular-nums text-highlight">{formatDate(row.vaccination.nextDueOn)}</span></li>{/each}

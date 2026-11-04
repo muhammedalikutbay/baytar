@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import { goto, replaceState } from '$app/navigation';
   import { Users } from '@lucide/svelte';
-  import { Button, Input, Card, Badge, Dialog, EmptyState } from '$lib/components/ui';
+  import { PageHeader, Button, Input, Card, Badge, Dialog, EmptyState } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { formatPhone } from '$lib/format';
   import * as owners from '$lib/api/owners';
@@ -44,12 +44,11 @@
 </script>
 
 <div class="grid gap-8">
-  <div class="flex flex-wrap items-start justify-between gap-4">
-    <div><h1 class="type-page">{tr.patients}</h1><p class="mt-2 text-fg-muted">{tr.patientsDescription}</p></div>
-    <Button onclick={() => open = true}>{tr.newOwner}</Button>
-  </div>
+  <PageHeader title={tr.patients} subtitle={tr.patientsDescription} icon={Users}>
+    {#snippet actions()}<Button onclick={() => open = true}>{tr.newOwner}</Button>{/snippet}
+  </PageHeader>
   <Input label={tr.search} type="search" bind:value={query} oninput={changeQuery} placeholder={tr.search} />
-  <Card class="overflow-hidden p-0 sm:p-0">
+  <Card title={tr.patients} icon={Users} count={rows.length} class="overflow-hidden p-0 sm:p-0 [&>div:first-child]:m-4">
     {#if loading}<p role="status" class="p-6 text-fg-muted">{tr.loading}</p>
     {:else if error}<div class="p-6"><p role="alert" class="mb-4 text-danger">{tr.loadError}</p><Button variant="secondary" onclick={() => refresh++}>{tr.retry}</Button></div>
     {:else if rows.length === 0}<EmptyState icon={Users} title={query.trim() ? tr.noResults : tr.ownersEmpty} description={query.trim() ? tr.noResultsDescription : tr.ownersEmptyDescription} />

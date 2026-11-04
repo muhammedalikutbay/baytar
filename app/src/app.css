@@ -1,10 +1,10 @@
-@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/plus-jakarta-sans/wght.css';
 @import 'tailwindcss';
 
 /* The contrast contract lives in docs/design-language.md. */
 @theme static {
   --color-*: initial;
-  --font-sans: 'Inter Variable', Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
   --color-canvas: #f7f7f9;
   --color-surface: #ffffff;
   --color-surface-muted: #f2f2f5;
@@ -16,6 +16,11 @@
   --color-fg-subtle: #6e6e78;
   --color-ink: #111114;
   --color-ink-fg: #ffffff;
+  --color-primary: #11756f;
+  --color-primary-fg: #ffffff;
+  --color-primary-hover: #0f665f;
+  --color-window-close: #c42b1c;
+  --color-window-close-fg: #ffffff;
   --color-accent: #11756f;
   --color-highlight: #a9521c;
   --color-success: #1f7a4d;
@@ -33,7 +38,7 @@
 }
 
 @theme inline {
-  /* Opaque sRGB mixes keep badge contrast independent of the parent. Badges only. */
+  /* Opaque tints keep chips, navigation and header strips independent of the canvas. */
   --color-accent-soft: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
   --color-highlight-soft: color-mix(in srgb, var(--color-highlight) 10%, var(--color-surface));
   --color-success-soft: color-mix(in srgb, var(--color-success) 10%, var(--color-surface));
@@ -55,6 +60,11 @@
   --color-fg-subtle: #6e6e78;
   --color-ink: #111114;
   --color-ink-fg: #ffffff;
+  --color-primary: #11756f;
+  --color-primary-fg: #ffffff;
+  --color-primary-hover: #0f665f;
+  --color-window-close: #c42b1c;
+  --color-window-close-fg: #ffffff;
   --color-accent: #11756f;
   --color-highlight: #a9521c;
   --color-success: #1f7a4d;
@@ -76,6 +86,9 @@
   --color-fg-subtle: #858590;
   --color-ink: #f2f2f5;
   --color-ink-fg: #0b0b0f;
+  --color-primary: #4fc3b8;
+  --color-primary-fg: #0b0b0f;
+  --color-primary-hover: #70d3c9;
   --color-accent: #4fc3b8;
   --color-highlight: #f0a06a;
   --color-success: #5bc48a;
@@ -93,7 +106,6 @@
     font-family: var(--font-sans);
     font-size: 14px;
     line-height: 1.55;
-    font-feature-settings: 'ss01', 'cv11';
     -webkit-font-smoothing: antialiased;
   }
   button, input, textarea, select { font: inherit; }
@@ -105,6 +117,7 @@
   input::placeholder, textarea::placeholder { color: var(--color-fg-subtle); opacity: 1; }
   input[type='search']::-webkit-search-cancel-button { cursor: pointer; }
   svg { flex-shrink: 0; }
+  table, .tabular-nums { font-feature-settings: 'tnum'; font-variant-numeric: tabular-nums; }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   }
@@ -119,4 +132,20 @@
 @utility type-section { font-size: 15px; line-height: 1.5; letter-spacing: -0.01em; font-weight: 600; }
 @utility type-body { font-size: 14px; line-height: 1.55; font-weight: 400; }
 @utility type-caption { font-size: 12px; line-height: 1.5; font-weight: 500; }
-@utility tabular { font-variant-numeric: tabular-nums; }
+@utility tabular { font-feature-settings: 'tnum'; font-variant-numeric: tabular-nums; }
+
+/* The pattern is masked independently so solid content never fades with it. */
+.content-canvas { position: relative; isolation: isolate; min-width: 0; }
+.content-canvas::before, .content-canvas::after { position: absolute; z-index: -1; inset: 0; pointer-events: none; content: ''; }
+.content-canvas::before {
+  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-border) 45%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--color-border) 45%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 90% 680px at 50% 0, black, transparent);
+}
+.content-canvas::after {
+  background: radial-gradient(ellipse 480px 300px at 5% 0, var(--color-accent), transparent 75%), radial-gradient(ellipse 420px 280px at 95% 0, var(--color-highlight), transparent 75%);
+  opacity: 0.1;
+  filter: blur(40px);
+  clip-path: inset(0);
+}
+[data-theme='dark'] .content-canvas::after { opacity: 0.16; }

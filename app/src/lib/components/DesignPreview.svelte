@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { Archive, Check, Plus } from '@lucide/svelte';
+  import { Archive, Check, Plus, CalendarDays, Syringe, TriangleAlert } from '@lucide/svelte';
   import { tr } from '$lib/i18n/tr';
   import type { ResolvedTheme } from '$lib/theme.svelte';
-  import { Badge, Button, Card, Checkbox, Dialog, EmptyState, IconButton, Input, Kbd, Select, Separator, Textarea, Toast } from '$lib/components/ui';
+  import Logo from '$lib/components/brand/Logo.svelte';
+  import { PageHeader, IconChip, StatTile, Badge, Button, Card, Checkbox, Dialog, EmptyState, IconButton, Input, Kbd, Select, Separator, Textarea, Toast } from '$lib/components/ui';
 
   let { mode }: { mode: ResolvedTheme } = $props();
   let name = $state(tr.galleryExampleName as string);
@@ -14,6 +15,8 @@
   let toastOpen = $state(true);
   let toastMessage = $state(tr.galleryToastMessage as string);
   const colors = [
+    ['primary', tr.galleryPrimaryColor], ['primary-fg', tr.galleryPrimaryForeground], ['primary-hover', tr.galleryPrimaryHover],
+    ['accent-soft', tr.galleryAccent], ['highlight-soft', tr.galleryHighlight],
     ['canvas', tr.galleryColorCanvas], ['surface', tr.galleryColorSurface], ['surface-muted', tr.galleryColorSurfaceMuted],
     ['border', tr.galleryColorBorder], ['border-strong', tr.galleryColorBorderStrong], ['border-control', tr.galleryColorBorderControl],
     ['fg', tr.galleryColorFg], ['fg-muted', tr.galleryColorFgMuted], ['fg-subtle', tr.galleryColorFgSubtle],
@@ -34,6 +37,26 @@
   </header>
 
   <div class="grid gap-8">
+    <section aria-label={tr.galleryBrand}>
+      <h3 class="type-section mb-4">{tr.galleryBrand}</h3>
+      <div class="flex items-center gap-5"><Logo size={16} /><Logo size={20} /><Logo size={28} /><Logo size={40} /></div>
+    </section>
+    <section aria-label={tr.galleryHierarchy} class="grid gap-4">
+      <PageHeader title={tr.homeDate} subtitle={tr.galleryStatHint} icon={CalendarDays}>
+        {#snippet actions()}<Button size="sm" onclick={() => dialogOpen = true}><Plus size={16} aria-hidden="true" />{tr.agendaAction}</Button>{/snippet}
+      </PageHeader>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <StatTile icon={Syringe} value="24" label={tr.vaccines} hint={tr.galleryStatHint} />
+        <StatTile icon={TriangleAlert} tone="highlight" value="3" label={tr.overdue} hint={tr.homeOverdueHint} />
+      </div>
+      <div class="flex gap-3">
+        <IconChip icon={Syringe} /><IconChip icon={TriangleAlert} tone="highlight" /><IconChip icon={Archive} tone="neutral" /><IconChip icon={TriangleAlert} tone="danger" /><IconChip icon={Check} tone="success" />
+      </div>
+      <Card title={tr.homeUpcomingVaccines} icon={Syringe} count={24}>
+        {#snippet actions()}<Button size="sm" variant="ghost" onclick={() => dialogOpen = true}>{tr.homeAll}</Button>{/snippet}
+        <p class="text-fg-muted">{tr.galleryCardDescription}</p>
+      </Card>
+    </section>
     <section aria-label={tr.galleryPalette}>
       <h3 class="type-section mb-4">{tr.galleryPalette}</h3>
       <div class="grid grid-cols-3 gap-x-3 gap-y-4">
@@ -65,7 +88,7 @@
         <Button onclick={() => dialogOpen = true}>{tr.galleryPrimary}</Button>
         <Button variant="secondary" onclick={() => dialogOpen = true}>{tr.gallerySecondary}</Button>
         <Button variant="ghost" onclick={() => dialogOpen = true}>{tr.galleryGhost}</Button>
-        <Button variant="danger" onclick={() => dialogOpen = true}>{tr.galleryDanger}</Button>
+        <Button variant="destructive" onclick={() => dialogOpen = true}>{tr.galleryDanger}</Button>
         <Button size="sm" variant="secondary" onclick={() => dialogOpen = true}>{tr.gallerySmall}</Button>
         <IconButton label={tr.galleryIcon} onclick={() => dialogOpen = true}><Plus size={18} aria-hidden="true" /></IconButton>
         <IconButton label={tr.galleryChecked} selected aria-pressed="true" onclick={() => dialogOpen = true}><Check size={18} aria-hidden="true" /></IconButton>

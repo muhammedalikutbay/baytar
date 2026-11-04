@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { Syringe, TriangleAlert } from '@lucide/svelte';
   import { isTauri } from '@tauri-apps/api/core';
   import { openWhatsapp } from '$lib/api/settings';
-  import { Card, Button, Badge, Dialog } from '$lib/components/ui';
+  import { PageHeader, Card, Button, Badge, Dialog, buttonStyles } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { todayDate, dateAfterDays, daysUntil, formatDate, formatPhone, whatsappPhone } from '$lib/format';
   import * as vaccinations from '$lib/api/vaccinations';
@@ -52,7 +53,9 @@
 </script>
 
 <div class="grid gap-8">
-  <div><h1 class="type-page">{tr.vaccines}</h1><p class="mt-2 text-fg-muted">{tr.vaccinesDescription}</p></div>
+  <PageHeader title={tr.vaccines} subtitle={tr.vaccinesDescription} icon={Syringe}>
+    {#snippet actions()}<a class={buttonStyles()} href="/agenda">{tr.vaccinesHeaderAction}</a>{/snippet}
+  </PageHeader>
   <div class="flex flex-wrap items-center gap-2" role="group" aria-label={tr.duePeriod}>
     <span class="mr-2 type-caption text-fg-muted">{tr.upcoming}</span>
     {#each [7, 30, 90] as days}<Button size="sm" variant={period === days ? 'primary' : 'secondary'} aria-pressed={period === days} onclick={() => period = days}>{days} {tr.dayUnit}</Button>{/each}
@@ -61,8 +64,7 @@
   {:else if failed}<Card><p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" onclick={() => refresh++}>{tr.retry}</Button></Card>
   {:else}
     {#each [{ title: tr.overdue, rows: overdue, empty: tr.noOverdue }, { title: tr.upcoming, rows: upcoming, empty: tr.noUpcoming }] as section}
-      <section aria-label={section.title}><Card>
-        <h2 class="type-section mb-4">{section.title} <span class="text-fg-muted">({section.rows.length})</span></h2>
+      <section aria-label={section.title}><Card title={section.title} icon={section.title === tr.overdue ? TriangleAlert : Syringe} tone={section.title === tr.overdue ? 'highlight' : 'accent'} count={section.rows.length}>
         {#if !section.rows.length}<p class="text-fg-muted">{section.empty}</p>
         {:else}<ul class="divide-y divide-border">{#each section.rows as row (row.vaccination.id)}
           {@const days = daysUntil(row.vaccination.nextDueOn ?? '')}
