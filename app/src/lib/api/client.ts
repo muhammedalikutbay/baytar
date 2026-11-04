@@ -126,6 +126,20 @@ for (const [patientIndex, name, dueOffset] of [[0, 'Kuduz aşısı', -5], [0, '�
   clinical.call('vaccination_create', { input: { patientId: patients[patientIndex].id, vaccineTypeId: type.id,
     vaccineName: type.name, givenOn: demoDate(dueOffset - 365), nextDueOn: demoDate(dueOffset) } });
 }
+// Synthetic agenda examples relative to the browser's local day.
+const mockDay = new Date();
+const agendaDate = (offset: number) => {
+  const date = new Date(mockDay.getFullYear(), mockDay.getMonth(), mockDay.getDate() + offset);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+for (const input of [
+  { title: tr.appointmentSampleReminder, startsOn: agendaDate(0), kind: 'reminder' },
+  { title: tr.appointmentSampleVisit, startsOn: agendaDate(0), startsTime: '10:00', durationMin: 30, patientId: 4, ownerId: first.id, kind: 'visit' },
+  { title: tr.appointmentSampleVaccine, startsOn: agendaDate(0), startsTime: '14:30', patientId: 5, ownerId: first.id, kind: 'vaccine' },
+  { title: tr.appointmentSampleVisit, startsOn: agendaDate(-1), patientId: 4, ownerId: first.id, kind: 'visit' },
+  { title: tr.appointmentSampleVaccine, startsOn: agendaDate(2), patientId: 4, ownerId: first.id, kind: 'vaccine' },
+  { title: tr.appointmentSampleVisit, startsOn: agendaDate(-2), patientId: 4, ownerId: first.id, kind: 'visit', status: 'done' }
+]) clinical.call('appointment_create', { input });
 
 // Dispatch types are checked at the public call boundary and by each handler.
 

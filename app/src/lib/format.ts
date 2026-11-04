@@ -45,10 +45,28 @@ export function formatPhone(value: string | null | undefined): string {
     ? `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 9)} ${digits.slice(9)}` : value;
 }
 
-function parseDate(value: string): Date | null {
+export function parseDate(value: string): Date | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
   const date = new Date(value + 'T00:00:00Z');
   return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value ? date : null;
+}
+
+export function localDate(date = new Date()): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+export function addDateDays(value: string, days: number): string {
+  const date = parseDate(value);
+  if (!date || !Number.isSafeInteger(days)) return '';
+  date.setUTCDate(date.getUTCDate() + days);
+  return Number.isFinite(date.getTime()) && date.getUTCFullYear() >= 1 && date.getUTCFullYear() <= 9999 ? date.toISOString().slice(0, 10) : '';
+}
+
+export function formatAgendaDate(value: string): string {
+  const date = parseDate(value);
+  if (!date) return value;
+  const weekday = new Intl.DateTimeFormat('tr-TR', { weekday: 'long', timeZone: 'UTC' }).format(date);
+  return `${weekday[0].toLocaleUpperCase('tr-TR') + weekday.slice(1)}, ${formatDate(value)}`;
 }
 
 export function formatDate(value: string | null | undefined): string {
