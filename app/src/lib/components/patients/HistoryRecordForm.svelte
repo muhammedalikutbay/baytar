@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { validateForm } from '$lib/validation';
   import { untrack, tick } from 'svelte';
-  import { Button, Input, Textarea, Select } from '$lib/components/ui';
+  import { Button, Input, Textarea, Select, DateInput, NumberInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { isValidDate, parseDecimal } from '$lib/format';
   import * as vaccinations from '$lib/api/vaccinations';
@@ -23,7 +24,8 @@
   let saving = $state(false);
   let form: HTMLFormElement;
   async function submit(event: SubmitEvent) {
-    event.preventDefault(); if (saving) return;
+    event.preventDefault();
+    if (!validateForm(event.currentTarget as HTMLFormElement)) return; if (saving) return;
     errors = {};
     if (!name.trim()) errors.name = tr.requiredField;
     if (!isValidDate(date)) errors.date = tr.validDate;
@@ -43,13 +45,13 @@
 <form bind:this={form} onsubmit={submit} novalidate class="grid gap-4">
   <fieldset disabled={saving} class="grid min-w-0 gap-4">
     <Input label={(vaccine ? tr.vaccineName : tr.appointmentTitle) + ' *'} bind:value={name} required error={errors.name} />
-    <Input label={tr.date + ' *'} type="date" bind:value={date} required error={errors.date} />
+    <DateInput label={tr.date + ' *'} bind:value={date} required error={errors.date} />
     {#if vaccine}
-      <Input label={tr.nextDue} type="date" bind:value={nextDue} error={errors.nextDue} />
+      <DateInput label={tr.nextDue} bind:value={nextDue} error={errors.nextDue} />
       <Input label={tr.batchNo} bind:value={batch} />
     {:else}
       <Input label={tr.time} type="time" bind:value={time} error={errors.time} />
-      <Input label={tr.durationMin} inputmode="numeric" bind:value={duration} error={errors.duration} />
+      <NumberInput label={tr.durationMin} bind:value={() => parseDecimal(duration), n => duration = n === null ? '' : String(n)} error={errors.duration} min={1} max={2147483647} step={1} unit={tr.inputMinuteUnit} />
       <Select label={tr.appointmentKind} bind:value={kind} options={(['visit', 'vaccine', 'reminder', 'other'] as AppointmentKind[]).map(value => ({value, label: value === 'vaccine' ? tr.vaccination : tr[value]}))} />
       <Select label={tr.appointmentStatus} bind:value={status} options={(['planned', 'done', 'cancelled'] as AppointmentStatus[]).map(value => ({value, label: tr[value]}))} />
     {/if}

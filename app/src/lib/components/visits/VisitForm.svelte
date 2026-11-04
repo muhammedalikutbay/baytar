@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { validateForm } from '$lib/validation';
   import { onMount, untrack, tick } from 'svelte';
-  import { Button, Input, Textarea, Select } from '$lib/components/ui';
+  import { Button, Input, Textarea, Select, DateInput, NumberInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { isValidDate, localToday, parseDecimal } from '$lib/format';
   import * as visits from '$lib/api/visits';
@@ -70,6 +71,7 @@
   }
   async function submit(event: SubmitEvent) {
     event.preventDefault();
+    if (!validateForm(event.currentTarget as HTMLFormElement)) return;
     if (saving || loading || loadFailed) return;
     errors = {};
     if (!isValidDate(visitOn)) errors.visitOn = tr.validDate;
@@ -107,7 +109,7 @@
 <form bind:this={form} onsubmit={submit} novalidate class="grid gap-4">
   <fieldset disabled={saving} class="grid min-w-0 gap-4">
     <div class="grid gap-4 sm:grid-cols-2">
-      <Input label={tr.date + ' *'} type="date" bind:value={visitOn} required error={errors.visitOn} />
+      <DateInput label={tr.date + ' *'} bind:value={visitOn} required error={errors.visitOn} />
       <Input label={tr.time} type="time" bind:value={visitTime} error={errors.visitTime} />
     </div>
     <Textarea label={tr.reason} bind:value={reason} />
@@ -115,8 +117,8 @@
     <Textarea label={tr.diagnosis} bind:value={diagnosis} />
     <Textarea label={tr.treatment} bind:value={treatment} />
     <div class="grid gap-4 sm:grid-cols-2">
-      <Input label={tr.weight} inputmode="decimal" bind:value={weight} error={errors.weight} />
-      <Input label={tr.temperature} inputmode="decimal" bind:value={temperature} error={errors.temperature} />
+      <NumberInput label={tr.weight} bind:value={() => parseDecimal(weight), n => weight = n === null ? '' : String(n)} error={errors.weight} min={Number.MIN_VALUE} max={1500} unit={'kg'} />
+      <NumberInput label={tr.temperature} bind:value={() => parseDecimal(temperature), n => temperature = n === null ? '' : String(n)} error={errors.temperature} unit={tr.inputTemperatureUnit} />
     </div>
     <Textarea label={tr.notes} bind:value={notes} />
     <section class="grid gap-4 border-t border-border pt-4" aria-label={tr.prescription}>
@@ -134,8 +136,8 @@
             ]} />
             <Input id={`${uid}-${line.key}-name`} label={tr.medicationName + ' *'} bind:value={line.name} readonly={!!line.medicationId} required error={errors[`${line.key}-name`]} />
             <div class="grid gap-4 sm:grid-cols-2">
-              <Input label={tr.doseMg} inputmode="decimal" bind:value={line.doseMg} error={errors[`${line.key}-mg`]} />
-              <Input label={tr.doseMl} inputmode="decimal" bind:value={line.doseMl} error={errors[`${line.key}-ml`]} />
+              <NumberInput label={tr.doseMg} bind:value={() => parseDecimal(line.doseMg), n => line.doseMg = n === null ? '' : String(n)} error={errors[`${line.key}-mg`]} min={Number.MIN_VALUE} unit={'mg'} />
+              <NumberInput label={tr.doseMl} bind:value={() => parseDecimal(line.doseMl), n => line.doseMl = n === null ? '' : String(n)} error={errors[`${line.key}-ml`]} min={Number.MIN_VALUE} unit={'ml'} />
             </div>
             <Input label={tr.doseText} bind:value={line.doseText} />
             <Button variant="ghost" size="sm" onclick={() => doseLineKey = doseLineKey === line.key ? null : line.key}>{tr.doseFromLine}</Button>
@@ -150,7 +152,7 @@
                 }} />
             {/if}
             <Input label={tr.frequency} bind:value={line.frequency} hint={tr.frequencyHint} />
-            <Input label={tr.durationDays} inputmode="numeric" bind:value={line.duration} error={errors[`${line.key}-duration`]} />
+            <NumberInput label={tr.durationDays} bind:value={() => parseDecimal(line.duration), n => line.duration = n === null ? '' : String(n)} error={errors[`${line.key}-duration`]} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} />
             <Input label={tr.notes} bind:value={line.notes} />
             <Button variant="secondary" size="sm" onclick={() => removeLine(line)}>{tr.removeLine}</Button>
           </fieldset>

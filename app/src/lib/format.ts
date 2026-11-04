@@ -1,3 +1,6 @@
+import { parsePhoneNumberFromString } from 'libphonenumber-js/min';
+import { toE164 } from './validation';
+export { toE164, parseDecimal } from './validation';
 import { tr } from '$lib/i18n/tr';
 
 export function todayDate(): string {
@@ -29,11 +32,7 @@ export function daysUntil(value: string, today = todayDate()): number | null {
 }
 
 export function whatsappPhone(value: string | null | undefined): string | null {
-  let digits = value?.replace(/\D/g, '') ?? '';
-  if (digits.startsWith('0090')) digits = digits.slice(2);
-  if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
-  if (digits.length === 10) digits = '90' + digits;
-  return /^90[1-9]\d{9}$/.test(digits) ? digits : null;
+  return toE164(value ?? '').slice(1) || null;
 }
 
 export function formatUnits(value: number): string {
@@ -46,11 +45,14 @@ export function formatUnits(value: number): string {
 
 export function formatPhone(value: string | null | undefined): string {
   if (!value) return '';
-  let digits = value.replace(/\D/g, '');
-  if (digits.length === 12 && digits.startsWith('90')) digits = '0' + digits.slice(2);
-  if (digits.length === 10) digits = '0' + digits;
-  return digits.length === 11 && digits.startsWith('0')
-    ? `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 9)} ${digits.slice(9)}` : value;
+  const normalized = toE164(value);
+  const phone = normalized ? parsePhoneNumberFromString(normalized) : undefined;
+  if (!phone) return value;
+  if (phone.country === 'TR') {
+    const d = '0' + phone.nationalNumber;
+    return d.slice(0, 4) + ' ' + d.slice(4, 7) + ' ' + d.slice(7, 9) + ' ' + d.slice(9);
+  }
+  return phone.formatInternational();
 }
 
 export function parseDate(value: string): Date | null {
@@ -82,13 +84,6 @@ export function isValidDate(value: string): boolean { return parseDate(value) !=
 export function localToday(): string {
   const today = new Date();
   return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-}
-
-// Clinical decimal fields accept either Turkish commas or decimal points, never grouping.
-export function parseDecimal(value: string): number | null {
-  if (!value.trim()) return null;
-  if (!/^[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(value.trim())) return NaN;
-  return Number(value.trim().replace(',', '.'));
 }
 
 export function formatNumber(value: number, maximumFractionDigits = 6): string {
