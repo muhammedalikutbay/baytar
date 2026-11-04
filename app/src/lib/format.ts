@@ -3,6 +3,11 @@ import { toE164 } from './validation';
 export { toE164, parseDecimal } from './validation';
 import { tr } from '$lib/i18n/tr';
 
+/** Format integer minor units (kuruş) for display. */
+export function formatMoney(minor: number): string {
+  return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(minor / 100);
+}
+
 export function todayDate(): string {
   const date = new Date();
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;

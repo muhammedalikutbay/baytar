@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { ExternalLink, Settings2, Moon, Stethoscope, ShieldCheck, Import, RefreshCw, Info } from '@lucide/svelte';
-  import { PageHeader, IconChip } from '$lib/components/ui';
+  import { PageHeader, IconChip, Card, EmailInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { theme } from '$lib/theme.svelte';
   import { updater } from '$lib/updater.svelte';
@@ -12,7 +12,10 @@
   import Dialog from '$lib/components/ui/Dialog.svelte';
   import { buttonStyles } from '$lib/components/ui/button';
 
-  let clinic = $state({ clinic_name: '', vet_name: '', clinic_phone: '', clinic_address: '' });
+  let clinic = $state({ ...api.emptyClinic });
+  let logoBusy = $state(false);
+  let clinicBusy = $state(false);
+  let clinicReady = $state(false);
   let backups = $state<BackupInfo[]>([]);
   let info = $state<AppInfo | null>(null);
   let updateEnabled = $state(true);
@@ -25,13 +28,24 @@
   async function load() {
     try {
       const [values, rows, appInfo] = await Promise.all([api.getAll(), api.backups(), api.info()]);
-      clinic = { clinic_name: values.clinic_name ?? '', vet_name: values.vet_name ?? '', clinic_phone: values.clinic_phone ?? '', clinic_address: values.clinic_address ?? '' };
+      clinic = api.clinicProfile(values); clinicReady = true;
       updateEnabled = (values.update_check_enabled ?? '1') !== '0'; backups = rows; info = appInfo;
     } catch { error = tr.settingsError; }
   }
   async function saveClinic() {
+    if (clinicBusy || logoBusy || !clinicReady) return;
+    clinicBusy = true; toast = '';
     try { await Promise.all(Object.entries(clinic).map(([key, value]) => api.set(key, value))); toast = tr.settingsSaved; error = ''; }
     catch { error = tr.settingsError; }
+    finally { clinicBusy = false; }
+  }
+  async function selectLogo(event: Event) {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0]; if (!file) return;
+    logoBusy = true; toast = ''; error = '';
+    try { clinic.clinic_logo = await api.prepareClinicLogo(file); }
+    catch { error = tr.documentsLogoError; }
+    finally { logoBusy = false; input.value = ''; }
   }
   async function backupNow() { busy = true; try { await api.createBackup(); backups = await api.backups(); toast = tr.settingsSaved; error = ''; } catch { error = tr.settingsBackupError; } finally { busy = false; } }
   async function exportBackup() { try { if (await api.exportBackup()) { toast = tr.settingsBackupExported; error = ''; } } catch { error = tr.settingsBackupError; } }
@@ -53,14 +67,24 @@
     <div class="flex items-center gap-3"><IconChip icon={Moon} tone="neutral" size="sm" /><div><h2 class="type-section">{tr.theme}</h2><p class="text-sm text-fg-muted">{theme.preference === 'system' ? tr.themeFollowSystem : tr.themeManual}</p></div></div>
     <button class="type-caption min-h-7 text-accent underline underline-offset-4" onclick={() => theme.set('system')}>{tr.useSystemTheme}</button>
   </section>
-  <section class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section flex items-center gap-3"><IconChip icon={Stethoscope} tone="accent" size="sm" />{tr.settingsClinic}</h2>
-    <form class="mt-4 grid gap-4 sm:grid-cols-2" onsubmit={(e) => { e.preventDefault(); if (validateForm(e.currentTarget)) void saveClinic(); }}>
-      {#each [['clinic_name', tr.settingsClinicName], ['vet_name', tr.settingsVetName], ['clinic_phone', tr.settingsPhone], ['clinic_address', tr.settingsAddress]] as [key, label]}
-        {#if key === 'clinic_phone'}<PhoneInput {label} bind:value={clinic.clinic_phone} />{:else}<label class="grid gap-1 text-sm">{label}<input class="min-h-11 rounded-md border border-border-control bg-surface px-3 text-fg" bind:value={clinic[key as keyof typeof clinic]} /></label>{/if}
+  <Card title={tr.documentsClinic} icon={Stethoscope}>
+    <form class="grid gap-4 sm:grid-cols-2" onsubmit={(e) => { e.preventDefault(); if (validateForm(e.currentTarget)) void saveClinic(); }}>
+      <fieldset disabled={!clinicReady || clinicBusy} class="contents">
+      {#each [['clinic_name', tr.settingsClinicName], ['vet_name', tr.settingsVetName], ['clinic_title', tr.documentsVetTitle], ['clinic_registry_no', tr.documentsRegistry], ['clinic_tax_office', tr.documentsTaxOffice], ['clinic_tax_no', tr.documentsTaxNo]] as [key, label]}
+        <label class="grid gap-1 text-sm">{label}<input class="min-h-11 rounded-md border border-border-control bg-surface px-3 text-fg" bind:value={clinic[key as keyof typeof clinic]} /></label>
       {/each}
-      <div class="sm:col-span-2"><button class={buttonStyles('primary')} type="submit">{tr.save}</button></div>
+      <PhoneInput label={tr.settingsPhone} bind:value={clinic.clinic_phone} />
+      <EmailInput label={tr.email} bind:value={clinic.clinic_email} />
+      <label class="grid gap-1 text-sm sm:col-span-2">{tr.settingsAddress}<textarea class="min-h-22 rounded-md border border-border-control bg-surface p-3 text-fg" bind:value={clinic.clinic_address}></textarea></label>
+      <div class="grid gap-3 sm:col-span-2">
+        <label class="grid gap-2 text-sm">{tr.documentsLogo}<input type="file" accept="image/png,image/jpeg,image/webp" disabled={logoBusy} onchange={selectLogo} /></label>
+        <p class="text-sm text-fg-muted">{tr.documentsLogoHint}</p>
+        {#if api.safeClinicLogo(clinic.clinic_logo)}<img src={api.safeClinicLogo(clinic.clinic_logo)} alt={tr.documentsLogo} class="h-20 w-36 rounded-sm border border-border bg-surface object-contain" /><button type="button" disabled={logoBusy} class={buttonStyles('secondary')} onclick={() => clinic.clinic_logo = ''}>{tr.documentsRemoveLogo}</button>{/if}
+      </div>
+      <div class="sm:col-span-2"><button class={buttonStyles('primary')} type="submit" disabled={logoBusy || clinicBusy || !clinicReady}>{clinicBusy || logoBusy ? tr.loading : tr.save}</button></div>
+      </fieldset>
     </form>
-  </section>
+  </Card>
   <section class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section flex items-center gap-3"><IconChip icon={ShieldCheck} tone="accent" size="sm" />{tr.settingsBackups}</h2>
     <p class="mt-2 text-fg-muted">{tr.settingsBackupPolicy}</p>
     <div class="mt-4 flex flex-wrap gap-2"><button class={buttonStyles('primary')} disabled={busy} onclick={() => void backupNow()}>{tr.settingsBackupNow}</button><button class={buttonStyles('secondary')} onclick={() => void exportBackup()}>{tr.settingsExport}</button></div>

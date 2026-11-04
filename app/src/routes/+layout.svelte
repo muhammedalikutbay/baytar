@@ -21,6 +21,7 @@
       ?? (pathname === '/' ? tr.home : tr.appName));
 
   onMount(() => {
+    if (pathname === '/print') return;
     const disposeTheme = theme.init();
     const disposeUpdater = updater.init();
     if ('__TAURI_INTERNALS__' in window) {
@@ -40,6 +41,9 @@
   <link rel="alternate icon" href="/favicon.ico" />
 </svelte:head>
 
+{#if pathname === '/print'}
+  {@render children()}
+{:else}
 <a href="#main-content" class="skip-link">{tr.skipToContent}</a>
 <TitleBar {title} />
 <div class="app-shell">
@@ -92,6 +96,7 @@
   </div>
 </div>
 
+{/if}
 
 <style>
   .app-shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: calc(100dvh - 40px); }
