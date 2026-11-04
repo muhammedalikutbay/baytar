@@ -33,6 +33,7 @@ export interface CommandMap {
   backup_restore: { args: { path: string }; result: null };
   app_info: { args: Record<string, never>; result: AppInfo };
   open_data_folder: { args: Record<string, never>; result: null };
+  open_whatsapp: { args: { url: string }; result: null };
   import_candidates: { args: Record<string, never>; result: ImportCandidate[] };
   import_prepare: { args: { path: string }; result: PreparedImport };
   import_execute: { args: { token: string }; result: ImportReport };

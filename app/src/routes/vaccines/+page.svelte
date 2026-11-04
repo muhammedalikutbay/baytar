@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { isTauri } from '@tauri-apps/api/core';
+  import { openWhatsapp } from '$lib/api/settings';
   import { Card, Button, Badge, Dialog } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { todayDate, dateAfterDays, daysUntil, formatDate, formatPhone, whatsappPhone } from '$lib/format';
@@ -43,7 +45,9 @@
     const phone = whatsappPhone(row.phone);
     if (!phone) return;
     const message = tr.whatsappMessage.replace('{pet}', row.patientName).replace('{vaccine}', row.vaccination.vaccineName).replace('{date}', formatDate(row.vaccination.nextDueOn));
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    if (isTauri()) void openWhatsapp(url);
+    else window.open(url, '_blank', 'noopener,noreferrer');
   }
 </script>
 

@@ -162,3 +162,14 @@ pub fn open_data_folder(app: tauri::AppHandle) -> Result<(), String> {
         .open_path(data.to_string_lossy(), None::<&str>)
         .map_err(|_| internal())
 }
+
+/// Opens a WhatsApp chat link in the default browser. Only `https://wa.me/` links are allowed.
+#[tauri::command]
+pub fn open_whatsapp(app: tauri::AppHandle, url: String) -> Result<(), String> {
+    if !url.starts_with("https://wa.me/") {
+        return Err(internal());
+    }
+    app.opener()
+        .open_url(url, None::<&str>)
+        .map_err(|_| internal())
+}

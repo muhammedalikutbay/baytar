@@ -15,3 +15,4 @@ export async function exportBackup(): Promise<string | null> {
   if (typeof path !== 'string') return null;
   return call('backup_export', { path });
 }
+export const openWhatsapp = (url: string) => call('open_whatsapp', { url });

@@ -162,6 +162,7 @@ function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['arg
     case 'backup_restore': return null;
     case 'app_info': return { version: '0.2.0', dataFolder: '/demo/Baytar', backupsFolder: '/demo/Baytar/backups', databaseSizeBytes: 204800 };
     case 'open_data_folder': return null;
+    case 'open_whatsapp': return null;
     case 'import_candidates': return [{ path: '/demo/HastaTakipDB.db', fileName: 'HastaTakipDB.db', sizeBytes: 942080, modifiedAt: '2026-10-30T12:00:00Z', location: '/demo' }];
     case 'import_prepare': { const { path } = args as { path: string }; const token = String(++importSequence); const preview = mockPreview(path); importPrepared.set(token, preview); return { token, preview }; }
     case 'import_cancel': { importPrepared.delete((args as { token: string }).token); return null; }

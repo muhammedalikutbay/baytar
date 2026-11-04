@@ -597,6 +597,7 @@ pub fn run() {
             settings::backup_restore,
             settings::app_info,
             settings::open_data_folder,
+            settings::open_whatsapp,
             visit_get,
             visit_create,
             visit_update,
