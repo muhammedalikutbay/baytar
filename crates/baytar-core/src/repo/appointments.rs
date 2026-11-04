@@ -25,6 +25,10 @@ pub struct NewAppointment {
     pub series_id: Option<String>,
     #[serde(default)]
     pub notes: Option<String>,
+    #[serde(default)]
+    pub vaccine_type_id: Option<i64>,
+    #[serde(default)]
+    pub vaccination_id: Option<i64>,
 }
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -73,6 +77,18 @@ pub struct AppointmentPatch {
         deserialize_with = "super::nullable"
     )]
     pub notes: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub vaccine_type_id: Option<Option<i64>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub vaccination_id: Option<Option<i64>>,
 }
 fn default_kind() -> String {
     "other".into()
@@ -93,10 +109,12 @@ impl Default for NewAppointment {
             status: "planned".into(),
             series_id: Default::default(),
             notes: Default::default(),
+            vaccine_type_id: Default::default(),
+            vaccination_id: Default::default(),
         }
     }
 }
-const COLUMNS: &str = "id, patient_id, owner_id, title, starts_on, starts_time, duration_min, kind, status, series_id, notes, created_at, updated_at, deleted_at";
+const COLUMNS: &str = "id, patient_id, owner_id, title, starts_on, starts_time, duration_min, kind, status, series_id, notes, created_at, updated_at, deleted_at, vaccine_type_id, vaccination_id";
 pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<Appointment> {
     Ok(Appointment {
         id: r.get(0)?,
@@ -117,6 +135,8 @@ pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<Appointment> {
         created_at: r.get(11)?,
         updated_at: r.get(12)?,
         deleted_at: r.get(13)?,
+        vaccine_type_id: r.get(14)?,
+        vaccination_id: r.get(15)?,
     })
 }
 pub fn get(conn: &Connection, id: i64) -> Result<Appointment> {
@@ -136,7 +156,7 @@ pub fn create(conn: &Connection, mut input: NewAppointment) -> Result<Appointmen
     Ok(result)
 }
 fn insert(conn: &Connection, input: NewAppointment) -> Result<Appointment> {
-    conn.execute("INSERT INTO appointments (patient_id, owner_id, title, starts_on, starts_time, duration_min, kind, status, series_id, notes, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)", params![input.patient_id, input.owner_id, input.title, input.starts_on, input.starts_time, input.duration_min, input.kind, input.status, input.series_id, input.notes, now()])?;
+    conn.execute("INSERT INTO appointments (patient_id, owner_id, title, starts_on, starts_time, duration_min, kind, status, series_id, notes, vaccine_type_id, vaccination_id, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)", params![input.patient_id, input.owner_id, input.title, input.starts_on, input.starts_time, input.duration_min, input.kind, input.status, input.series_id, input.notes, input.vaccine_type_id, input.vaccination_id, now()])?;
     get(conn, conn.last_insert_rowid())
 }
 pub fn update(conn: &Connection, id: i64, patch: AppointmentPatch) -> Result<Appointment> {
@@ -156,9 +176,11 @@ pub fn update(conn: &Connection, id: i64, patch: AppointmentPatch) -> Result<App
         status: patch.status.unwrap_or(old.status.as_str().to_string()),
         series_id: patch.series_id.unwrap_or(old.series_id),
         notes: patch.notes.unwrap_or(old.notes),
+        vaccine_type_id: patch.vaccine_type_id.unwrap_or(old.vaccine_type_id),
+        vaccination_id: patch.vaccination_id.unwrap_or(old.vaccination_id),
     };
     prepare(&tx, &mut input, Some(id))?;
-    tx.execute("UPDATE appointments SET patient_id = ?1, owner_id = ?2, title = ?3, starts_on = ?4, starts_time = ?5, duration_min = ?6, kind = ?7, status = ?8, series_id = ?9, notes = ?10, updated_at = ?11 WHERE id = ?12", params![input.patient_id, input.owner_id, input.title, input.starts_on, input.starts_time, input.duration_min, input.kind, input.status, input.series_id, input.notes, now(), id])?;
+    tx.execute("UPDATE appointments SET patient_id = ?1, owner_id = ?2, title = ?3, starts_on = ?4, starts_time = ?5, duration_min = ?6, kind = ?7, status = ?8, series_id = ?9, notes = ?10, vaccine_type_id = ?11, vaccination_id = ?12, updated_at = ?13 WHERE id = ?14", params![input.patient_id, input.owner_id, input.title, input.starts_on, input.starts_time, input.duration_min, input.kind, input.status, input.series_id, input.notes, input.vaccine_type_id, input.vaccination_id, now(), id])?;
     let result = get(&tx, id)?;
     tx.commit()?;
     Ok(result)
@@ -210,6 +232,23 @@ fn prepare(conn: &Connection, input: &mut NewAppointment, _id: Option<i64>) -> R
     if let Some(id) = input.owner_id {
         if super::owners::get(conn, id)?.deleted_at.is_some() {
             return Err(RepoError::NotFound);
+        }
+    }
+    if let Some(id) = input.vaccine_type_id {
+        if super::vaccine_types::get(conn, id)?.deleted_at.is_some() {
+            return Err(RepoError::NotFound);
+        }
+    }
+    if let Some(id) = input.vaccination_id {
+        let vaccination = super::vaccinations::get(conn, id)?;
+        if input
+            .patient_id
+            .is_some_and(|patient| patient != vaccination.patient_id)
+        {
+            return Err(super::invalid(
+                "vaccinationId",
+                "vaccination must belong to the appointment's patient",
+            ));
         }
     }
     Ok(())
@@ -277,8 +316,8 @@ pub fn between(conn: &Connection, from: &str, to: &str) -> Result<Vec<CalendarAp
         .query_map(params![from, to], |r| {
             Ok(CalendarAppointment {
                 appointment: row(r)?,
-                patient_name: r.get(14)?,
-                owner_name: r.get(15)?,
+                patient_name: r.get(16)?,
+                owner_name: r.get(17)?,
             })
         })?
         .collect::<std::result::Result<_, _>>()?;

@@ -1,4 +1,4 @@
-use super::{digits, ListQuery};
+use super::{clean, digits, phone_value, ListQuery};
 use super::{now, required, transaction, RepoError, Result};
 use crate::{model::Owner, text::fold};
 use rusqlite::{params, Connection, OptionalExtension, Row};
@@ -17,6 +17,12 @@ pub struct NewOwner {
     pub address: Option<String>,
     #[serde(default)]
     pub notes: Option<String>,
+    #[serde(default)]
+    pub national_id: Option<String>,
+    #[serde(default)]
+    pub city: Option<String>,
+    #[serde(default)]
+    pub district: Option<String>,
 }
 /// Omitted fields are unchanged; null clears nullable fields.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -54,6 +60,24 @@ pub struct OwnerPatch {
         deserialize_with = "super::nullable"
     )]
     pub notes: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub national_id: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub city: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub district: Option<Option<String>>,
 }
 pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<Owner> {
     Ok(Owner {
@@ -69,9 +93,12 @@ pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<Owner> {
         created_at: r.get(9)?,
         updated_at: r.get(10)?,
         deleted_at: r.get(11)?,
+        national_id: r.get(12)?,
+        city: r.get(13)?,
+        district: r.get(14)?,
     })
 }
-const COLUMNS: &str = "id, full_name, phone, phone_raw, phone_alt, email, address, notes, search_text, created_at, updated_at, deleted_at";
+const COLUMNS: &str = "id, full_name, phone, phone_raw, phone_alt, email, address, notes, search_text, created_at, updated_at, deleted_at, national_id, city, district";
 pub fn get(conn: &Connection, id: i64) -> Result<Owner> {
     conn.query_row(
         &format!("SELECT {COLUMNS} FROM owners WHERE id = ?1"),
@@ -107,20 +134,59 @@ fn validate(input: &NewOwner) -> Result<()> {
     required("fullName", &input.full_name)?;
     Ok(())
 }
-fn search_text(input: &NewOwner) -> String {
+/// Folded search key: name, every digit form of both phones (E.164 digits plus the Turkish
+/// national `0` form, so typing `0532...` still finds `+90532...`), and the city.
+pub(crate) fn search_key(
+    full_name: &str,
+    phone: Option<&str>,
+    phone_alt: Option<&str>,
+    city: Option<&str>,
+) -> String {
     fold(&format!(
-        "{} {} {}",
-        input.full_name,
-        digits(input.phone.as_deref()).unwrap_or_default(),
-        digits(input.phone_alt.as_deref()).unwrap_or_default()
+        "{} {} {} {}",
+        full_name,
+        phone_terms(phone),
+        phone_terms(phone_alt),
+        city.unwrap_or_default()
     ))
+}
+fn phone_terms(phone: Option<&str>) -> String {
+    let all = digits(phone).unwrap_or_default();
+    match phone
+        .and_then(|p| p.trim().strip_prefix("+90"))
+        .filter(|national| national.len() == 10 && national.bytes().all(|b| b.is_ascii_digit()))
+    {
+        Some(national) => format!("{all} 0{national}"),
+        None => all,
+    }
+}
+/// Free-text fields trimmed (empty becomes NULL). Phones are canonicalised by the callers, so an
+/// unrelated edit never rewrites a stored number.
+fn stored(input: NewOwner) -> NewOwner {
+    NewOwner {
+        national_id: clean(input.national_id),
+        city: clean(input.city),
+        district: clean(input.district),
+        ..input
+    }
 }
 pub fn create(conn: &Connection, input: NewOwner) -> Result<Owner> {
     validate(&input)?;
+    let phone_raw = input.phone.clone();
+    let input = stored(NewOwner {
+        phone: phone_value(input.phone.as_deref()),
+        phone_alt: phone_value(input.phone_alt.as_deref()),
+        ..input
+    });
     let tx = transaction(conn)?;
     let stamp = now();
-    let key = search_text(&input);
-    tx.execute("INSERT INTO owners (full_name, phone, phone_raw, phone_alt, email, address, notes, search_text, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)", params![input.full_name, digits(input.phone.as_deref()), input.phone, digits(input.phone_alt.as_deref()), input.email, input.address, input.notes, key, stamp])?;
+    let key = search_key(
+        &input.full_name,
+        input.phone.as_deref(),
+        input.phone_alt.as_deref(),
+        input.city.as_deref(),
+    );
+    tx.execute("INSERT INTO owners (full_name, phone, phone_raw, phone_alt, email, address, notes, national_id, city, district, search_text, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)", params![input.full_name, input.phone, phone_raw, input.phone_alt, input.email, input.address, input.notes, input.national_id, input.city, input.district, key, stamp])?;
     let id = tx.last_insert_rowid();
     let result = get(&tx, id)?;
     tx.commit()?;
@@ -135,21 +201,32 @@ pub fn update(conn: &Connection, id: i64, patch: OwnerPatch) -> Result<Owner> {
     // Imported phone_raw can differ from the normalized number (e.g. a restored
     // leading zero). An unrelated edit must preserve both existing values.
     let (phone, phone_raw) = match patch.phone {
-        Some(raw) => (digits(raw.as_deref()), raw),
+        Some(raw) => (phone_value(raw.as_deref()), raw),
         None => (old.phone, old.phone_raw),
     };
-    let input = NewOwner {
+    let input = stored(NewOwner {
         full_name: patch.full_name.unwrap_or(old.full_name),
         phone,
-        phone_alt: patch.phone_alt.unwrap_or(old.phone_alt),
+        phone_alt: match patch.phone_alt {
+            Some(raw) => phone_value(raw.as_deref()),
+            None => old.phone_alt,
+        },
         email: patch.email.unwrap_or(old.email),
         address: patch.address.unwrap_or(old.address),
         notes: patch.notes.unwrap_or(old.notes),
-    };
+        national_id: patch.national_id.unwrap_or(old.national_id),
+        city: patch.city.unwrap_or(old.city),
+        district: patch.district.unwrap_or(old.district),
+    });
     validate(&input)?;
     let stamp = now();
-    let key = search_text(&input);
-    tx.execute("UPDATE owners SET full_name = ?1, phone = ?2, phone_raw = ?3, phone_alt = ?4, email = ?5, address = ?6, notes = ?7, search_text = ?8, updated_at = ?9 WHERE id = ?10", params![input.full_name, input.phone, phone_raw, digits(input.phone_alt.as_deref()), input.email, input.address, input.notes, key, stamp, id])?;
+    let key = search_key(
+        &input.full_name,
+        input.phone.as_deref(),
+        input.phone_alt.as_deref(),
+        input.city.as_deref(),
+    );
+    tx.execute("UPDATE owners SET full_name = ?1, phone = ?2, phone_raw = ?3, phone_alt = ?4, email = ?5, address = ?6, notes = ?7, national_id = ?8, city = ?9, district = ?10, search_text = ?11, updated_at = ?12 WHERE id = ?13", params![input.full_name, input.phone, phone_raw, input.phone_alt, input.email, input.address, input.notes, input.national_id, input.city, input.district, key, stamp, id])?;
     let result = get(&tx, id)?;
     tx.commit()?;
     Ok(result)
@@ -211,10 +288,21 @@ pub(crate) fn set_deleted(
     deleted: Option<&str>,
     stamp: &str,
 ) -> Result<()> {
-    let raw: String = conn.query_row("SELECT full_name || ' ' || coalesce(phone, '') || ' ' || coalesce(phone_alt, '') FROM owners WHERE id = ?1", [id], |r| r.get(0))?;
+    let key = conn.query_row(
+        "SELECT full_name, phone, phone_alt, city FROM owners WHERE id = ?1",
+        [id],
+        |r| {
+            Ok(search_key(
+                &r.get::<_, String>(0)?,
+                r.get::<_, Option<String>>(1)?.as_deref(),
+                r.get::<_, Option<String>>(2)?.as_deref(),
+                r.get::<_, Option<String>>(3)?.as_deref(),
+            ))
+        },
+    )?;
     conn.execute(
         "UPDATE owners SET deleted_at = ?1, updated_at = ?2, search_text = ?3 WHERE id = ?4",
-        params![deleted, stamp, fold(&raw), id],
+        params![deleted, stamp, key, id],
     )?;
     Ok(())
 }

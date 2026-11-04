@@ -1,17 +1,20 @@
-export type Species = 'cat' | 'dog' | 'bird' | 'rabbit' | 'other';
+export type Species = 'cat' | 'dog' | 'bird' | 'rabbit' | 'rodent' | 'ferret' | 'reptile' | 'other';
+export type MedicationCategory = 'antibiotic' | 'nsaid' | 'analgesic' | 'antiparasitic' | 'anesthetic' | 'sedative' | 'corticosteroid' | 'antiemetic' | 'gastro' | 'cardio' | 'dermatologic' | 'ophthalmic' | 'otic' | 'vitamin' | 'fluid' | 'hormone' | 'antifungal' | 'antiviral' | 'other';
 export type Sex = 'male' | 'female' | 'unknown';
 export interface Audit { id: number; createdAt: string; updatedAt: string; deletedAt: string | null }
 export interface Owner extends Audit {
   fullName: string; phone: string | null; phoneRaw: string | null; phoneAlt: string | null;
   email: string | null; address: string | null; notes: string | null; searchText: string;
+  nationalId: string | null; city: string | null; district: string | null;
 }
 export interface Patient extends Audit {
   ownerId: number; name: string; species: Species; speciesNote: string | null; breed: string | null;
   sex: Sex; neutered: boolean | null; birthDate: string | null; birthDateIsEstimate: boolean;
   color: string | null; microchip: string | null; notes: string | null; deceasedOn: string | null; searchText: string;
+  alerts: string | null;
 }
-// Phone is the value as typed: the backend stores its digits and preserves phoneRaw.
-export type NewOwner = Pick<Owner, 'fullName'> & Partial<Pick<Owner, 'phone' | 'phoneAlt' | 'email' | 'address' | 'notes'>>;
+// Phone is the value as typed or E.164: the backend stores E.164 when recoverable and preserves phoneRaw.
+export type NewOwner = Pick<Owner, 'fullName'> & Partial<Pick<Owner, 'phone' | 'phoneAlt' | 'email' | 'address' | 'notes' | 'nationalId' | 'city' | 'district'>>;
 export type OwnerPatch = Partial<NewOwner>;
 export type NewPatient = Pick<Patient, 'ownerId' | 'name' | 'species'> & Partial<Omit<Patient, keyof Audit | 'ownerId' | 'name' | 'species' | 'searchText'>>;
 export type PatientPatch = Partial<NewPatient>;
@@ -100,6 +103,9 @@ export interface Visit extends Audit {
   treatment: string | null;
   weightKg: number | null;
   temperatureC: number | null;
+  heartRateBpm: number | null;
+  respRateBpm: number | null;
+  bodyCondition: number | null;
   notes: string | null;
 }
 export type NewVisit = Pick<Visit, 'patientId' | 'visitOn'> & Partial<Omit<Visit, keyof Audit | 'patientId' | 'visitOn'>>;
@@ -110,6 +116,12 @@ export interface VaccineType extends Audit {
   defaultIntervalDays: number | null;
   notes: string | null;
   isActive: boolean;
+  isBuiltin: boolean;
+  manufacturer: string | null;
+  diseases: string | null;
+  primaryDoses: number | null;
+  primaryIntervalDays: number | null;
+  minAgeWeeks: number | null;
 }
 export type NewVaccineType = Pick<VaccineType, 'name'> & Partial<Omit<VaccineType, keyof Audit | 'name'>>;
 export type VaccineTypePatch = Partial<NewVaccineType>;
@@ -135,6 +147,12 @@ export interface Medication extends Audit {
   doseMgPerKgMax: number | null;
   route: string | null;
   notes: string | null;
+  isBuiltin: boolean;
+  category: MedicationCategory | null;
+  manufacturer: string | null;
+  targetSpecies: string | null;
+  prescriptionRequired: boolean | null;
+  packUnit: string | null;
 }
 export type NewMedication = Pick<Medication, 'name'> & Partial<Omit<Medication, keyof Audit | 'name'>>;
 export type MedicationPatch = Partial<NewMedication>;
@@ -162,6 +180,8 @@ export interface Appointment extends Audit {
   status: AppointmentStatus;
   seriesId: string | null;
   notes: string | null;
+  vaccineTypeId: number | null;
+  vaccinationId: number | null;
 }
 export type NewAppointment = Pick<Appointment, 'title' | 'startsOn'> & Partial<Omit<Appointment, keyof Audit | 'title' | 'startsOn'>>;
 export type AppointmentPatch = Partial<NewAppointment>;

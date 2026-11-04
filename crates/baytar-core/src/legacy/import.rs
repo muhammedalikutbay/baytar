@@ -745,7 +745,7 @@ fn build_plan(p: &PreparedImport, target: &Connection) -> Result<Plan, LegacyErr
             .raw
             .filter(|original| !original.trim().is_empty());
         let phone = match (&normalized.value, &phone_raw) {
-            (Some(digits), _) => Some(digits.clone()),
+            (Some(e164), _) => Some(e164.clone()),
             // Unrecognized input is kept as typed so the vet still sees it.
             (None, Some(original)) => Some(original.trim().to_owned()),
             (None, None) => None,
@@ -770,8 +770,8 @@ fn build_plan(p: &PreparedImport, target: &Connection) -> Result<Plan, LegacyErr
 
         let skip = mapping.contains_key(&(OWNER_TABLE, id));
         if !skip {
-            if let Some(digits) = &normalized.value {
-                if existing.contains(&(fold(&full_name), digits.clone())) {
+            if let Some(e164) = &normalized.value {
+                if existing.contains(&(fold(&full_name), e164.clone())) {
                     pv.duplicate_owners += 1;
                     add_issue(
                         &mut pv,
@@ -784,15 +784,9 @@ fn build_plan(p: &PreparedImport, target: &Connection) -> Result<Plan, LegacyErr
                 }
             }
         }
-        let phone_digits: String = phone
-            .as_deref()
-            .unwrap_or_default()
-            .chars()
-            .filter(char::is_ascii_digit)
-            .collect();
         owners.push(PlannedOwner {
             source_id: id,
-            search_text: fold(&format!("{full_name} {phone_digits}")),
+            search_text: crate::repo::owners::search_key(&full_name, phone.as_deref(), None, None),
             full_name,
             phone,
             phone_raw,

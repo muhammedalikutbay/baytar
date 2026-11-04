@@ -1,11 +1,39 @@
-# Data model: schema v1
+# Data model: schema v2
 
-The canonical schema is `crates/baytar-core/src/db/migrations/0001_init.sql`.
-Migration 1 replaces the unreleased placeholder in place; `PRAGMA user_version`
-remains 1. The existing migration runner applies migrations in a transaction,
-backs up an existing versioned database before upgrading it, and checks database
-and foreign-key integrity before committing. A fresh database needs no backup.
-Legacy databases must be copied and read separately, never migrated in place.
+The canonical schema is the ordered migration list in `crates/baytar-core/src/db/migrations/`:
+`0001_init.sql` (schema v1, the first public schema) and `0002_v2.sql` (schema v2, the current
+one, `PRAGMA user_version` = 2). The migration runner applies all pending migrations in one
+transaction, backs up an existing versioned database before upgrading it, and checks database
+and foreign-key integrity before committing. A fresh database needs no backup. Legacy
+databases must be copied and read separately, never migrated in place.
+
+## Migration v1 to v2
+
+Every row and every foreign key of a v1 database survives the upgrade; `phone_raw`, `search_text`,
+ids, timestamps and soft-deletion markers are never rewritten. What `0002_v2.sql` does:
+
+- **Species CHECK extension by table rebuild.** SQLite cannot alter a CHECK, so `patients` and
+  `vaccine_types` are rebuilt with the same ids and columns plus their new columns. The runner
+  executes migrations inside one transaction with `foreign_keys = ON`, where
+  `PRAGMA foreign_keys = OFF` is a no-op, so the file uses `PRAGMA defer_foreign_keys = ON`.
+  SQLite counts violated deferred constraints: dropping a parent that still has children raises
+  the count and inserting the matching parent rows lowers it again. The classic order (create
+  new, copy, drop old, rename) therefore fails at commit, because the copy happens while the old
+  parents still exist and the count never returns to zero. The migration copies the rows aside
+  first (`CREATE TABLE x_copy AS SELECT * FROM x`), drops the old table, creates the new one under
+  its final name, copies the rows back and drops the copy. No rename is involved, so no child
+  table's REFERENCES clause is rewritten, and indexes are recreated under their old names.
+  The runner's `foreign_key_check` before commit proves no child is left dangling; a violation
+  rolls everything back.
+- **E.164 phones.** `owners.phone` and `owners.phone_alt` are converted only when the whole value
+  matches `0` + 10 digits (`+90` + the 10 digits after the zero) or 10 digits starting with `5`
+  (`+90` + the digits). Anything else (already international, spaced, foreign, free text, a
+  12-digit `90...` value) is left exactly as stored. `phone_raw` is never touched.
+- **New columns** are added with `ALTER TABLE ... ADD COLUMN`, defaulting to NULL (or 0 for
+  `is_builtin`).
+- **New tables** are created empty, together with their indexes.
+- Atomicity: a failure anywhere (including a deferred foreign-key violation found at commit)
+  rolls the database back to v1; the pre-migration backup stays on disk.
 
 ## Storage and application conventions
 
@@ -14,9 +42,10 @@ Legacy databases must be copied and read separately, never migrated in place.
 - All foreign keys use `ON DELETE RESTRICT`, including optional relationships.
   Connections enable `PRAGMA foreign_keys = ON`. Soft deletion does not remove
   the parent or release its foreign-key restrictions.
-- The eight user-facing tables (`owners`, `patients`, `visits`, `vaccine_types`,
-  `vaccinations`, `medications`, `prescription_items`, `appointments`) each have
-  the shared audit columns below. UI deletion sets `deleted_at`; it never
+- The user-facing tables (`owners`, `patients`, `visits`, `vaccine_types`,
+  `vaccinations`, `medications`, `prescription_items`, `appointments`, and the v2 tables
+  `services`, `inventory_items`, `inventory_lots`, `stock_movements`, `charges`, `payments`,
+  `attachments`, `visit_templates`) each have the shared audit columns below. UI deletion sets `deleted_at`; it never
   hard-deletes. Normal lists exclude deleted rows, while historical references
   can still resolve them. Settings and import provenance have their own lifecycle.
 - Timestamps are ISO 8601 UTC text, for example `2026-11-04T09:30:00.000Z`.
@@ -26,6 +55,8 @@ Legacy databases must be copied and read separately, never migrated in place.
   in the clinic's local calendar; they are not UTC timestamps. A NULL appointment
   time means all day. The app validates calendar/time syntax before writing;
   `STRICT` enforces storage types, not valid dates or time zones.
+- Money is INTEGER minor units (kuruÅ) in `*_minor` columns; Rust `i64`. Quantities that can be
+  fractional (stock, charge quantity) are REAL. VAT rates are integer percents.
 - NULL means absent or unknown; it is distinct from an empty string. SQLite
   boolean flags use INTEGER 0/1 with CHECK constraints. Rust models use `bool`
   or `Option<bool>`. Other nullable columns use `Option<T>`. REAL maps to `f64`.
@@ -42,14 +73,17 @@ Legacy databases must be copied and read separately, never migrated in place.
   whitespace to one ASCII space; keep digits and punctuation. Thus `İSTANBUL`
   becomes `istanbul`, `IŞIK` becomes `isik`, and `Çağrı Öztürk` becomes
   `cagri ozturk`. Display text retains its original spelling. Store relevant
-  name/contact terms for owners and name/species/breed/identifier terms for patients.
+  name/contact terms for owners (name, both phones, city) and name/species/breed/identifier
+  terms for patients. Phones contribute every digit form: for `+905321234567` the key holds
+  `905321234567` and `05321234567`, so typing either finds the owner.
 - SQLite CHECK constraints validate enums, boolean flags, positive known weight,
-  and ordered dose bounds. Application validation also checks dates, clinical
+  ordered dose bounds, body condition 1 to 9, non-negative money and stock quantities,
+  positive payment amounts and charge quantities, and non-zero stock deltas. Application validation also checks dates, clinical
   inputs, and linked-record consistency: a vaccination's visit must belong to
   its patient, and an appointment's explicit owner should match its patient.
   Foreign keys alone do not enforce those multi-column relationships.
 
-Shared columns on each of the eight user-facing tables:
+Shared columns on each user-facing table:
 
 | Column | Storage / default | Meaning |
 | --- | --- | --- |
@@ -71,12 +105,15 @@ An owner or clinic contact. Includes all four shared columns.
 | Column | Type / requirement | Meaning |
 | --- | --- | --- |
 | `full_name` | TEXT required | Display name, retained in its original spelling. |
-| `phone` | TEXT | Normalized primary phone, including leading zero where recoverable. |
-| `phone_raw` | TEXT | Original legacy/input phone representation before normalization. |
-| `phone_alt` | TEXT | Additional contact number. |
+| `phone` | TEXT | Primary phone in E.164 (`+905551112233`) when recoverable; otherwise digits or the text as it was stored. |
+| `phone_raw` | TEXT | Original legacy/input phone representation before normalization; never rewritten by a migration. |
+| `phone_alt` | TEXT | Additional contact number, same canonical form as `phone`. |
 | `email` | TEXT | Email contact. |
 | `address` | TEXT | Postal or free-form address. |
 | `notes` | TEXT | Owner notes and any preserved legacy values without a dedicated field. |
+| `national_id` | TEXT | TCKN (11 digits) or VKN (10 digits); checksum validation lives in the UI input. |
+| `city` | TEXT | City (il); part of the search key. |
+| `district` | TEXT | District (ilÃ§e). |
 | `search_text` | TEXT required, default `''` | Folded search key, maintained by the app. |
 
 ### patients
@@ -87,7 +124,7 @@ An animal belonging to one owner. Includes all four shared columns.
 | --- | --- | --- |
 | `owner_id` | INTEGER required, FK owners.id | Current owner, including a generated owner for legacy orphans. |
 | `name` | TEXT required | Patient's display name. |
-| `species` | TEXT required, CHECK enum | `cat`, `dog`, `bird`, `rabbit`, or `other`. |
+| `species` | TEXT required, CHECK enum | `cat`, `dog`, `bird`, `rabbit`, `rodent`, `ferret`, `reptile`, or `other`. |
 | `species_note` | TEXT | Original free-text species or explanation of `other`. |
 | `breed` | TEXT | Breed description. |
 | `sex` | TEXT required, default `unknown`, CHECK enum | `male`, `female`, or `unknown`. |
@@ -97,6 +134,7 @@ An animal belonging to one owner. Includes all four shared columns.
 | `color` | TEXT | Coat, plumage, or other color description. |
 | `microchip` | TEXT | Identifier kept as text to retain leading zeroes. |
 | `notes` | TEXT | Patient notes and preserved unmapped legacy values. |
+| `alerts` | TEXT | Allergies, aggression, chronic conditions; shown as a warning banner. |
 | `deceased_on` | TEXT date | Known death date; independent of soft deletion. |
 | `search_text` | TEXT required, default `''` | Folded search key, maintained by the app. |
 
@@ -115,6 +153,9 @@ A clinical encounter for one patient. Includes all four shared columns.
 | `treatment` | TEXT | Procedures or treatment description. |
 | `weight_kg` | REAL, CHECK NULL or > 0 | Measured body weight in kilograms. |
 | `temperature_c` | REAL | Measured temperature in degrees Celsius. |
+| `heart_rate_bpm` | INTEGER, CHECK NULL or > 0 | Heart rate, beats per minute. |
+| `resp_rate_bpm` | INTEGER, CHECK NULL or > 0 | Respiratory rate, breaths per minute. |
+| `body_condition` | INTEGER, CHECK NULL or 1..9 | Body condition score (9-point scale). |
 | `notes` | TEXT | Additional encounter notes. |
 
 ### vaccine_types
@@ -124,10 +165,16 @@ Reusable vaccine catalog entries. Includes all four shared columns.
 | Column | Type / requirement | Meaning |
 | --- | --- | --- |
 | `name` | TEXT required | Catalog display name. |
-| `species` | TEXT, CHECK species enum | Applicable species; NULL means any species. |
-| `default_interval_days` | INTEGER | Suggested interval before the next dose, in days. |
+| `species` | TEXT, CHECK species enum | Applicable species (the full species list above); NULL means any species. |
+| `default_interval_days` | INTEGER | Booster interval: suggested days before the next dose after the primary series. |
 | `notes` | TEXT | Catalog instructions or details. |
 | `is_active` | INTEGER 0/1 required, default 1 | Available for new selections; independent of deletion. |
+| `is_builtin` | INTEGER 0/1 required, default 0 | Row came from the built-in catalog seed; users may still edit, deactivate or delete it. |
+| `manufacturer` | TEXT | Manufacturer or marketing authorisation holder. |
+| `diseases` | TEXT | Diseases covered, display text. |
+| `primary_doses` | INTEGER, CHECK NULL or >= 1 | Number of doses in the primary series. |
+| `primary_interval_days` | INTEGER, CHECK NULL or > 0 | Days between primary-series doses. |
+| `min_age_weeks` | INTEGER, CHECK NULL or >= 0 | Earliest recommended age for the first dose, in weeks. |
 
 The unique index on `lower(name) WHERE deleted_at IS NULL` prevents duplicate
 non-deleted names, including inactive entries. Deletion frees the name; restoring
@@ -165,6 +212,12 @@ Reusable medication catalog entries and dose parameters. Includes all four share
 | `dose_mg_per_kg_max` | REAL | Upper dose bound in mg/kg; CHECK max >= min when both exist. |
 | `route` | TEXT | Administration route. |
 | `notes` | TEXT | Catalog instructions, caveats, or preserved details. |
+| `is_builtin` | INTEGER 0/1 required, default 0 | Row came from the built-in catalog seed; editable and deletable by users. |
+| `category` | TEXT, CHECK enum | `antibiotic`, `nsaid`, `analgesic`, `antiparasitic`, `anesthetic`, `sedative`, `corticosteroid`, `antiemetic`, `gastro`, `cardio`, `dermatologic`, `ophthalmic`, `otic`, `vitamin`, `fluid`, `hormone`, `antifungal`, `antiviral`, or `other`; NULL if unknown. |
+| `manufacturer` | TEXT | Manufacturer or brand owner. |
+| `target_species` | TEXT | Display text such as `KÃ¶pek, Kedi`; not a CHECKed enum. |
+| `prescription_required` | INTEGER 0/1/NULL | Whether a prescription is required; NULL is unknown. |
+| `pack_unit` | TEXT | Pack description, for example `50 ml flakon`. |
 
 Missing dose bounds are allowed independently. Clinical suitability and additional
 numeric validation belong to the app and dose calculator.
@@ -201,6 +254,135 @@ A dated appointment, reminder, or task. Includes all four shared columns.
 | `status` | TEXT required, default `planned`, CHECK enum | `planned`, `done`, or `cancelled`. |
 | `series_id` | TEXT | Opaque application-generated recurring-series group identifier; no separate series table. |
 | `notes` | TEXT | Task or scheduling notes. |
+| `vaccine_type_id` | INTEGER, FK vaccine_types.id | Vaccine planned by a `vaccine` appointment. |
+| `vaccination_id` | INTEGER, FK vaccinations.id | Set when the planned vaccination is given. App validation: it must belong to the appointment's patient. |
+
+### services
+
+Price list of services. Includes all four shared columns.
+
+| Column | Type / requirement | Meaning |
+| --- | --- | --- |
+| `name` | TEXT required | Service name. |
+| `category` | TEXT required, default `other`, CHECK enum | `exam`, `vaccination`, `surgery`, `lab`, `imaging`, `grooming`, `boarding`, `hospitalisation`, or `other`. |
+| `price_minor` | INTEGER, CHECK NULL or >= 0 | Default price in kuruş; NULL means no price set. |
+| `vat_rate` | INTEGER, CHECK NULL or 0..100 | VAT percent. |
+| `is_builtin` | INTEGER 0/1 required, default 0 | Row came from the built-in catalog seed. |
+| `is_active` | INTEGER 0/1 required, default 1 | Offered for new charges. |
+| `notes` | TEXT | Details. |
+
+### inventory_items
+
+Stock-keeping items. Includes all four shared columns.
+
+| Column | Type / requirement | Meaning |
+| --- | --- | --- |
+| `name` | TEXT required | Item name. |
+| `kind` | TEXT required, default `other`, CHECK enum | `medication`, `vaccine`, `supply`, `food`, `product`, or `other`. |
+| `medication_id` | INTEGER, FK medications.id | Optional catalog link. |
+| `vaccine_type_id` | INTEGER, FK vaccine_types.id | Optional catalog link. |
+| `unit` | TEXT required, default `adet` | Counting unit. |
+| `sale_price_minor` | INTEGER, CHECK NULL or >= 0 | Sale price per unit in kuruş. |
+| `reorder_level` | REAL, CHECK NULL or >= 0 | Low-stock threshold. |
+| `is_active` | INTEGER 0/1 required, default 1 | Offered for new use. |
+| `notes` | TEXT | Details. |
+
+### inventory_lots
+
+Received batches of an item. Includes all four shared columns.
+
+| Column | Type / requirement | Meaning |
+| --- | --- | --- |
+| `item_id` | INTEGER required, FK inventory_items.id | Item the lot belongs to. |
+| `lot_no` | TEXT | Manufacturer lot or batch number. |
+| `expires_on` | TEXT date | Expiry date. |
+| `quantity` | REAL required, default 0, CHECK >= 0 | Quantity currently on hand, kept in sync with `stock_movements` by the repository in one transaction. |
+| `cost_minor` | INTEGER, CHECK NULL or >= 0 | Purchase cost per unit in kuruş. |
+| `received_on` | TEXT date | Date received. |
+| `notes` | TEXT | Details. |
+
+### stock_movements
+
+Ledger of quantity changes. Includes all four shared columns.
+
+| Column | Type / requirement | Meaning |
+| --- | --- | --- |
+| `item_id` | INTEGER required, FK inventory_items.id | Item moved. |
+| `lot_id` | INTEGER, FK inventory_lots.id | Lot affected, if lot-tracked. |
+| `delta` | REAL required, CHECK <> 0 | Signed quantity change (positive in, negative out). |
+| `reason` | TEXT required, CHECK enum | `purchase`, `use`, `sale`, `adjust`, `expired`, or `return`. |
+| `ref_table` | TEXT | Table of the record that caused the movement (for example `vaccinations`); polymorphic, app-validated. |
+| `ref_id` | INTEGER | Row id in `ref_table`. |
+| `moved_on` | TEXT date required | Movement date. |
+| `notes` | TEXT | Details. |
+
+### charges
+
+Amounts billed to an owner. Includes all four shared columns.
+
+| Column | Type / requirement | Meaning |
+| --- | --- | --- |
+| `owner_id` | INTEGER required, FK owners.id | Owner billed. |
+| `patient_id` | INTEGER, FK patients.id | Patient the charge relates to. |
+| `visit_id` | INTEGER, FK visits.id | Visit the charge was added from. |
+| `service_id` | INTEGER, FK services.id | Price-list service, if any. |
+| `inventory_item_id` | INTEGER, FK inventory_items.id | Stock item sold or used, if any. |
+| `description` | TEXT required | Line text snapshot. |
+| `quantity` | REAL required, default 1, CHECK > 0 | Quantity. |
+| `unit_price_minor` | INTEGER required, CHECK >= 0 | Unit price in kuruş. |
+| `discount_minor` | INTEGER required, default 0, CHECK >= 0 | Discount in kuruş. |
+| `vat_rate` | INTEGER, CHECK NULL or 0..100 | VAT percent snapshot. |
+| `total_minor` | INTEGER required, CHECK >= 0 | `round(quantity * unit_price_minor) - discount_minor`, computed by the repository. |
+| `charged_on` | TEXT date required | Charge date. |
+| `notes` | TEXT | Details. |
+
+### payments
+
+Money received from an owner. Includes all four shared columns.
+
+| Column | Type / requirement | Meaning |
+| --- | --- | --- |
+| `owner_id` | INTEGER required, FK owners.id | Paying owner. |
+| `paid_on` | TEXT date required | Payment date. |
+| `amount_minor` | INTEGER required, CHECK > 0 | Amount in kuruş. |
+| `method` | TEXT required, default `cash`, CHECK enum | `cash`, `card`, `transfer`, or `other`. |
+| `notes` | TEXT | Details. |
+
+Owner balance = sum of non-deleted `charges.total_minor` minus sum of non-deleted
+`payments.amount_minor`. It is derived, never stored.
+
+### attachments
+
+Metadata of files attached to a patient or visit. Includes all four shared columns.
+
+| Column | Type / requirement | Meaning |
+| --- | --- | --- |
+| `patient_id` | INTEGER required, FK patients.id | Patient the file belongs to. |
+| `visit_id` | INTEGER, FK visits.id | Visit the file belongs to, if any. |
+| `kind` | TEXT required, default `other`, CHECK enum | `photo`, `lab`, `imaging`, `document`, or `other`. |
+| `title` | TEXT | Display title. |
+| `file_name` | TEXT required | Original file name. |
+| `mime` | TEXT required | Media type. |
+| `size_bytes` | INTEGER, CHECK NULL or >= 0 | File size. |
+| `sha256` | TEXT | Content hash. |
+
+### attachment_data
+
+File bytes, kept apart so listing attachments never loads blobs. No shared audit columns.
+
+| Column | Type / requirement | Meaning |
+| --- | --- | --- |
+| `attachment_id` | INTEGER PRIMARY KEY, FK attachments.id | Owning attachment. |
+| `data` | BLOB required | File content. Files live inside the database so a backup or restore stays one file; the app limits files to 25 MB. |
+
+### visit_templates
+
+Reusable text to prefill a visit. Includes all four shared columns.
+
+| Column | Type / requirement | Meaning |
+| --- | --- | --- |
+| `name` | TEXT required | Template name. |
+| `reason`, `findings`, `diagnosis`, `treatment`, `notes` | TEXT | Prefill text for the matching visit fields. |
 
 ### settings
 
@@ -261,6 +443,22 @@ visits       1 <-- N prescription_items
 medications  1 <-- N prescription_items (catalog link optional)
 owners       1 <-- N appointments       (owner link optional)
 patients     1 <-- N appointments       (patient link optional)
+vaccine_types 1 <-- N appointments      (planned vaccine, optional)
+vaccinations 1 <-- N appointments       (given vaccination, optional)
+owners       1 <-- N charges
+owners       1 <-- N payments
+patients     1 <-- N charges            (optional)
+visits       1 <-- N charges            (optional)
+services     1 <-- N charges            (optional)
+inventory_items 1 <-- N charges         (optional)
+medications  1 <-- N inventory_items    (optional)
+vaccine_types 1 <-- N inventory_items   (optional)
+inventory_items 1 <-- N inventory_lots
+inventory_items 1 <-- N stock_movements
+inventory_lots 1 <-- N stock_movements  (optional)
+patients     1 <-- N attachments
+visits       1 <-- N attachments        (optional)
+attachments  1 <-- 1 attachment_data
 import_runs  1 <-- N legacy_map
 legacy_map   * ... 1 target_table/target_id (app-validated polymorphic link)
 settings: independent key/value preferences
@@ -281,6 +479,16 @@ prescription items preserve the historical label even when catalogs change.
 | vaccinations | `patient_id` | Patient vaccination history. |
 | vaccinations | `next_due_on` WHERE `deleted_at IS NULL` | Upcoming dose lookup. |
 | appointments | `starts_on` | Calendar date/range lookup. |
+| appointments | `vaccine_type_id`, `vaccination_id` | Planned vaccine and given-vaccination links. |
+| inventory_items | `medication_id`, `vaccine_type_id` | Catalog links. |
+| inventory_lots | `item_id` | Lots of an item. |
+| inventory_lots | `expires_on` WHERE `deleted_at IS NULL` | Expiry warnings. |
+| stock_movements | `item_id`, `lot_id` | Movement history of an item or lot. |
+| charges | `owner_id`, `patient_id`, `visit_id`, `service_id`, `inventory_item_id` | Account statement and per-record lookups. |
+| charges | `charged_on` | Daily and monthly summaries. |
+| payments | `owner_id` | Account statement. |
+| payments | `paid_on` | Daily cash summary. |
+| attachments | `patient_id`, `visit_id` | Files of a patient or visit. |
 | prescription_items | `visit_id` | Encounter prescription lines. |
 | legacy_map | UNIQUE `source_sha256, source_table, source_id` | Import idempotency. |
 
@@ -301,11 +509,11 @@ preserved in the local report. Unknown or malformed values never crash import.
 | PatientOwner.Id | legacy_map.source_id -> owners.id | Allocate a new local ID; keep original identity under source table `PatientOwner`. |
 | PatientOwner.OwnerName | owners.full_name | Preserve display spelling; app folds its searchable representation. Missing required names need a reported generated label. |
 | PatientOwner.OwnerAdress | owners.address | Preserve free text; detect the original misspelled column. |
-| PatientOwner.OwnerPhone | owners.phone_raw, owners.phone | Preserve original scalar text, including malformed input. Restore a lost leading zero for recognized Turkish numbers or replace `90` country prefix with `0`; report adjustments/unparsed values. Never invent digits. |
+| PatientOwner.OwnerPhone | owners.phone_raw, owners.phone | Preserve original scalar text, including malformed input. Normalize recognized Turkish numbers to E.164 (`+90` + 10 digits): restore a lost leading zero, accept a `90` or `+90` country prefix, strip display separators; report adjustments/unparsed values. Unrecognized text is kept as typed. Never invent digits. |
 | Patient.Id | legacy_map.source_id -> patients.id | Allocate local ID; source table `Patient`. |
 | Patient.OwnerId | patients.owner_id | Resolve through the owner mapping. Missing/deleted/unresolvable legacy owners use a generated `Sahibi bilinmeyen` owner and a report warning. |
 | Patient.PatientName | patients.name | Preserve name; missing required names need a reported generated label. |
-| Patient.PatientType | patients.species, patients.species_note | Shared legacy normalizer maps Turkish/ASCII aliases to cat/dog/bird/rabbit/other; unknown free text becomes other with the original in species_note and the report. Missing species needs other plus a warning because the target is required. |
+| Patient.PatientType | patients.species, patients.species_note | Shared legacy normalizer maps Turkish/ASCII aliases to cat/dog/bird/rabbit/other (the v2 species are not produced by legacy data); unknown free text becomes other with the original in species_note and the report. Missing species needs other plus a warning because the target is required. |
 | Patient.PatientGender | patients.sex, patients.notes/report | Erkek -> male; Dişi -> female; missing/unknown -> unknown. Preserve unrecognized raw text in notes and report. |
 | Patient.BirthDate | patients.birth_date, patients.notes/report | Parse documented Turkish/English long dates and supported numeric/ISO dates through legacy::normalize. Keep an unparsed raw value in notes/report and leave birth_date NULL. Do not infer an estimate from malformed input. |
 | Patient.RegistrationDate | patients.created_at (date at 00:00Z); notes when unparsable | The registration date is the patient's history, so the importer stores it in created_at at midnight UTC (the time part carries no meaning). An unparsable value is kept in notes. See docs/legacy-schema.md, Mapping. |

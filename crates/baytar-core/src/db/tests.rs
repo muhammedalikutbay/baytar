@@ -122,10 +122,7 @@ fn newer_schema_is_refused_and_file_untouched() {
     let err = Database::open(&path, &bdir).err().unwrap();
     assert!(matches!(
         err,
-        DbError::NewerSchema {
-            found: 99,
-            supported: 1
-        }
+        DbError::NewerSchema { found: 99, supported } if supported == migrations().len() as u32
     ));
     assert_eq!(std::fs::read(&path).unwrap(), before);
     assert!(backups(&bdir).is_empty());

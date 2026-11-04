@@ -127,3 +127,27 @@ pub(crate) fn range(from: &str, to: &str) -> Result<()> {
     }
     Ok(())
 }
+
+/// Trims free text; an empty or blank value becomes `None`.
+pub(crate) fn clean(value: Option<String>) -> Option<String> {
+    value.map(|v| v.trim().to_owned()).filter(|v| !v.is_empty())
+}
+
+/// Canonical stored phone: E.164 (`+905551112233`) when the input is a recognizable Turkish
+/// number or already international, otherwise digits only (the v1 behaviour). The original
+/// text is kept separately in `phone_raw`.
+pub(crate) fn phone_value(value: Option<&str>) -> Option<String> {
+    use crate::legacy::normalize::{phone, Raw};
+    let text = value?.trim();
+    if text.is_empty() {
+        return None;
+    }
+    if let Some(e164) = phone(Raw::Text(text)).value {
+        return Some(e164);
+    }
+    let all = digits(Some(text))?;
+    if text.starts_with('+') && (8..=15).contains(&all.len()) {
+        return Some(format!("+{all}"));
+    }
+    Some(all)
+}

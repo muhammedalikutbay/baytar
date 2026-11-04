@@ -8,13 +8,13 @@ function active<T extends Audit>(row: T): T { if (row.deletedAt) ctx.fail("not_f
 const visits: Visit[] = [];
 function visitsGet(id: number): Visit { return visits.find(r => r.id === id) ?? ctx.fail("not_found", "Record not found."); }
 function visitsCreate(input: NewVisit): Visit {
-const row: Visit = { patientId: input.patientId, visitOn: input.visitOn, visitTime: input.visitTime ?? null, reason: input.reason ?? null, findings: input.findings ?? null, diagnosis: input.diagnosis ?? null, treatment: input.treatment ?? null, weightKg: input.weightKg ?? null, temperatureC: input.temperatureC ?? null, notes: input.notes ?? null, ...audit() };
+const row: Visit = { patientId: input.patientId, visitOn: input.visitOn, visitTime: input.visitTime ?? null, reason: input.reason ?? null, findings: input.findings ?? null, diagnosis: input.diagnosis ?? null, treatment: input.treatment ?? null, weightKg: input.weightKg ?? null, temperatureC: input.temperatureC ?? null, heartRateBpm: input.heartRateBpm ?? null, respRateBpm: input.respRateBpm ?? null, bodyCondition: input.bodyCondition ?? null, notes: input.notes ?? null, ...audit() };
 visitsPrepare(row, true); visits.push(row); return row; }
 function visitsUpdate(id: number, patch: VisitPatch): Visit { const old = active(visitsGet(id)); const row = { ...old, ...patch }; visitsPrepare(row, false); Object.assign(old, row, { updatedAt: ctx.now() }); return old; }
 const vaccine_types: VaccineType[] = [];
 function vaccine_typesGet(id: number): VaccineType { return vaccine_types.find(r => r.id === id) ?? ctx.fail("not_found", "Record not found."); }
 function vaccine_typesCreate(input: NewVaccineType): VaccineType {
-const row: VaccineType = { name: input.name, species: input.species ?? null, defaultIntervalDays: input.defaultIntervalDays ?? null, notes: input.notes ?? null, isActive: input.isActive ?? true, ...audit() };
+const row: VaccineType = { name: input.name, species: input.species ?? null, defaultIntervalDays: input.defaultIntervalDays ?? null, notes: input.notes ?? null, isActive: input.isActive ?? true, isBuiltin: input.isBuiltin ?? false, manufacturer: input.manufacturer ?? null, diseases: input.diseases ?? null, primaryDoses: input.primaryDoses ?? null, primaryIntervalDays: input.primaryIntervalDays ?? null, minAgeWeeks: input.minAgeWeeks ?? null, ...audit() };
 vaccine_typesPrepare(row, true); vaccine_types.push(row); return row; }
 function vaccine_typesUpdate(id: number, patch: VaccineTypePatch): VaccineType { const old = active(vaccine_typesGet(id)); const row = { ...old, ...patch }; vaccine_typesPrepare(row, false); Object.assign(old, row, { updatedAt: ctx.now() }); return old; }
 const vaccinations: Vaccination[] = [];
@@ -26,7 +26,7 @@ function vaccinationsUpdate(id: number, patch: VaccinationPatch): Vaccination { 
 const medications: Medication[] = [];
 function medicationsGet(id: number): Medication { return medications.find(r => r.id === id) ?? ctx.fail("not_found", "Record not found."); }
 function medicationsCreate(input: NewMedication): Medication {
-const row: Medication = { name: input.name, activeIngredient: input.activeIngredient ?? null, form: input.form ?? null, concentrationMgPerMl: input.concentrationMgPerMl ?? null, strengthMgPerUnit: input.strengthMgPerUnit ?? null, doseMgPerKgMin: input.doseMgPerKgMin ?? null, doseMgPerKgMax: input.doseMgPerKgMax ?? null, route: input.route ?? null, notes: input.notes ?? null, ...audit() };
+const row: Medication = { name: input.name, activeIngredient: input.activeIngredient ?? null, form: input.form ?? null, concentrationMgPerMl: input.concentrationMgPerMl ?? null, strengthMgPerUnit: input.strengthMgPerUnit ?? null, doseMgPerKgMin: input.doseMgPerKgMin ?? null, doseMgPerKgMax: input.doseMgPerKgMax ?? null, route: input.route ?? null, notes: input.notes ?? null, isBuiltin: input.isBuiltin ?? false, category: input.category ?? null, manufacturer: input.manufacturer ?? null, targetSpecies: input.targetSpecies ?? null, prescriptionRequired: input.prescriptionRequired ?? null, packUnit: input.packUnit ?? null, ...audit() };
 medicationsPrepare(row, true); medications.push(row); return row; }
 function medicationsUpdate(id: number, patch: MedicationPatch): Medication { const old = active(medicationsGet(id)); const row = { ...old, ...patch }; medicationsPrepare(row, false); Object.assign(old, row, { updatedAt: ctx.now() }); return old; }
 const prescriptions: PrescriptionItem[] = [];
@@ -38,7 +38,7 @@ function prescriptionsUpdate(id: number, patch: PrescriptionPatch): Prescription
 const appointments: Appointment[] = [];
 function appointmentsGet(id: number): Appointment { return appointments.find(r => r.id === id) ?? ctx.fail("not_found", "Record not found."); }
 function appointmentsCreate(input: NewAppointment): Appointment {
-const row: Appointment = { patientId: input.patientId ?? null, ownerId: input.ownerId ?? null, title: input.title, startsOn: input.startsOn, startsTime: input.startsTime ?? null, durationMin: input.durationMin ?? null, kind: input.kind ?? "other", status: input.status ?? "planned", seriesId: input.seriesId ?? null, notes: input.notes ?? null, ...audit() };
+const row: Appointment = { patientId: input.patientId ?? null, ownerId: input.ownerId ?? null, title: input.title, startsOn: input.startsOn, startsTime: input.startsTime ?? null, durationMin: input.durationMin ?? null, kind: input.kind ?? "other", status: input.status ?? "planned", seriesId: input.seriesId ?? null, notes: input.notes ?? null, vaccineTypeId: input.vaccineTypeId ?? null, vaccinationId: input.vaccinationId ?? null, ...audit() };
 appointmentsPrepare(row, true); appointments.push(row); return row; }
 function appointmentsUpdate(id: number, patch: AppointmentPatch): Appointment { const old = active(appointmentsGet(id)); const row = { ...old, ...patch }; appointmentsPrepare(row, false); Object.assign(old, row, { updatedAt: ctx.now() }); return old; }
 function visitsList(patientId: number) { return visits.filter(v => !v.deletedAt && v.patientId === patientId).sort((a,b) => b.visitOn.localeCompare(a.visitOn) || (b.visitTime ?? "").localeCompare(a.visitTime ?? "") || b.id-a.id); }
@@ -110,7 +110,7 @@ function visitsPrepare(r: Visit, _snapshot: boolean) {
 }
 function vaccine_typesPrepare(r: VaccineType, _snapshot: boolean) {
   required('name', r.name); integer('defaultIntervalDays', r.defaultIntervalDays);
-  if (r.species !== null && !['cat','dog','bird','rabbit','other'].includes(r.species)) ctx.fail('invalid', 'Unknown species.', 'species');
+  if (r.species !== null && !['cat', 'dog', 'bird', 'rabbit', 'rodent', 'ferret', 'reptile', 'other'].includes(r.species)) ctx.fail('invalid', 'Unknown species.', 'species');
   if (vaccine_types.some(v => v.id !== r.id && !v.deletedAt && asciiLower(v.name) === asciiLower(r.name))) ctx.fail('conflict', 'Record conflicts with its current state.');
 }
 function vaccinationsPrepare(r: Vaccination, _snapshot: boolean) {

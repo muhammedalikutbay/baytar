@@ -22,7 +22,7 @@
   let errors = $state<Record<string, string>>({});
   let saving = $state(false);
   let first = $state<HTMLInputElement | null>(null);
-  const speciesOptions = ['cat', 'dog', 'bird', 'rabbit', 'other'].map(value => ({ value, label: tr[value as Species] }));
+  const speciesOptions = (['cat', 'dog', 'bird', 'rabbit', 'rodent', 'ferret', 'reptile', 'other'] as Species[]).map(value => ({ value, label: tr[value] }));
   const sexOptions = ['male', 'female', 'unknown'].map(value => ({ value, label: tr[value as Sex] }));
   onMount(() => first?.focus());
   async function submit(event: SubmitEvent) {

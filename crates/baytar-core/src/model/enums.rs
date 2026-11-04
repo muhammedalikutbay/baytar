@@ -18,6 +18,9 @@ pub enum Species {
     Dog,
     Bird,
     Rabbit,
+    Rodent,
+    Ferret,
+    Reptile,
     Other,
 }
 
@@ -28,6 +31,9 @@ impl Species {
             Self::Dog => "dog",
             Self::Bird => "bird",
             Self::Rabbit => "rabbit",
+            Self::Rodent => "rodent",
+            Self::Ferret => "ferret",
+            Self::Reptile => "reptile",
             Self::Other => "other",
         }
     }
@@ -42,6 +48,9 @@ impl FromStr for Species {
             "dog" => Ok(Self::Dog),
             "bird" => Ok(Self::Bird),
             "rabbit" => Ok(Self::Rabbit),
+            "rodent" => Ok(Self::Rodent),
+            "ferret" => Ok(Self::Ferret),
+            "reptile" => Ok(Self::Reptile),
             "other" => Ok(Self::Other),
             _ => Err(ParseEnumError {
                 enum_name: "Species",
@@ -236,6 +245,303 @@ impl FromStr for ImportStatus {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum MedicationCategory {
+    Antibiotic,
+    Nsaid,
+    Analgesic,
+    Antiparasitic,
+    Anesthetic,
+    Sedative,
+    Corticosteroid,
+    Antiemetic,
+    Gastro,
+    Cardio,
+    Dermatologic,
+    Ophthalmic,
+    Otic,
+    Vitamin,
+    Fluid,
+    Hormone,
+    Antifungal,
+    Antiviral,
+    Other,
+}
+
+impl MedicationCategory {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Antibiotic => "antibiotic",
+            Self::Nsaid => "nsaid",
+            Self::Analgesic => "analgesic",
+            Self::Antiparasitic => "antiparasitic",
+            Self::Anesthetic => "anesthetic",
+            Self::Sedative => "sedative",
+            Self::Corticosteroid => "corticosteroid",
+            Self::Antiemetic => "antiemetic",
+            Self::Gastro => "gastro",
+            Self::Cardio => "cardio",
+            Self::Dermatologic => "dermatologic",
+            Self::Ophthalmic => "ophthalmic",
+            Self::Otic => "otic",
+            Self::Vitamin => "vitamin",
+            Self::Fluid => "fluid",
+            Self::Hormone => "hormone",
+            Self::Antifungal => "antifungal",
+            Self::Antiviral => "antiviral",
+            Self::Other => "other",
+        }
+    }
+}
+
+impl FromStr for MedicationCategory {
+    type Err = ParseEnumError;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "antibiotic" => Ok(Self::Antibiotic),
+            "nsaid" => Ok(Self::Nsaid),
+            "analgesic" => Ok(Self::Analgesic),
+            "antiparasitic" => Ok(Self::Antiparasitic),
+            "anesthetic" => Ok(Self::Anesthetic),
+            "sedative" => Ok(Self::Sedative),
+            "corticosteroid" => Ok(Self::Corticosteroid),
+            "antiemetic" => Ok(Self::Antiemetic),
+            "gastro" => Ok(Self::Gastro),
+            "cardio" => Ok(Self::Cardio),
+            "dermatologic" => Ok(Self::Dermatologic),
+            "ophthalmic" => Ok(Self::Ophthalmic),
+            "otic" => Ok(Self::Otic),
+            "vitamin" => Ok(Self::Vitamin),
+            "fluid" => Ok(Self::Fluid),
+            "hormone" => Ok(Self::Hormone),
+            "antifungal" => Ok(Self::Antifungal),
+            "antiviral" => Ok(Self::Antiviral),
+            "other" => Ok(Self::Other),
+            _ => Err(ParseEnumError {
+                enum_name: "MedicationCategory",
+                value: value.to_owned(),
+            }),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum ServiceCategory {
+    Exam,
+    Vaccination,
+    Surgery,
+    Lab,
+    Imaging,
+    Grooming,
+    Boarding,
+    Hospitalisation,
+    Other,
+}
+
+impl ServiceCategory {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Exam => "exam",
+            Self::Vaccination => "vaccination",
+            Self::Surgery => "surgery",
+            Self::Lab => "lab",
+            Self::Imaging => "imaging",
+            Self::Grooming => "grooming",
+            Self::Boarding => "boarding",
+            Self::Hospitalisation => "hospitalisation",
+            Self::Other => "other",
+        }
+    }
+}
+
+impl FromStr for ServiceCategory {
+    type Err = ParseEnumError;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "exam" => Ok(Self::Exam),
+            "vaccination" => Ok(Self::Vaccination),
+            "surgery" => Ok(Self::Surgery),
+            "lab" => Ok(Self::Lab),
+            "imaging" => Ok(Self::Imaging),
+            "grooming" => Ok(Self::Grooming),
+            "boarding" => Ok(Self::Boarding),
+            "hospitalisation" => Ok(Self::Hospitalisation),
+            "other" => Ok(Self::Other),
+            _ => Err(ParseEnumError {
+                enum_name: "ServiceCategory",
+                value: value.to_owned(),
+            }),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum InventoryKind {
+    Medication,
+    Vaccine,
+    Supply,
+    Food,
+    Product,
+    Other,
+}
+
+impl InventoryKind {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Medication => "medication",
+            Self::Vaccine => "vaccine",
+            Self::Supply => "supply",
+            Self::Food => "food",
+            Self::Product => "product",
+            Self::Other => "other",
+        }
+    }
+}
+
+impl FromStr for InventoryKind {
+    type Err = ParseEnumError;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "medication" => Ok(Self::Medication),
+            "vaccine" => Ok(Self::Vaccine),
+            "supply" => Ok(Self::Supply),
+            "food" => Ok(Self::Food),
+            "product" => Ok(Self::Product),
+            "other" => Ok(Self::Other),
+            _ => Err(ParseEnumError {
+                enum_name: "InventoryKind",
+                value: value.to_owned(),
+            }),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum StockReason {
+    Purchase,
+    Use,
+    Sale,
+    Adjust,
+    Expired,
+    Return,
+}
+
+impl StockReason {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Purchase => "purchase",
+            Self::Use => "use",
+            Self::Sale => "sale",
+            Self::Adjust => "adjust",
+            Self::Expired => "expired",
+            Self::Return => "return",
+        }
+    }
+}
+
+impl FromStr for StockReason {
+    type Err = ParseEnumError;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "purchase" => Ok(Self::Purchase),
+            "use" => Ok(Self::Use),
+            "sale" => Ok(Self::Sale),
+            "adjust" => Ok(Self::Adjust),
+            "expired" => Ok(Self::Expired),
+            "return" => Ok(Self::Return),
+            _ => Err(ParseEnumError {
+                enum_name: "StockReason",
+                value: value.to_owned(),
+            }),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum PaymentMethod {
+    Cash,
+    Card,
+    Transfer,
+    Other,
+}
+
+impl PaymentMethod {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Cash => "cash",
+            Self::Card => "card",
+            Self::Transfer => "transfer",
+            Self::Other => "other",
+        }
+    }
+}
+
+impl FromStr for PaymentMethod {
+    type Err = ParseEnumError;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "cash" => Ok(Self::Cash),
+            "card" => Ok(Self::Card),
+            "transfer" => Ok(Self::Transfer),
+            "other" => Ok(Self::Other),
+            _ => Err(ParseEnumError {
+                enum_name: "PaymentMethod",
+                value: value.to_owned(),
+            }),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum AttachmentKind {
+    Photo,
+    Lab,
+    Imaging,
+    Document,
+    Other,
+}
+
+impl AttachmentKind {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Photo => "photo",
+            Self::Lab => "lab",
+            Self::Imaging => "imaging",
+            Self::Document => "document",
+            Self::Other => "other",
+        }
+    }
+}
+
+impl FromStr for AttachmentKind {
+    type Err = ParseEnumError;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "photo" => Ok(Self::Photo),
+            "lab" => Ok(Self::Lab),
+            "imaging" => Ok(Self::Imaging),
+            "document" => Ok(Self::Document),
+            "other" => Ok(Self::Other),
+            _ => Err(ParseEnumError {
+                enum_name: "AttachmentKind",
+                value: value.to_owned(),
+            }),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -263,6 +569,9 @@ mod tests {
             Species::Dog,
             Species::Bird,
             Species::Rabbit,
+            Species::Rodent,
+            Species::Ferret,
+            Species::Reptile,
             Species::Other,
         ];
         check(&variants, &variants.map(Species::as_str));
@@ -297,5 +606,139 @@ mod tests {
             ImportStatus::Failed,
         ];
         check(&variants, &variants.map(ImportStatus::as_str));
+        let variants = [
+            MedicationCategory::Antibiotic,
+            MedicationCategory::Nsaid,
+            MedicationCategory::Analgesic,
+            MedicationCategory::Antiparasitic,
+            MedicationCategory::Anesthetic,
+            MedicationCategory::Sedative,
+            MedicationCategory::Corticosteroid,
+            MedicationCategory::Antiemetic,
+            MedicationCategory::Gastro,
+            MedicationCategory::Cardio,
+            MedicationCategory::Dermatologic,
+            MedicationCategory::Ophthalmic,
+            MedicationCategory::Otic,
+            MedicationCategory::Vitamin,
+            MedicationCategory::Fluid,
+            MedicationCategory::Hormone,
+            MedicationCategory::Antifungal,
+            MedicationCategory::Antiviral,
+            MedicationCategory::Other,
+        ];
+        check(&variants, &variants.map(MedicationCategory::as_str));
+        let variants = [
+            ServiceCategory::Exam,
+            ServiceCategory::Vaccination,
+            ServiceCategory::Surgery,
+            ServiceCategory::Lab,
+            ServiceCategory::Imaging,
+            ServiceCategory::Grooming,
+            ServiceCategory::Boarding,
+            ServiceCategory::Hospitalisation,
+            ServiceCategory::Other,
+        ];
+        check(&variants, &variants.map(ServiceCategory::as_str));
+        let variants = [
+            InventoryKind::Medication,
+            InventoryKind::Vaccine,
+            InventoryKind::Supply,
+            InventoryKind::Food,
+            InventoryKind::Product,
+            InventoryKind::Other,
+        ];
+        check(&variants, &variants.map(InventoryKind::as_str));
+        let variants = [
+            StockReason::Purchase,
+            StockReason::Use,
+            StockReason::Sale,
+            StockReason::Adjust,
+            StockReason::Expired,
+            StockReason::Return,
+        ];
+        check(&variants, &variants.map(StockReason::as_str));
+        let variants = [
+            PaymentMethod::Cash,
+            PaymentMethod::Card,
+            PaymentMethod::Transfer,
+            PaymentMethod::Other,
+        ];
+        check(&variants, &variants.map(PaymentMethod::as_str));
+        let variants = [
+            AttachmentKind::Photo,
+            AttachmentKind::Lab,
+            AttachmentKind::Imaging,
+            AttachmentKind::Document,
+            AttachmentKind::Other,
+        ];
+        check(&variants, &variants.map(AttachmentKind::as_str));
+        let variants = [
+            MedicationCategory::Antibiotic,
+            MedicationCategory::Nsaid,
+            MedicationCategory::Analgesic,
+            MedicationCategory::Antiparasitic,
+            MedicationCategory::Anesthetic,
+            MedicationCategory::Sedative,
+            MedicationCategory::Corticosteroid,
+            MedicationCategory::Antiemetic,
+            MedicationCategory::Gastro,
+            MedicationCategory::Cardio,
+            MedicationCategory::Dermatologic,
+            MedicationCategory::Ophthalmic,
+            MedicationCategory::Otic,
+            MedicationCategory::Vitamin,
+            MedicationCategory::Fluid,
+            MedicationCategory::Hormone,
+            MedicationCategory::Antifungal,
+            MedicationCategory::Antiviral,
+            MedicationCategory::Other,
+        ];
+        check(&variants, &variants.map(MedicationCategory::as_str));
+        let variants = [
+            ServiceCategory::Exam,
+            ServiceCategory::Vaccination,
+            ServiceCategory::Surgery,
+            ServiceCategory::Lab,
+            ServiceCategory::Imaging,
+            ServiceCategory::Grooming,
+            ServiceCategory::Boarding,
+            ServiceCategory::Hospitalisation,
+            ServiceCategory::Other,
+        ];
+        check(&variants, &variants.map(ServiceCategory::as_str));
+        let variants = [
+            InventoryKind::Medication,
+            InventoryKind::Vaccine,
+            InventoryKind::Supply,
+            InventoryKind::Food,
+            InventoryKind::Product,
+            InventoryKind::Other,
+        ];
+        check(&variants, &variants.map(InventoryKind::as_str));
+        let variants = [
+            StockReason::Purchase,
+            StockReason::Use,
+            StockReason::Sale,
+            StockReason::Adjust,
+            StockReason::Expired,
+            StockReason::Return,
+        ];
+        check(&variants, &variants.map(StockReason::as_str));
+        let variants = [
+            PaymentMethod::Cash,
+            PaymentMethod::Card,
+            PaymentMethod::Transfer,
+            PaymentMethod::Other,
+        ];
+        check(&variants, &variants.map(PaymentMethod::as_str));
+        let variants = [
+            AttachmentKind::Photo,
+            AttachmentKind::Lab,
+            AttachmentKind::Imaging,
+            AttachmentKind::Document,
+            AttachmentKind::Other,
+        ];
+        check(&variants, &variants.map(AttachmentKind::as_str));
     }
 }
