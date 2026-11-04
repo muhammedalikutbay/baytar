@@ -469,6 +469,25 @@ export const tr = {
   clinicalDeceasedDescription: 'Hasta geçmişi korunur; aşı hatırlatmalarından çıkarılır.', clinicalClearDeceased: 'Vefat bilgisini kaldır',
   clinicalInvalidDeceased: 'Doğum tarihi ile bugün arasında bir tarih girin.', clinicalPatientInfo: 'Hasta bilgileri',
   clinicalHistoryTab: 'Klinik geçmiş', clinicalDemoLab: 'Örnek hemogram sonucu', clinicalDemoDocument: 'Örnek bakım planı',
+  // Reports and CSV export
+  reports: 'Raporlar', reportsDescription: 'Muayene, ciro ve aşı durumunuzun özeti. Veriler yalnızca bu bilgisayarda hesaplanır.',
+  reportsPeriod: 'Dönem', reportsThisMonth: 'Bu ay', reportsLast3Months: 'Son 3 ay', reportsThisYear: 'Bu yıl', reportsLastYear: 'Geçen yıl', reportsCustom: 'Özel aralık',
+  reportsFrom: 'Başlangıç', reportsTo: 'Bitiş', reportsRangeError: 'Bitiş tarihi başlangıçtan önce olamaz.', reportsRangeTooLong: 'En fazla 10 yıllık aralık seçilebilir.',
+  reportsRangeLabel: 'Seçili aralık',
+  reportsVisits: 'Muayene', reportsNewPatients: 'Yeni hasta', reportsRevenue: 'Ciro', reportsCollections: 'Tahsilat', reportsOutstanding: 'Açık alacak',
+  reportsPreviousPeriod: 'önceki dönem', reportsVsPrevious: 'Önceki döneme göre', reportsOutstandingHint: 'Dönem sonu bakiyesi', reportsNoChange: 'değişim yok',
+  reportsVisitsChart: 'Aylık muayene sayısı', reportsMoneyChart: 'Ciro ve tahsilat', reportsSpeciesChart: 'Tür dağılımı', reportsSpeciesHint: 'Aktif hastalar (vefat edenler hariç)',
+  reportsDiagnoses: 'En sık tanılar', reportsMedicines: 'En sık yazılan ilaçlar', reportsDiagnosis: 'Tanı', reportsMedicine: 'İlaç', reportsCount: 'Adet',
+  reportsCoverage: 'Aşı kapsaması', reportsCoverageHint: 'Aktif kedi ve köpeklerde gecikmiş aşısı olmayanların oranı', reportsRabies: 'Kuduz aşısı güncel', reportsCoreAll: 'Karma aşı güncel',
+  reportsCoverageOf: 'hasta', reportsCoverageEmpty: 'Henüz aktif kedi veya köpek kaydı yok.',
+  reportsNoData: 'Bu dönemde kayıt yok', reportsNoDataDescription: 'Başka bir dönem seçin ya da muayene ve ödeme kaydı ekleyin.',
+  reportsEmptyShort: 'Gösterilecek veri yok.', reportsChartData: 'Grafik verisi', reportsMonth: 'Ay',
+  reportsExport: 'Dışa aktar', reportsExportDescription: 'Tabloları Excel’de açılacak CSV dosyaları olarak kaydedin. Silinen kayıtlar dahil edilmez.',
+  reportsExportAll: 'Hepsini bir klasöre aktar', reportsExportTable: 'CSV kaydet', reportsSaveCsv: 'CSV dosyasını kaydet', reportsChooseFolder: 'Dosyaların kaydedileceği klasör',
+  reportsExportedOne: 'Dosya kaydedildi', reportsExportedMany: 'dosya klasöre kaydedildi', reportsExportError: 'Dosya kaydedilemedi. Klasörü ve yazma iznini kontrol edin.',
+  reportsExportOwners: 'Sahipler', reportsExportPatients: 'Hastalar', reportsExportVisits: 'Muayeneler', reportsExportVaccinations: 'Aşılar',
+  reportsExportPrescriptions: 'Reçeteler', reportsExportCharges: 'Borçlar', reportsExportPayments: 'Ödemeler', reportsExportInventory: 'Stok kalemleri',
+  reportsExportFormat: 'UTF-8, noktalı virgülle ayrılmış; tarihler YYYY-AA-GG, tutarlar virgüllü.',
 } as const satisfies Record<string, string>;
 
 export type TranslationKey = keyof typeof tr;

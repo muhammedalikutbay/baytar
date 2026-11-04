@@ -6,6 +6,7 @@ import { createVaccineMock } from './vaccinations-mock';
 import { createInventoryMock } from './inventory-mock';
 import { createAttachmentsMock } from './attachments-mock';
 import { createTemplatesMock } from './templates-mock';
+import { createReportsMock } from './reports-mock';
 import { calculateMock } from './dose-mock';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import type { ImportPreview, ImportReport, ApiError, CommandMap, ListQuery, NewOwner, NewPatient, Owner, OwnerPatch, Patient, PatientPatch, SearchHit } from './types';
@@ -126,6 +127,7 @@ const vaccines = createVaccineMock({ clinical, patients, patientGet, ownerGet, f
 const inventory = createInventoryMock({ now, fold, fail, catalog: clinical.call });
 const files = createAttachmentsMock({ patientGet, visitGet: id => clinical.call('visit_get', { id }) as import('./types').Visit, fail, now });
 const templates = createTemplatesMock({ fail, now });
+const reports = createReportsMock();
 
 // Synthetic vaccination examples, relative to the local day for useful previews.
 const demoDate = (offset: number) => {
@@ -190,6 +192,7 @@ function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['arg
   if (inventory.has(command)) return inventory.call(command, args);
   if (files.has(command)) return files.call(command, args);
   if (templates.has(command)) return templates.call(command, args);
+  if (reports.has(command)) return reports.call(command, args);
   if (command === 'patient_mark_deceased') {
     const { id, date } = args as CommandMap['patient_mark_deceased']['args'];
     const patient = patientGet(id);

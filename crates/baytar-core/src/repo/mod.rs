@@ -158,4 +158,5 @@ pub(crate) fn phone_value(value: Option<&str>) -> Option<String> {
 pub mod accounts;
 pub mod charges;
 pub mod payments;
+pub mod reports;
 pub mod services;
