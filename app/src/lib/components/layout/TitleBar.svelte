@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { Minus, Square, Copy, X } from '@lucide/svelte';
   import { getCurrentWindow } from '@tauri-apps/api/window';
+  import { branding } from '$lib/branding.svelte';
   import { tr } from '$lib/i18n/tr';
   import Logo from '$lib/components/brand/Logo.svelte';
   import GlobalSearch from '$lib/components/patients/GlobalSearch.svelte';
@@ -53,7 +54,7 @@
 <header bind:this={bar} class:mac class="titlebar" data-tauri-drag-region>
   <div class="brand" data-tauri-drag-region>
     <span class="brand-logo" data-tauri-drag-region><Logo size={24} /></span>
-    <span class="brand-name" data-tauri-drag-region>{tr.appName}</span>
+    <span class="brand-name truncate" title={branding.name || tr.appName} data-tauri-drag-region>{branding.name || tr.appName}</span>
   </div>
   <div class="breadcrumb" data-tauri-drag-region>
     <span class="text-fg-subtle" data-tauri-drag-region>{tr.workspace}</span>

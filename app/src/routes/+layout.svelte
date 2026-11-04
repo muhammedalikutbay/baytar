@@ -3,6 +3,8 @@
   import { onMount, type Snippet } from 'svelte';
   import { page } from '$app/state';
   import { ShieldCheck } from '@lucide/svelte';
+  import Logo from '$lib/components/brand/Logo.svelte';
+  import { branding } from '$lib/branding.svelte';
   import { tr } from '$lib/i18n/tr';
   import { theme } from '$lib/theme.svelte';
   import { updater } from '$lib/updater.svelte';
@@ -55,6 +57,7 @@
 {:else if lock.ready}
 <div class="app-shell">
   <aside class="sidebar">
+    <div class="sidebar-label flex items-center gap-2 px-5 pt-5"><Logo size={28} /><span class="truncate font-semibold">{branding.name || tr.appName}</span></div>
     <p class="sidebar-label type-caption px-5 pt-7 pb-3 text-fg-subtle">{tr.navWorkspace}</p>
     <nav aria-label={tr.navigation} class="grid gap-1 px-3">
       {#each navigation as item, index (item.href)}

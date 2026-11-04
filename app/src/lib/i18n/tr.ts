@@ -570,6 +570,17 @@ export const tr = {
   remindersDefaultAppointment: 'Merhaba {sahip}, {hasta} için {tarih} tarihindeki randevunuzu hatırlatmak isteriz. Saat: {saat}. Gelemeyecekseniz önceden haber verirseniz seviniriz. Görüşmek üzere.\n{klinik} {telefon}',
   remindersDefaultDebt: 'Merhaba {sahip}, kliniğimizdeki hesabınızda {tutar} açık bakiye bulunmaktadır. Uygun olduğunuzda ödeme yapmanızı rica ederiz. Teşekkür eder, iyi günler dileriz.\n{klinik} {telefon}',
   remindersDefaultFollowup: 'Merhaba {sahip}, {hasta} için {tarih} tarihinde kontrol muayenesi planlanmış durumda. Saat: {saat}. Bir değişiklik olursa lütfen bize haber verin. Sağlıklı günler dileriz.\n{klinik} {telefon}',
+  // Clinic branding and WhatsApp delivery (bay-ux2).
+  brandingUpload: 'Logo yükle', brandingChange: 'Değiştir', brandingRemove: 'Kaldır', brandingDrop: 'Logoyu buraya sürükleyin',
+  whatsappTitle: 'WhatsApp', whatsappAuto: 'Otomatik', whatsappApp: 'WhatsApp Masaüstü uygulaması', whatsappWeb: 'WhatsApp Web',
+  whatsappAutoHint: 'Sisteminiz WhatsApp uygulamasını veya tarayıcıyı seçer.',
+  whatsappAppHint: 'Yüklü WhatsApp Masaüstü uygulamasını açar.', whatsappWebHint: 'Tarayıcıda WhatsApp Web’i açar.',
+  whatsappHow: 'Nasıl çalışır?',
+  whatsappExplanation: 'Baytar mesajı hazırlar ve WhatsApp’ı ilgili kişiyle açar; göndermek için WhatsApp’ta Gönder’e basarsınız. Baytar mesajı kendisi göndermez, hesap bağlamak gerekmez.',
+  whatsappInstallHint: 'WhatsApp Masaüstü kurulu değilse WhatsApp Web seçin.',
+  whatsappTest: 'Deneme mesajı aç', whatsappTestText: 'Merhaba, bu Baytar’dan bir deneme mesajıdır.',
+  whatsappPhoneHint: 'Denemek için klinik telefonunu girip kaydedin.', whatsappCurrentMode: 'Açılış modu', whatsappChangeSettings: 'Ayarları değiştir',
+  whatsappOpenSend: "WhatsApp'ta aç ve gönder", whatsappPreviewHint: 'Mesaj WhatsApp’ta gönderilmeye hazır açılır. Göndermek için WhatsApp’ta Gönder’e basın.', whatsappAddPhone: 'Telefon ekle',
 } as const satisfies Record<string, string>;
 
 export type TranslationKey = keyof typeof tr;

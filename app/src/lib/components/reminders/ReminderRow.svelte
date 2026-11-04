@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge, Button } from '$lib/components/ui';
+  import { Badge, Button, buttonStyles } from '$lib/components/ui';
   import SpeciesIcon from '$lib/components/patients/SpeciesIcon.svelte';
   import { tr } from '$lib/i18n/tr';
   import { daysUntil, formatDate, formatMoney, formatPhone, whatsappPhone } from '$lib/format';
@@ -35,7 +35,7 @@
   <Badge variant={urgent ? 'highlight' : 'neutral'}>{relative}</Badge>
   {#if contacted}<Badge variant="success">{tr.remindersContactedToday}</Badge>{/if}
   <div class="flex flex-wrap gap-2">
-    <Button size="sm" variant="secondary" disabled={busy || !whatsappPhone(item.phone)} onclick={() => onwhatsapp(item)}>{tr.remindersWhatsApp}</Button>
+    {#if whatsappPhone(item.phone)}<Button size="sm" variant="secondary" disabled={busy} onclick={() => onwhatsapp(item)}>{tr.remindersWhatsApp}</Button>{:else}<a class={buttonStyles('secondary', 'sm')} href={`/patients/owner?id=${item.ownerId}`}>{tr.whatsappAddPhone}</a>{/if}
     <Button size="sm" variant="ghost" disabled={busy} onclick={() => onmark(item)}>{tr.remindersMarkContacted}</Button>
   </div>
 </li>
