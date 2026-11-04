@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { Stethoscope, Syringe, CalendarDays, ChevronDown } from '@lucide/svelte';
+  import { Stethoscope, Syringe, ChevronDown } from '@lucide/svelte';
   import { Button, Card, Dialog, EmptyState, Toast } from '$lib/components/ui';
+  import { isPastClinicalRecord } from './clinical';
   import PrintButton from '$lib/components/print/PrintButton.svelte';
   import VisitCharges from '$lib/components/billing/VisitCharges.svelte';
   import VisitVitals from '$lib/components/visits/VisitVitals.svelte';
@@ -10,11 +11,10 @@
   import { formatDate, formatMonth, formatNumber } from '$lib/format';
   import * as visits from '$lib/api/visits';
   import * as vaccinations from '$lib/api/vaccinations';
-  import * as appointments from '$lib/api/appointments';
   import * as prescriptions from '$lib/api/prescriptions';
-  import type { Visit, Vaccination, Appointment, PrescriptionItem } from '$lib/api/types';
-  let { patientId, revision = 0 }: { patientId: number; revision?: number } = $props();
-  type Entry = { kind: 'visit'; record: Visit } | { kind: 'vaccination'; record: Vaccination } | { kind: 'appointment'; record: Appointment };
+  import type { Visit, Vaccination, PrescriptionItem } from '$lib/api/types';
+  let { patientId, patientName = '', revision = 0, onchange = () => {} }: { patientId: number; patientName?: string; revision?: number; onchange?: () => void } = $props();
+  type Entry = { kind: 'visit'; record: Visit } | { kind: 'vaccination'; record: Vaccination };
   let entries = $state<Entry[]>([]);
   let prescriptionItems = $state<Record<number, PrescriptionItem[]>>({});
   let loading = $state(true);
@@ -35,35 +35,31 @@
     loading = true; failed = false;
     (async () => {
       try {
-        // No patient appointment query exists yet; filter the complete dated range locally.
-        const [encounters, vaccines, calendar] = await Promise.all([
-          visits.listByPatient(id), vaccinations.listByPatient(id), appointments.between('0001-01-01', '9999-12-31')
+        const [encounters, vaccines] = await Promise.all([
+          visits.listByPatient(id), vaccinations.listByPatient(id)
         ]);
         const items = await Promise.all(encounters.map(async visit => [visit.id, await prescriptions.listByVisit(visit.id)] as const));
         if (cancelled) return;
         prescriptionItems = Object.fromEntries(items);
         entries = [
-          ...encounters.map(record => ({ kind: 'visit' as const, record })),
-          ...vaccines.map(record => ({ kind: 'vaccination' as const, record })),
-          ...calendar.filter(item => item.appointment.patientId === id).map(item => ({ kind: 'appointment' as const, record: item.appointment }))
+          ...encounters.filter(v => isPastClinicalRecord(v.visitOn, v.visitTime)).map(record => ({ kind: 'visit' as const, record })),
+          ...vaccines.filter(v => isPastClinicalRecord(v.givenOn)).map(record => ({ kind: 'vaccination' as const, record }))
         ].sort((a, b) => date(b).localeCompare(date(a)) || time(b).localeCompare(time(a)) || b.record.id - a.record.id || a.kind.localeCompare(b.kind));
       } catch { if (!cancelled) failed = true; }
       finally { if (!cancelled) loading = false; }
     })();
     return () => { cancelled = true; };
   });
-  function date(entry: Entry): string { return entry.kind === 'visit' ? entry.record.visitOn : entry.kind === 'vaccination' ? entry.record.givenOn : entry.record.startsOn; }
-  function time(entry: Entry): string { return entry.kind === 'visit' ? entry.record.visitTime ?? '' : entry.kind === 'appointment' ? entry.record.startsTime ?? '' : ''; }
-  function summary(entry: Entry): string { return entry.kind === 'visit' ? entry.record.reason || entry.record.diagnosis || tr.visit : entry.kind === 'vaccination' ? entry.record.vaccineName : entry.record.title; }
+  function date(entry: Entry): string { return entry.kind === 'visit' ? entry.record.visitOn : entry.record.givenOn; }
+  function time(entry: Entry): string { return entry.kind === 'visit' ? entry.record.visitTime ?? '' : ''; }
+  function summary(entry: Entry): string { return entry.kind === 'visit' ? entry.record.reason || entry.record.diagnosis || tr.visit : entry.record.vaccineName; }
   function details(entry: Entry): { label: string; value: string | null }[] {
     if (entry.kind === 'visit') {
       const v = entry.record;
       return [{label:tr.reason,value:v.reason}, {label:tr.findings,value:v.findings}, {label:tr.diagnosis,value:v.diagnosis}, {label:tr.treatment,value:v.treatment},
         {label:tr.weight,value:v.weightKg === null ? null : formatNumber(v.weightKg)}, {label:tr.temperature,value:v.temperatureC === null ? null : formatNumber(v.temperatureC)}, {label:tr.notes,value:v.notes}];
     }
-    if (entry.kind === 'vaccination') return [{label:tr.nextDue,value:formatDate(entry.record.nextDueOn)}, {label:tr.batchNo,value:entry.record.batchNo}, {label:tr.notes,value:entry.record.notes}];
-    return [{label:tr.appointmentKind,value:entry.record.kind === 'vaccine' ? tr.vaccination : tr[entry.record.kind]}, {label:tr.appointmentStatus,value:tr[entry.record.status]},
-      {label:tr.durationMin,value:entry.record.durationMin === null ? null : formatNumber(entry.record.durationMin)}, {label:tr.notes,value:entry.record.notes}];
+    return [{label:tr.nextDue,value:formatDate(entry.record.nextDueOn)}, {label:tr.batchNo,value:entry.record.batchNo}, {label:tr.notes,value:entry.record.notes}];
   }
   function prescriptionDetails(item: PrescriptionItem) {
     return [{label:tr.doseMg,value:item.doseMg === null ? null : formatNumber(item.doseMg)}, {label:tr.doseMl,value:item.doseMl === null ? null : formatNumber(item.doseMl)}, {label:tr.doseText,value:item.doseText}, {label:tr.frequency,value:item.frequency}, {label:tr.durationDays,value:item.durationDays === null ? null : formatNumber(item.durationDays)}, {label:tr.notes,value:item.notes}].filter(d => d.value);
@@ -77,49 +73,30 @@
     }
     return result;
   });
-  const weights = $derived(entries.filter((e): e is Extract<Entry, {kind:'visit'}> => e.kind === 'visit' && e.record.weightKg !== null).slice(0, 10).reverse());
-  const points = $derived.by(() => {
-    const values = weights.map(e => e.record.weightKg!);
-    const min = Math.min(...values), max = Math.max(...values);
-    return values.map((v, i) => `${values.length === 1 ? 60 : 4 + i * 112 / (values.length - 1)},${max === min ? 20 : 36 - (v - min) * 32 / (max - min)}`).join(' ');
-  });
-  function api(entry: Entry) { return entry.kind === 'visit' ? visits : entry.kind === 'vaccination' ? vaccinations : appointments; }
+  function api(entry: Entry) { return entry.kind === 'visit' ? visits : vaccinations; }
   async function remove() {
     if (!deleting || busy) return;
     const entry = deleting; busy = true; actionError = '';
     try {
       await api(entry).softDelete(entry.record.id);
       undos = [...undos, { key: undoKey++, entry, open: true }];
-      deleteOpen = false; refresh++;
+      deleteOpen = false; refresh++; onchange();
     } catch { actionError = tr.actionError; } finally { busy = false; }
   }
   async function undo(item: Undo) {
     if (busy) return;
     busy = true; actionError = '';
-    try { await api(item.entry).restore(item.entry.record.id); item.open = false; refresh++; }
+    try { await api(item.entry).restore(item.entry.record.id); item.open = false; refresh++; onchange(); }
     catch { actionError = tr.actionError; } finally { busy = false; }
   }
   function setEditOpen(open: boolean) { editOpen = open; if (!open) refresh++; }
-  function closeEdit() { setEditOpen(false); }
+  function closeEdit() { setEditOpen(false); onchange(); }
 </script>
 
 <section aria-label={tr.history}>
   <Card>
     <div class="flex flex-wrap items-center justify-between gap-4">
       <h2 class="type-section">{tr.history}</h2>
-      <PrintButton kind="vaccination" id={patientId} />
-      {#if !loading && !failed}
-        {#if weights.length}
-          <div class="flex items-center gap-3" aria-label={tr.weightTrend}>
-            <svg viewBox="0 0 120 40" class="h-10 w-30 text-fg-muted" role="img" aria-label={tr.weightTrend}>
-              <title>{weights.map(e => `${formatDate(e.record.visitOn)}: ${formatNumber(e.record.weightKg!)} kg`).join('; ')}</title>
-              <polyline points={points} fill="none" stroke="currentColor" stroke-width="1.75" />
-              {#each points.split(' ') as point}<circle cx={point.split(',')[0]} cy={point.split(',')[1]} r="2" fill="currentColor" />{/each}
-            </svg>
-            <span class="type-caption tabular-nums">{formatNumber(weights[weights.length - 1].record.weightKg!)} kg</span>
-          </div>
-        {:else}<span class="type-caption text-fg-muted">{tr.noWeight}</span>{/if}
-      {/if}
     </div>
     {#if actionError}<p role="alert" class="mt-4 text-danger">{actionError}</p>{/if}
     {#if loading}<p role="status" class="mt-4">{tr.loading}</p>
@@ -134,8 +111,7 @@
               <details class="py-3">
                 <summary class="flex min-h-11 cursor-pointer items-center gap-3 rounded-sm hover:bg-surface-muted">
                   {#if entry.kind === 'visit'}<Stethoscope size={18} class="shrink-0 text-fg-muted" aria-hidden="true" />
-                  {:else if entry.kind === 'vaccination'}<Syringe size={18} class="shrink-0 text-fg-muted" aria-hidden="true" />
-                  {:else}<CalendarDays size={18} class="shrink-0 text-fg-muted" aria-hidden="true" />{/if}
+                  {:else}<Syringe size={18} class="shrink-0 text-fg-muted" aria-hidden="true" />{/if}
                   <div class="min-w-0 flex-1"><p class="type-caption text-fg-muted"><time datetime={date(entry)}>{formatDate(date(entry))}</time>{time(entry) ? ` · ${time(entry)}` : ''} · {tr[entry.kind]}</p><p class="truncate">{summary(entry)}</p>{#if entry.kind === 'visit'}<VisitVitals visit={entry.record} />{/if}</div>
                   <ChevronDown size={16} class="shrink-0 text-fg-muted" aria-hidden="true" />
                 </summary>
@@ -168,7 +144,7 @@
     {/if}
   </Card>
 </section>
-<Dialog bind:open={() => editOpen, setEditOpen} title={editing?.kind === 'visit' ? tr.editVisit : tr.editHistory} description={editing?.kind === 'visit' ? tr.visitFormDescription : tr.historyFormDescription}>
+<Dialog wide={editing?.kind === 'visit'} bind:open={() => editOpen, setEditOpen} title={editing?.kind === 'visit' ? tr.visit + ' — ' + patientName : tr.editHistory} description={editing?.kind === 'visit' ? tr.visitFormDescription : tr.historyFormDescription}>
   {#if editOpen && editing}
     {#if editing.kind === 'visit'}<VisitForm {patientId} visit={editing.record} onsaved={closeEdit} oncancel={closeEdit} />
     {:else}<HistoryRecordForm record={editing.record} onsaved={closeEdit} oncancel={() => editOpen = false} />{/if}

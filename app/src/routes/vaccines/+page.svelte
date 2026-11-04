@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { get as getPatient } from '$lib/api/patients';
   import { sendWhatsapp } from '$lib/whatsapp';
-  import { PageHeader, Card, Button, Badge, Dialog, Select, StatTile } from '$lib/components/ui';
+  import { PageHeader, Card, Button, Badge, Dialog, Select, Combobox, StatTile } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { todayDate, dateAfterDays, dateAfterMonths, daysUntil, formatDate, whatsappPhone, parseDate } from '$lib/format';
   import { mergedDue } from '$lib/api/vaccinations';
@@ -62,7 +62,7 @@
   <VaccineCalendar {refresh} onplan={date => dialog = { mode: 'plan', date }} />
   <div class="grid gap-3 sm:grid-cols-3">
     <Select label={tr.species} bind:value={species} options={[{ value: '', label: tr.anySpecies }, ...(['cat','dog','bird','rabbit','rodent','ferret','reptile','other'] as Species[]).map(s => ({ value: s, label: tr[s] }))]} />
-    <Select label={tr.vaccineName} bind:value={typeId} options={[{ value: '', label: tr.vaccineAll }, ...types.map(t => ({ value: String(t.id), label: t.name }))]} />
+    <Combobox label={tr.vaccineName} bind:value={typeId} placeholder={tr.vaccineAll} items={types.map(t => ({ value: String(t.id), label: t.name, hint: [t.manufacturer, t.diseases].filter(Boolean).join(' · ') }))} />
     <Select label={tr.duePeriod} bind:value={period} options={[{ value: 'week', label: tr.vaccineThisWeek }, { value: 'month', label: tr.vaccineThisMonth }, { value: 'late', label: tr.overdue }]} />
   </div>
   {#if reminderError}<p role="alert" class="text-danger">{tr.vaccineReminderError}</p>{/if}

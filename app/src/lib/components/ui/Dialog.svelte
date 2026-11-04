@@ -5,15 +5,16 @@
   import type { ResolvedTheme } from '$lib/theme.svelte';
   import { tr } from '$lib/i18n/tr';
   import { buttonStyles } from './button';
-  let { open = $bindable(false), title, description, children, footer, theme }:
-    { open?: boolean; title: string; description: string; children?: Snippet; footer?: Snippet; theme?: ResolvedTheme } = $props();
+  let { open = $bindable(false), title, description, children, footer, theme, wide = false }:
+    { open?: boolean; title: string; description: string; children?: Snippet; footer?: Snippet; theme?: ResolvedTheme; wide?: boolean } = $props();
 </script>
 
 <Primitive.Root bind:open>
   <Primitive.Portal>
     <Primitive.Overlay class="fixed inset-0 z-40 bg-overlay" />
     <Primitive.Content data-theme={theme}
-      class="fixed top-1/2 left-1/2 z-50 max-h-[85dvh] w-[calc(100%_-_2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-border bg-surface p-6 text-fg shadow-float sm:p-8">
+      style={wide ? 'max-width: 960px' : 'max-width: 512px'}
+      class="fixed top-1/2 left-1/2 z-50 max-h-[85dvh] w-[calc(100%_-_2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-border bg-surface p-6 text-fg shadow-float sm:p-8">
       <Primitive.Title class="type-title pr-10">{title}</Primitive.Title>
       <Primitive.Description class="mt-3 text-fg-muted">{description}</Primitive.Description>
       <Primitive.Close aria-label={tr.close} title={tr.close}

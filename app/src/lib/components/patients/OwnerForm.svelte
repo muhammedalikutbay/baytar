@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PatientCreateFlow from './PatientCreateFlow.svelte';
   import { User, MapPin, StickyNote, Building2, IdCard } from '@lucide/svelte';
   import { validateForm } from '$lib/validation';
   import { onMount, untrack, tick } from 'svelte';
@@ -6,9 +7,10 @@
   import { tr } from '$lib/i18n/tr';
   import * as owners from '$lib/api/owners';
   import type { Owner, ApiError } from '$lib/api/types';
-  let { owner, onsaved, oncancel }: { owner?: Owner; onsaved: (owner: Owner) => void; oncancel: () => void } = $props();
+  let { owner, onsaved, oncancel, oncreated, onchanged = () => {} }: { owner?: Owner; onsaved: (owner: Owner) => void; oncancel: () => void; oncreated?: (owner: Owner) => void; onchanged?: () => void } = $props();
   // Each dialog mounts a fresh draft so refreshes cannot overwrite typing.
   const initial = untrack(() => owner);
+  let created = $state<Owner | null>(null), addingPatient = $state(false);
   let fullName = $state(initial?.fullName ?? '');
   let phone = $state(initial?.phone ?? initial?.phoneRaw ?? '');
   let phoneAlt = $state(initial?.phoneAlt ?? '');
@@ -34,11 +36,24 @@
     const input = { fullName: fullName.trim(), phone: phone.trim() || null, phoneAlt: phoneAlt.trim() || null,
       city: city.trim() || null, district: district.trim() || null, nationalId: nationalId || null,
       email: email.trim() || null, address: address.trim() || null, notes: notes.trim() || null };
-    try { onsaved(owner ? await owners.update(owner.id, input) : await owners.create(input)); }
+    try {
+      if (owner) onsaved(await owners.update(owner.id, input));
+      else {
+        const saved = await owners.create(input);
+        onchanged();
+        if (oncreated) oncreated(saved); else created = saved;
+      }
+    }
     catch (error) { const e = error as ApiError; errors = e?.field && ["fullName","phone","phoneAlt","email","address","notes","city","district","nationalId"].includes(e.field) ? { [e.field]: tr.invalidField } : { form: tr.saveError }; }
     finally { saving = false; }
   }
 </script>
+{#if created}
+  {#if addingPatient}<PatientCreateFlow owner={created} {onchanged} ondone={() => { if (created) onsaved(created); }} />
+  {:else}<div class="grid gap-4"><p role="status">{tr.flowOwnerSaved.replace('{name}', created.fullName)}</p>
+    <div class="flex flex-wrap justify-end gap-2"><Button variant="secondary" onclick={() => { if (created) onsaved(created); }}>{tr.flowNotNow}</Button><Button onclick={() => addingPatient = true}>{tr.flowAddPatient}</Button></div>
+  </div>{/if}
+{:else}
 <form onsubmit={submit} novalidate class="grid gap-4">
   <RequiredNote />
   <Input icon={User} label={tr.fullName} bind:value={fullName} bind:ref={first} required autocomplete="name" error={errors.fullName} />
@@ -55,3 +70,5 @@
   {#if errors.form}<p role="alert" class="text-danger">{errors.form}</p>{/if}
   <div class="mt-2 flex justify-end gap-2"><Button variant="secondary" onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving}>{saving ? tr.saving : tr.save}</Button></div>
 </form>
+
+{/if}

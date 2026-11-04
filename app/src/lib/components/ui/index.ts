@@ -26,3 +26,5 @@ export { default as DateInput } from './DateInput.svelte';
 export { default as RequiredNote } from './RequiredNote.svelte';
 export { default as Combobox } from './Combobox.svelte';
 export { default as TimeInput } from './TimeInput.svelte';
+
+export { default as MenuButton } from './MenuButton.svelte';

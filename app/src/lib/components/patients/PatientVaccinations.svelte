@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+  import PrintButton from '$lib/components/print/PrintButton.svelte';
   import { page } from '$app/state';
   import { Syringe, CalendarDays } from '@lucide/svelte';
   import { Card, Button, Badge, Dialog } from '$lib/components/ui';
@@ -9,6 +10,7 @@
   import { get as getPatient } from '$lib/api/patients';
   import type { Vaccination, VaccineDue, VaccineType, Patient } from '$lib/api/types';
   import VaccinationForm from '$lib/components/vaccines/VaccinationForm.svelte';
+  let { revision = 0, onchange = () => {} }: { revision?: number; onchange?: () => void } = $props();
   let records = $state<Vaccination[]>([]);
   let due = $state<VaccineDue[]>([]);
   let types = $state<VaccineType[]>([]);
@@ -31,7 +33,7 @@
     }).sort((a,b) => (a.next?.dueOn ?? '9999').localeCompare(b.next?.dueOn ?? '9999') || a.name.localeCompare(b.name, 'tr'));
   });
   $effect(() => {
-    const id = patientId; refresh;
+    const id = patientId; refresh; revision;
     let cancelled = false;
     loading = true; failed = false; dialog = null;
     Promise.all([vaccinations.listByPatient(id), vaccinations.mergedDue({ patientId: id }), listTypes(), getPatient(id)]).then(([history, reminders, catalog, pet]) => {
@@ -41,6 +43,7 @@
   });
 </script>
 <section aria-label={tr.vaccines} class="grid gap-4">
+  <div class="flex justify-end"><PrintButton kind="vaccination" id={patientId} /></div>
   <Card title={tr.vaccineSchedule} icon={CalendarDays}>
     <div class="mb-4 flex flex-wrap justify-end gap-2"><Button size="sm" variant="secondary" disabled={!!patient?.deceasedOn || loading} onclick={() => dialog = { mode: 'plan' }}>{tr.vaccinePlan}</Button><Button size="sm" disabled={!!patient?.deceasedOn || loading} onclick={() => dialog = { mode: 'give' }}>{tr.vaccineGive}</Button></div>
     {#if loading}<p role="status">{tr.loading}</p>
@@ -72,6 +75,6 @@
   </Card>
 </section>
 <Dialog bind:open={() => dialog !== null, value => { if (!value) dialog = null; }} title={dialog?.mode === 'plan' ? tr.vaccinePlan : tr.vaccineGive} description={tr.vaccineWorkflowDescription}>
-  {#if dialog}<VaccinationForm {patientId} mode={dialog.mode} vaccineTypeId={dialog.typeId} vaccineName={dialog.name} appointmentId={dialog.appointmentId} initialDate={todayDate()} onsaved={() => { dialog = null; refresh++; }} oncancel={() => dialog = null} />{/if}
+  {#if dialog}<VaccinationForm {patientId} mode={dialog.mode} vaccineTypeId={dialog.typeId} vaccineName={dialog.name} appointmentId={dialog.appointmentId} initialDate={todayDate()} onsaved={() => { dialog = null; refresh++; onchange(); }} oncancel={() => dialog = null} />{/if}
   {#snippet footer()}{/snippet}
 </Dialog>

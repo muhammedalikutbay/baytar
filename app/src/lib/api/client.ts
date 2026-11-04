@@ -111,8 +111,10 @@ function patientDeleted(id: number, deleted: boolean): Patient {
 }
 function search(query: string, limit: number): SearchHit[] {
   query = fold(query); if (!query || limit === 0) return [];
-  const hits = owners.filter(o => !o.deletedAt).map(owner => ({ owner, patients: patientsByOwner(owner.id).filter(p => p.searchText.includes(query)) }))
-    .filter(h => h.owner.searchText.includes(query) || h.patients.length > 0);
+  const hits = owners.filter(o => !o.deletedAt).map(owner => ({ owner, patients: patientsByOwner(owner.id) }))
+    .filter(h => h.owner.searchText.includes(query) || h.patients.some(p => p.searchText.includes(query)));
+  for (const hit of hits) if (!hit.owner.searchText.includes(query))
+    hit.patients.sort((a, b) => Number(b.searchText.includes(query)) - Number(a.searchText.includes(query)));
   const prefix = (h: SearchHit) => h.owner.searchText.startsWith(query) || h.patients.some(p => p.searchText.startsWith(query));
   return hits.sort((a, b) => Number(prefix(b)) - Number(prefix(a)) || byText(a.owner, b.owner)).slice(0, limit);
 }

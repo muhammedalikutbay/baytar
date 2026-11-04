@@ -2,9 +2,11 @@
   import { ClipboardList, Stethoscope, ClipboardCheck, HeartPulse, StickyNote, Pill, Pipette, Repeat, Hourglass, List } from '@lucide/svelte';
   import { validateForm } from '$lib/validation';
   import { onMount, untrack, tick } from 'svelte';
-  import { Button, Input, Textarea, Select, DateInput, NumberInput, Dialog, RequiredNote, TimeInput } from '$lib/components/ui';
+  import { Button, Input, Textarea, Select, Combobox, DateInput, NumberInput, Dialog, RequiredNote, TimeInput } from '$lib/components/ui';
+  import { visitDefaults } from '$lib/components/patients/clinical';
+  import { formLabels } from '$lib/components/medications/options';
   import { tr } from '$lib/i18n/tr';
-  import { isValidDate, localToday, parseDecimal } from '$lib/format';
+  import { isValidDate, parseDecimal } from '$lib/format';
   import * as visits from '$lib/api/visits';
   import * as prescriptions from '$lib/api/prescriptions';
   import * as medications from '$lib/api/medications';
@@ -25,8 +27,9 @@
   const initial = untrack(() => visit);
   const uid = $props.id();
   let savedVisit = initial;
-  let visitOn = $state(initial?.visitOn ?? localToday());
-  let visitTime = $state(initial?.visitTime ?? '');
+  const defaults = visitDefaults();
+  let visitOn = $state(initial?.visitOn ?? defaults.date);
+  let visitTime = $state(initial ? initial.visitTime ?? '' : defaults.time);
   let reason = $state(initial?.reason ?? '');
   let findings = $state(initial?.findings ?? '');
   let diagnosis = $state(initial?.diagnosis ?? '');
@@ -92,8 +95,8 @@
     } catch { loadFailed = true; } finally { loading = false; }
   }
   onMount(() => { void load(); });
-  function selectMedication(line: Line, event: Event) {
-    line.medicationId = (event.currentTarget as HTMLSelectElement).value;
+  function selectMedication(line: Line, value: string | number) {
+    line.medicationId = String(value);
     const medication = catalog.find(m => String(m.id) === line.medicationId);
     if (medication) line.name = medication.name;
   }
@@ -154,20 +157,25 @@
 </script>
 
 <form bind:this={form} onsubmit={submit} novalidate class="grid gap-4">
+  <div class="flex flex-wrap items-center justify-between gap-3"><h3 class="type-section">{tr.visit}{patient ? ' — ' + patient.name : ''}</h3><TemplatePicker onselect={chooseTemplate} /></div>
   <RequiredNote />
-  <fieldset disabled={saving} class="grid min-w-0 gap-4">
+  <fieldset disabled={saving} class="grid min-w-0 items-start gap-6 lg:grid-cols-2">
+    <div class="grid min-w-0 gap-4">
     <div class="grid gap-4 sm:grid-cols-2">
       <DateInput label={tr.date} bind:value={visitOn} required error={errors.visitOn} />
       <TimeInput label={tr.time} optional bind:value={visitTime} error={errors.visitTime} />
     </div>
-    <TemplatePicker onselect={chooseTemplate} />
     <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapSubjective}</h3><Textarea icon={ClipboardList} label={tr.reason} bind:value={reason} /></section>
     <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapObjective}</h3>
-      <VitalFields species={patient?.species} bind:weightKg={() => parseDecimal(weight), n => weight = n === null ? '' : String(n)} bind:temperatureC={() => parseDecimal(temperature), n => temperature = n === null ? '' : String(n)} bind:heartRateBpm={heartRate} bind:respRateBpm={respRate} bind:bodyCondition />
       <Textarea icon={Stethoscope} label={tr.findings} bind:value={findings} /></section>
     <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapAssessment}</h3><Textarea icon={ClipboardCheck} label={tr.diagnosis} bind:value={diagnosis} /></section>
     <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapPlan}</h3><Textarea icon={HeartPulse} label={tr.treatment} bind:value={treatment} /></section>
     <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />
+    </div>
+    <div class="grid min-w-0 gap-4">
+    <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section">{tr.clinicalVitals}</h3>
+      <VitalFields species={patient?.species} bind:weightKg={() => parseDecimal(weight), n => weight = n === null ? '' : String(n)} bind:temperatureC={() => parseDecimal(temperature), n => temperature = n === null ? '' : String(n)} bind:heartRateBpm={heartRate} bind:respRateBpm={respRate} bind:bodyCondition />
+    </section>
     <section class="grid gap-4 border-t border-border pt-4" aria-label={tr.prescription}>
       <h3 class="type-section">{tr.prescription}</h3>
       {#if loading}<p role="status">{tr.loading}</p>
@@ -176,10 +184,10 @@
         {#each lines as line (line.key)}
           <fieldset class="grid min-w-0 gap-4 rounded-md border border-border p-4">
             <legend class="type-caption px-1">{tr.medicationName} {lines.indexOf(line) + 1}</legend>
-            <Select icon={Pill} label={tr.medicationCatalog} bind:value={line.medicationId} onchange={event => selectMedication(line, event)} options={[
+            <Combobox icon={Pill} label={tr.medicationCatalog} bind:value={line.medicationId} onchange={value => selectMedication(line, value)} items={[
               { value: '', label: tr.freeMedication },
               ...(!catalog.some(m => String(m.id) === line.medicationId) && line.medicationId ? [{ value: line.medicationId, label: line.name }] : []),
-              ...catalog.map(m => ({ value: String(m.id), label: m.name }))
+              ...catalog.map(m => ({ value: String(m.id), label: m.name, hint: [m.form ? formLabels[m.form] : '', m.concentrationMgPerMl ? formatUnits(m.concentrationMgPerMl) + ' mg/ml' : m.strengthMgPerUnit ? formatUnits(m.strengthMgPerUnit) + ' mg' : ''].filter(Boolean).join(' · ') }))
             ]} />
             <Input icon={Pill} id={`${uid}-${line.key}-name`} label={tr.medicationName} bind:value={line.name} readonly={!!line.medicationId} required error={errors[`${line.key}-name`]} />
             <div class="grid gap-4 sm:grid-cols-2">
@@ -219,15 +227,17 @@
       {#if pendingFiles.length}<ul aria-label={tr.clinicalPendingFiles} class="grid gap-2">{#each pendingFiles as file, index}<li class="flex items-center justify-between gap-2"><span class="truncate">{tr.clinicalPendingFiles} {index + 1}</span><Button variant="ghost" size="sm" onclick={() => pendingFiles = pendingFiles.filter((_, i) => i !== index)}>{tr.removeLine}</Button></li>{/each}</ul>{/if}
       {#if fileError}<p role="alert" class="text-danger">{fileError}</p>{/if}
     </section>
+    {#if initial}<div class="mt-6"><VisitCharges visitId={initial.id} {patientId} date={initial.visitOn} /></div>{:else}<p class="type-caption mt-4 text-fg-muted">{tr.billingSaveVisitFirst}</p>{/if}
+    </div>
   </fieldset>
   {#if errors.form}<p role="alert" class="text-danger">{errors.form}</p>{/if}
-  <div class="flex justify-end gap-2">
+  <div class="sticky -bottom-8 z-10 -mx-2 flex justify-end gap-2 border-t border-border bg-surface px-2 py-4">
     <Button variant="secondary" disabled={saving} onclick={oncancel}>{tr.cancel}</Button>
     <Button type="submit" disabled={saving || loading || loadFailed}>{saving ? tr.saving : tr.save}</Button>
   </div>
 </form>
 
-{#if initial}<div class="mt-6"><VisitCharges visitId={initial.id} {patientId} date={initial.visitOn} /></div>{:else}<p class="type-caption mt-4 text-fg-muted">{tr.billingSaveVisitFirst}</p>{/if}
+
 <Dialog bind:open={overwriteOpen} title={tr.clinicalTemplateOverwrite} description={tr.clinicalTemplateOverwriteDescription}>
   {#snippet footer()}<Button variant="secondary" onclick={() => overwriteOpen = false}>{tr.cancel}</Button><Button variant="secondary" onclick={() => { if (pendingTemplate) applyTemplate(pendingTemplate, false); }}>{tr.clinicalFillEmpty}</Button><Button onclick={() => { if (pendingTemplate) applyTemplate(pendingTemplate, true); }}>{tr.clinicalOverwrite}</Button>{/snippet}
 </Dialog>
