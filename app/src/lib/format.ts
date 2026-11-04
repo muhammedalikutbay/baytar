@@ -1,5 +1,41 @@
 import { tr } from '$lib/i18n/tr';
 
+export function todayDate(): string {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+export function dateAfterDays(value: string, days: number): string {
+  const date = parseDate(value);
+  if (!date) return '';
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+export function dateAfterMonths(value: string, months: number): string {
+  const date = parseDate(value);
+  if (!date) return '';
+  const day = date.getUTCDate();
+  date.setUTCDate(1);
+  date.setUTCMonth(date.getUTCMonth() + months);
+  const end = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
+  date.setUTCDate(Math.min(day, end));
+  return date.toISOString().slice(0, 10);
+}
+
+export function daysUntil(value: string, today = todayDate()): number | null {
+  const due = parseDate(value), start = parseDate(today);
+  return due && start ? Math.round((due.getTime() - start.getTime()) / 86400000) : null;
+}
+
+export function whatsappPhone(value: string | null | undefined): string | null {
+  let digits = value?.replace(/\D/g, '') ?? '';
+  if (digits.startsWith('0090')) digits = digits.slice(2);
+  if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
+  if (digits.length === 10) digits = '90' + digits;
+  return /^90[1-9]\d{9}$/.test(digits) ? digits : null;
+}
+
 export function formatPhone(value: string | null | undefined): string {
   if (!value) return '';
   let digits = value.replace(/\D/g, '');

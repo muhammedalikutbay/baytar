@@ -114,6 +114,19 @@ patientCreate({ ownerId: third.id, name: 'Fındık', species: 'rabbit' });
 
 const clinical = createClinicalMock({ patientGet, ownerGet, fail, fold, now });
 
+// Synthetic vaccination examples, relative to the local day for useful previews.
+const demoDate = (offset: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + offset);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+const demoTypes = clinical.call('vaccine_types_list', {}) as import('./types').VaccineType[];
+for (const [patientIndex, name, dueOffset] of [[0, 'Kuduz aşısı', -5], [0, 'İç parazit', 10], [1, 'Karma aşı', 25]] as const) {
+  const type = demoTypes.find(row => row.name === name)!;
+  clinical.call('vaccination_create', { input: { patientId: patients[patientIndex].id, vaccineTypeId: type.id,
+    vaccineName: type.name, givenOn: demoDate(dueOffset - 365), nextDueOn: demoDate(dueOffset) } });
+}
+
 // Dispatch types are checked at the public call boundary and by each handler.
 
 const importPrepared = new Map<string, ImportPreview>();
