@@ -1,0 +1,687 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "biocan-combo",
+      "title": "Bioveta: product catalogue 2024, Biocan DHPPi+L",
+      "url": "https://www.bioveta.eu/files/files/Ke-stazeni/Brozury/en/__KATALOG_GB_2024_komplet_op.pdf"
+    },
+    {
+      "id": "biocan-novel",
+      "title": "UPD: Biocan Novel DHPPi/L4R and product-family assessment",
+      "url": "https://medicines.health.europa.eu/veterinary/en/600000053331"
+    },
+    {
+      "id": "biocan-tr",
+      "title": "Interhas: Biocan DHPPi Turkish product information",
+      "url": "https://www.interhas.com.tr/product-page/biocan-dhppi"
+    },
+    {
+      "id": "eurican",
+      "title": "ANSES: Eurican DAPPi product information",
+      "url": "https://www.ircp.anmv.anses.fr/rcp.aspx?NomMedicament=EURICAN+DAPPI+LYOPHILISAT+ET+SOLVANT+POUR+SUSPENSION+INJECTABLE"
+    },
+    {
+      "id": "felocell-cvr",
+      "title": "Union Product Database: Felocell CVR, antigens and target species (foreign record)",
+      "url": "https://medicines.health.europa.eu/veterinary/en/600000090172"
+    },
+    {
+      "id": "ferrets",
+      "title": "American Ferret Association: ferret vaccination policy, 2026",
+      "url": "https://www.ferret.org/read/vaccinations.html"
+    },
+    {
+      "id": "letifend",
+      "title": "EMA: letifend, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/letifend"
+    },
+    {
+      "id": "leucofeligen-felvrcp",
+      "title": "EMA: leucofeligen-felvrcp, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/leucofeligen-felvrcp"
+    },
+    {
+      "id": "nobivac-l4",
+      "title": "EMA: nobivac-l4, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/nobivac-l4"
+    },
+    {
+      "id": "nobivac-myxo-rhd-plus",
+      "title": "EMA: nobivac-myxo-rhd-plus, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/nobivac-myxo-rhd-plus"
+    },
+    {
+      "id": "purevax-felv",
+      "title": "EMA: purevax-felv, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/purevax-felv"
+    },
+    {
+      "id": "purevax-rabies",
+      "title": "EMA: purevax-rabies, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/purevax-rabies"
+    },
+    {
+      "id": "purevax-rcp",
+      "title": "EMA: purevax-rcp, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/purevax-rcp"
+    },
+    {
+      "id": "purevax-rcpch",
+      "title": "EMA: purevax-rcpch, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/purevax-rcpch"
+    },
+    {
+      "id": "purevax-rcpch-felv",
+      "title": "EMA: purevax-rcpch-felv, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/purevax-rcpch-felv"
+    },
+    {
+      "id": "rabbits",
+      "title": "Paul-Ehrlich-Institut: immunological medicines for rabbits (foreign reference)",
+      "url": "https://www.pei.de/EN/medicinal-products/veterinary/rabbits/rabbits-node.html"
+    },
+    {
+      "id": "tr-batches-2026",
+      "title": "Bornova Veteriner Kontrol Enstitüsü: piyasaya arzı uygun biyolojik ürünler, 03.03.2026 (parti listesi)",
+      "url": "https://vetkontrol.tarimorman.gov.tr/bornova/Belgeler/asi_030326.pdf"
+    },
+    {
+      "id": "tr-dhppi",
+      "title": "MSD Türkiye: Nobivac DHPPi Türkçe prospektüs",
+      "url": "https://www.msd-hayvan-sagligi.com/downloads/nobivac-dhppi/"
+    },
+    {
+      "id": "tr-gmp-2018",
+      "title": "Tarım ve Orman Bakanlığı: aşı GMP listesi, 07.11.2018 (tarihsel marka kaydı)",
+      "url": "https://www.tarimorman.gov.tr/GKGM/Belgeler/Veteriner%20Hizmetleri/vetsagurun/temp/Asilar_icin_GMP_Durumu.pdf"
+    },
+    {
+      "id": "tr-kc",
+      "title": "MSD Türkiye: Nobivac KC Türkçe prospektüs",
+      "url": "https://www.msd-hayvan-sagligi.com/downloads/nobivac-kc/"
+    },
+    {
+      "id": "tr-msd-pets",
+      "title": "MSD Türkiye: evcil hayvan ürünleri (Nobivac Puppy DP dahil)",
+      "url": "https://www.msd-hayvan-sagligi.com/product-category/evcil-hayvan/"
+    },
+    {
+      "id": "tr-rabies",
+      "title": "MSD Türkiye: Nobivac Rabies Türkçe prospektüs",
+      "url": "https://www.msd-hayvan-sagligi.com/downloads/nobivac-rabies/"
+    },
+    {
+      "id": "tr-tricat",
+      "title": "MSD Turkey: Nobivac Tricat Trio in pet product catalogue",
+      "url": "https://www.msd-hayvan-sagligi.com/product-category/evcil-hayvan/"
+    },
+    {
+      "id": "vanguard-identity",
+      "title": "Zoetis Poland: Vanguard Plus 5 product information",
+      "url": "https://www.zoetis.com.pl/charakterystyki-produktow/zwierzeta-towarzyszace/vanguard-plus-5-liofilizat-i-rozpuszczalnik-do-sporzadzania-zawiesiny-do-wstrzykiwan-dla-psow.aspx"
+    },
+    {
+      "id": "vanguard-tr",
+      "title": "Zoetis: Turkish Vanguard Plus 5 L4 leaflet (hosted by distributor)",
+      "url": "https://www.hekimlermedikal.com.tr/urun/zoetis/VanguardPlus.pdf"
+    },
+    {
+      "id": "versican-plus-dhppi-l4r",
+      "title": "EMA: versican-plus-dhppi-l4r, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/versican-plus-dhppi-l4r"
+    },
+    {
+      "id": "versican-plus-l4",
+      "title": "EMA: versican-plus-l4, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/versican-plus-l4"
+    },
+    {
+      "id": "versican-plus-pi",
+      "title": "EMA: versican-plus-pi, EU product identity and product-information links",
+      "url": "https://www.ema.europa.eu/en/medicines/veterinary/EPAR/versican-plus-pi"
+    },
+    {
+      "id": "versifel-cvr",
+      "title": "VMD: Versifel CVR product leaflet",
+      "url": "https://www.vmd.defra.gov.uk/ProductInformationdatabase/files/QRD_Documents/QRD-Auth_2915602.PDF"
+    },
+    {
+      "id": "versifel-felv",
+      "title": "VMD: Versifel FeLV product leaflet",
+      "url": "https://www.vmd.defra.gov.uk/productinformationdatabase/files/QRD_Documents/QRD-Auth_404423.PDF"
+    },
+    {
+      "id": "virbac-vaccines",
+      "title": "Virbac Croatia: Canigen DHPPi/L and Leucofeligen",
+      "url": "https://hr.virbac.com/home/zdravlje-ivotinja/pagecontent/svi-savjeti/vanost-cijepljenja-i-zatite-pasa.html"
+    },
+    {
+      "id": "wsava-2024",
+      "title": "WSAVA 2024 guidelines for the vaccination of dogs and cats",
+      "url": "https://wsava.org/wp-content/uploads/2024/04/WSAVA-Vaccination-guidelines-2024.pdf"
+    }
+  ],
+  "items": [
+    {
+      "name": "Biocan DHPPi",
+      "species": "dog",
+      "manufacturer": "Bioveta",
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs, Hepatit, Parainfluenza",
+      "min_age_weeks": 6,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "biocan-tr",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Biocan DHPPi+L",
+      "species": "dog",
+      "manufacturer": "Bioveta",
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs, Hepatit, Parainfluenza, Leptospiroz",
+      "min_age_weeks": 8,
+      "primary_doses": 2,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. L bileşeni için 8 haftadan itibaren iki doz/28 gün esas alınır; temel antijen yavru serisi ayrıca tamamlanır. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır. Bioveta prospektüsünde ikinci doz 14–21 gündür; 28 günlük başlangıç hatırlatması uygulamadan önce düzeltilir.",
+      "source_ids": [
+        "biocan-combo",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Biocan Novel DHPPi/L4",
+      "species": "dog",
+      "manufacturer": "Bioveta",
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs, Hepatit, Parainfluenza, Leptospiroz",
+      "min_age_weeks": 8,
+      "primary_doses": 2,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. L bileşeni için 8 haftadan itibaren iki doz/28 gün esas alınır; temel antijen yavru serisi ayrıca tamamlanır. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "biocan-novel",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Canigen DHPPi",
+      "species": "dog",
+      "manufacturer": "Virbac",
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs, Hepatit, Parainfluenza",
+      "min_age_weeks": 6,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "virbac-vaccines",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Eurican DAPPi",
+      "species": "dog",
+      "manufacturer": "Boehringer Ingelheim",
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs, Hepatit, Parainfluenza",
+      "min_age_weeks": 6,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "eurican",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Eurican DAPPi-L",
+      "species": "dog",
+      "manufacturer": "Boehringer Ingelheim",
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs, Hepatit, Parainfluenza, Leptospiroz",
+      "min_age_weeks": 8,
+      "primary_doses": 2,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. L bileşeni için 8 haftadan itibaren iki doz/28 gün esas alınır; temel antijen yavru serisi ayrıca tamamlanır. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "eurican",
+        "tr-gmp-2018",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Felocell CVR",
+      "species": "cat",
+      "manufacturer": "Zoetis",
+      "diseases": "Kedi gribi (herpes, calici), Panlökopeni",
+      "min_age_weeks": 8,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "felocell-cvr",
+        "tr-batches-2026",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Gençlik hastalığı aşısı (gelincik)",
+      "species": "ferret",
+      "manufacturer": null,
+      "diseases": "Gençlik hastalığı (distemper)",
+      "min_age_weeks": 8,
+      "primary_doses": 2,
+      "primary_interval_days": 21,
+      "default_interval_days": 365,
+      "notes": "Gelincik için uygun ürün seçilir; köpek aşıları doğrudan ikame edilmez. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "ferrets"
+      ]
+    },
+    {
+      "name": "Karma aşı (kedi, RCP)",
+      "species": "cat",
+      "manufacturer": null,
+      "diseases": "Kedi gribi (herpes, calici), Panlökopeni",
+      "min_age_weeks": 8,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "tr-tricat",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Karma aşı (köpek, DHPPi)",
+      "species": "dog",
+      "manufacturer": null,
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs, Hepatit, Parainfluenza",
+      "min_age_weeks": 6,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "tr-dhppi",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Koronavirüs aşısı (köpek)",
+      "species": "dog",
+      "manufacturer": null,
+      "diseases": "Koronavirüs",
+      "min_age_weeks": 6,
+      "primary_doses": 2,
+      "primary_interval_days": 21,
+      "default_interval_days": 365,
+      "notes": "Jenerik enterik koronavirüs kaydı; WSAVA rutin uygulamayı önermez. Solunum koronavirüsüne karşı koruma varsayılmaz. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Kuduz aşısı (köpek ve kedi)",
+      "species": null,
+      "manufacturer": null,
+      "diseases": "Kuduz",
+      "min_age_weeks": 12,
+      "primary_doses": 1,
+      "primary_interval_days": null,
+      "default_interval_days": 365,
+      "notes": "Yalnız Köpek ve Kedi. Yasal zorunluluk; yıllık klinik hatırlatma. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "tr-rabies"
+      ]
+    },
+    {
+      "name": "Letifend",
+      "species": "dog",
+      "manufacturer": "LETI Pharma",
+      "diseases": "Leishmaniyaz",
+      "min_age_weeks": 26,
+      "primary_doses": 1,
+      "primary_interval_days": null,
+      "default_interval_days": 365,
+      "notes": "Enfeksiyon yönünden değerlendirilmiş köpeklerde; vektör korunması sürdürülür. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "letifend"
+      ]
+    },
+    {
+      "name": "Leucofeligen FeLV/RCP",
+      "species": "cat",
+      "manufacturer": "Virbac",
+      "diseases": "Kedi gribi (herpes, calici), Panlökopeni, Lösemi (FeLV)",
+      "min_age_weeks": 8,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. FeLV için aşı öncesi test ve temas riski değerlendirmesi; FeLV bileşeninin primer serisi iki dozdur. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "leucofeligen-felvrcp",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Nobivac DHPPi",
+      "species": "dog",
+      "manufacturer": "MSD Animal Health",
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs, Hepatit, Parainfluenza",
+      "min_age_weeks": 6,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "tr-dhppi",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Nobivac KC",
+      "species": "dog",
+      "manufacturer": "MSD Animal Health",
+      "diseases": "Bordetella bronchiseptica, Parainfluenza",
+      "min_age_weeks": 3,
+      "primary_doses": 1,
+      "primary_interval_days": null,
+      "default_interval_days": 365,
+      "notes": "Burun içi uygulanır; enjeksiyon yapılmaz. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "tr-kc",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Nobivac L4",
+      "species": "dog",
+      "manufacturer": "MSD Animal Health",
+      "diseases": "Leptospiroz",
+      "min_age_weeks": 8,
+      "primary_doses": 2,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "nobivac-l4",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Nobivac Myxo-RHD Plus",
+      "species": "rabbit",
+      "manufacturer": "MSD Animal Health",
+      "diseases": "Miksomatozis, RHD1, RHD2",
+      "min_age_weeks": 5,
+      "primary_doses": 1,
+      "primary_interval_days": null,
+      "default_interval_days": 365,
+      "notes": "Evcil tavşan; önceki miksomatozis aşıları değerlendirilir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "nobivac-myxo-rhd-plus"
+      ]
+    },
+    {
+      "name": "Nobivac Puppy DP",
+      "species": "dog",
+      "manufacturer": "MSD Animal Health",
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs",
+      "min_age_weeks": 6,
+      "primary_doses": 1,
+      "primary_interval_days": null,
+      "default_interval_days": null,
+      "notes": "Erken yavru dozu; ardından temel aşı serisine geçilir. Puppy DP, DP Plus değildir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "tr-msd-pets",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Nobivac Rabies",
+      "species": null,
+      "manufacturer": "MSD Animal Health",
+      "diseases": "Kuduz",
+      "min_age_weeks": 12,
+      "primary_doses": 1,
+      "primary_interval_days": null,
+      "default_interval_days": 365,
+      "notes": "Köpek ve Kedi. Yasal zorunluluk; Türkiye klinik pratiği için yıllık hatırlatma. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "tr-rabies"
+      ]
+    },
+    {
+      "name": "Nobivac Tricat Trio",
+      "species": "cat",
+      "manufacturer": "MSD Animal Health",
+      "diseases": "Kedi gribi (herpes, calici), Panlökopeni",
+      "min_age_weeks": 8,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "tr-tricat",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Purevax FeLV",
+      "species": "cat",
+      "manufacturer": "Boehringer Ingelheim",
+      "diseases": "Lösemi (FeLV)",
+      "min_age_weeks": 8,
+      "primary_doses": 2,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Aşı öncesi FeLV testi ve temas riski değerlendirilir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "purevax-felv",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Purevax Rabies",
+      "species": "cat",
+      "manufacturer": "Boehringer Ingelheim",
+      "diseases": "Kuduz",
+      "min_age_weeks": 12,
+      "primary_doses": 1,
+      "primary_interval_days": null,
+      "default_interval_days": 365,
+      "notes": "Yalnız Kedi. Yasal zorunluluk; yıllık klinik hatırlatma. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "purevax-rabies"
+      ]
+    },
+    {
+      "name": "Purevax RCP",
+      "species": "cat",
+      "manufacturer": "Boehringer Ingelheim",
+      "diseases": "Kedi gribi (herpes, calici), Panlökopeni",
+      "min_age_weeks": 8,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "purevax-rcp",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Purevax RCPCh",
+      "species": "cat",
+      "manufacturer": "Boehringer Ingelheim",
+      "diseases": "Kedi gribi (herpes, calici), Panlökopeni, Klamidya",
+      "min_age_weeks": 8,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "purevax-rcpch",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Purevax RCPCh FeLV",
+      "species": "cat",
+      "manufacturer": "Boehringer Ingelheim",
+      "diseases": "Kedi gribi (herpes, calici), Panlökopeni, Klamidya, Lösemi (FeLV)",
+      "min_age_weeks": 8,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. FeLV için aşı öncesi test ve temas riski değerlendirmesi; FeLV bileşeninin primer serisi iki dozdur. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "purevax-rcpch-felv",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Rabisin",
+      "species": null,
+      "manufacturer": "Boehringer Ingelheim",
+      "diseases": "Kuduz",
+      "min_age_weeks": 12,
+      "primary_doses": 1,
+      "primary_interval_days": null,
+      "default_interval_days": 365,
+      "notes": "Köpek ve Kedi. Yasal zorunluluk; yıllık klinik hatırlatma. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "tr-batches-2026"
+      ]
+    },
+    {
+      "name": "RHD2 aşısı (evcil tavşan)",
+      "species": "rabbit",
+      "manufacturer": null,
+      "diseases": "RHD2",
+      "min_age_weeks": 10,
+      "primary_doses": 1,
+      "primary_interval_days": null,
+      "default_interval_days": 365,
+      "notes": "Jenerik RHD2 kaydı; kullanılan ürün daha erken yaşa veya farklı rapel aralığına izin verebilir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "rabbits"
+      ]
+    },
+    {
+      "name": "Vanguard Plus 5",
+      "species": "dog",
+      "manufacturer": "Zoetis",
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs, Hepatit, Parainfluenza",
+      "min_age_weeks": 6,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "vanguard-tr",
+        "vanguard-identity",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Vanguard Plus 5/L4",
+      "species": "dog",
+      "manufacturer": "Zoetis",
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs, Hepatit, Parainfluenza, Leptospiroz",
+      "min_age_weeks": 8,
+      "primary_doses": 2,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. L bileşeni için 8 haftadan itibaren iki doz/28 gün esas alınır; temel antijen yavru serisi ayrıca tamamlanır. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "vanguard-tr",
+        "vanguard-identity",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Versican Plus DHPPi/L4R",
+      "species": "dog",
+      "manufacturer": "Zoetis",
+      "diseases": "Gençlik hastalığı (distemper), Parvovirüs, Hepatit, Parainfluenza, Leptospiroz, Kuduz",
+      "min_age_weeks": 12,
+      "primary_doses": 2,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. L bileşeni için 8 haftadan itibaren iki doz/28 gün esas alınır; temel antijen yavru serisi ayrıca tamamlanır. Kuduz bileşeni için 12 haftadan önce uygulanmaz. Yasal zorunluluk; yıllık kuduz hatırlatması. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "versican-plus-dhppi-l4r",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Versican Plus L4",
+      "species": "dog",
+      "manufacturer": "Zoetis",
+      "diseases": "Leptospiroz",
+      "min_age_weeks": 8,
+      "primary_doses": 2,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "versican-plus-l4",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Versican Plus Pi",
+      "species": "dog",
+      "manufacturer": "Zoetis",
+      "diseases": "Parainfluenza",
+      "min_age_weeks": 8,
+      "primary_doses": 2,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Parenteral Pi; burun içi kennel cough aşısı değildir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır.",
+      "source_ids": [
+        "versican-plus-pi",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Versifel CVR",
+      "species": "cat",
+      "manufacturer": "Zoetis",
+      "diseases": "Kedi gribi (herpes, calici), Panlökopeni",
+      "min_age_weeks": 8,
+      "primary_doses": 3,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Yavru serisinin son dozu en az 16 haftalık yaşa denk getirilir; gerekirse ek doz planlanır. 365 gün klinik hatırlatma varsayılanıdır; WSAVA temel antijenlerde sonraki rapelleri risk ve ürüne göre daha uzun aralıklarla önerir. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır. Ürün etiketindeki başlangıç yaşı ve iki dozluk primer seri uygulama öncesi ayrıca kontrol edilir.",
+      "source_ids": [
+        "versifel-cvr",
+        "wsava-2024"
+      ]
+    },
+    {
+      "name": "Versifel FeLV",
+      "species": "cat",
+      "manufacturer": "Zoetis",
+      "diseases": "Lösemi (FeLV)",
+      "min_age_weeks": 8,
+      "primary_doses": 2,
+      "primary_interval_days": 28,
+      "default_interval_days": 365,
+      "notes": "Aşı öncesi FeLV testi; temas riskine göre programlanır. Düzenlenebilir klinik başlangıç şemasıdır; güncel ürün prospektüsü ve hasta riskiyle uyarlanır. Ürün etiketinde minimum yaş 9 haftadır; 8 haftalık klinik varsayılanı bu üründe 9 haftaya ertelenir.",
+      "source_ids": [
+        "versifel-felv",
+        "wsava-2024"
+      ]
+    }
+  ]
+}
