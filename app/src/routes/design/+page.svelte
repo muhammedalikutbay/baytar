@@ -1,12 +1,10 @@
 <script lang="ts">
+  import { PageHeader } from '$lib/components/ui';
   import DesignPreview from '$lib/components/DesignPreview.svelte';
   import { tr } from '$lib/i18n/tr';
 </script>
 
-<header class="mb-8">
-  <h1 class="type-page">{tr.galleryTitle}</h1>
-  <p class="mt-2 text-fg-muted">{tr.galleryDescription}</p>
-</header>
+<div class="mb-8"><PageHeader title={tr.galleryTitle} subtitle={tr.galleryDescription} /></div>
 <div class="gallery">
   <DesignPreview mode="light" />
   <DesignPreview mode="dark" />

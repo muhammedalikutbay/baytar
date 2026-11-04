@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Pill } from '@lucide/svelte';
-  import { Button, Card, Dialog, EmptyState, Input, Toast } from '$lib/components/ui';
+  import { PageHeader, Button, Card, Dialog, EmptyState, Input, Toast } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { formatNumber } from '$lib/format';
   import * as medications from '$lib/api/medications';
@@ -61,14 +61,13 @@
 </script>
 
 <div class="grid gap-8">
-  <div class="flex flex-wrap items-start justify-between gap-4">
-    <div><h1 class="type-page">{tr.medications}</h1><p class="mt-2 text-fg-muted">{tr.medicationsDescription}</p></div>
-    <Button onclick={() => edit()}>{tr.medicationsAction}</Button>
-  </div>
+  <PageHeader title={tr.medications} subtitle={tr.medicationsDescription} icon={Pill}>
+    {#snippet actions()}<Button onclick={() => edit()}>{tr.medicationsAction}</Button>{/snippet}
+  </PageHeader>
   <p class="text-fg-muted">{tr.medicationNoDoseData}</p>
   {#if actionError}<p role="alert" class="text-danger">{tr.actionError}</p>{/if}
   <Input label={tr.medicationSearch} type="search" bind:value={query} />
-  <Card class="overflow-hidden p-0 sm:p-0">
+  <Card title={tr.medications} icon={Pill} count={visible.length} class="overflow-hidden p-0 sm:p-0 [&>div:first-child]:m-4">
     {#if loading}<p role="status" class="p-6 text-fg-muted">{tr.loading}</p>
     {:else if loadError}<div class="p-6"><p role="alert" class="mb-4 text-danger">{tr.loadError}</p><Button variant="secondary" onclick={() => refresh++}>{tr.retry}</Button></div>
     {:else if visible.length === 0}

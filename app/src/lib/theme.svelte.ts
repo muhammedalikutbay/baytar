@@ -22,7 +22,10 @@ function createTheme() {
     set(value: ThemePreference) {
       preference = value;
       apply();
-      try { localStorage.setItem(storageKey, value); } catch { /* Keep working without persistence. */ }
+      try {
+        if (value === 'system') localStorage.removeItem(storageKey);
+        else localStorage.setItem(storageKey, value);
+      } catch { /* Keep working without persistence. */ }
     },
     // Initialize once from the root layout; clean up during HMR and unmounts.
     init() {

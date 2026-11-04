@@ -1,7 +1,7 @@
 ﻿<script lang="ts">
   import { onMount } from 'svelte';
   import { CalendarDays, Plus } from '@lucide/svelte';
-  import { Button, Card, Dialog, EmptyState } from '$lib/components/ui';
+  import { PageHeader, Button, Card, Dialog, EmptyState } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { addDateDays, formatAgendaDate, formatDate, localDate, parseDate } from '$lib/format';
   import * as appointments from '$lib/api/appointments';
@@ -49,7 +49,9 @@
   }
 </script>
 <div class="grid gap-8">
-  <header class="flex flex-wrap items-start justify-between gap-4"><div><h1 class="type-page">{tr.agenda}</h1><p class="mt-2 text-fg-muted">{tr.agendaDescription}</p></div><Button onclick={() => { editing = undefined; open = true; }}><Plus size={18} aria-hidden="true" />{tr.agendaAction}</Button></header>
+  <PageHeader title={tr.agenda} subtitle={tr.agendaDescription} icon={CalendarDays}>
+    {#snippet actions()}<Button onclick={() => { editing = undefined; open = true; }}><Plus size={18} aria-hidden="true" />{tr.agendaAction}</Button>{/snippet}
+  </PageHeader>
   <div class="flex flex-wrap items-center justify-between gap-4">
     <div class="flex flex-wrap items-center gap-2"><Button variant="secondary" onclick={() => move(-1)}>{tr.previous}</Button><Button variant="secondary" onclick={() => date = localDate()}>{tr.agendaToday}</Button><Button variant="secondary" onclick={() => move(1)}>{tr.next}</Button></div>
     <div role="group" aria-label={tr.agenda} class="flex gap-2"><Button variant="secondary" aria-pressed={view === 'day'} class={view === 'day' ? 'bg-surface-muted underline' : ''} onclick={() => view = 'day'}>{tr.agendaDay}</Button><Button variant="secondary" aria-pressed={view === 'week'} class={view === 'week' ? 'bg-surface-muted underline' : ''} onclick={() => view = 'week'}>{tr.agendaWeek}</Button></div>
@@ -58,11 +60,11 @@
   {#if actionError}<p role="alert" class="text-danger">{actionError}</p>{/if}
   {#if loading}<p role="status">{tr.loading}</p>
   {:else if failed}<Card><p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" class="mt-4" onclick={() => refresh++}>{tr.retry}</Button></Card>
-  {:else if view === 'day' && !items.length}<Card><EmptyState icon={CalendarDays} title={tr.agendaDayEmpty} description={tr.agendaEmptyHint} /></Card>
+  {:else if view === 'day' && !items.length}<Card title={formatAgendaDate(date)} icon={CalendarDays} count={0}><EmptyState icon={CalendarDays} title={tr.agendaDayEmpty} description={tr.agendaEmptyHint} /></Card>
   {:else}<div class="grid gap-4">{#each days as day (day)}
     {@const rows = items.filter(item => item.appointment.startsOn === day)}
-    <Card>
-      {#if view === 'week'}<div class="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3"><Button variant="ghost" onclick={() => { date = day; view = 'day'; }}>{formatAgendaDate(day)}</Button><span class="type-caption text-fg-muted">{rows.length} {tr.appointmentCountUnit}</span></div>{/if}
+    <Card title={formatAgendaDate(day)} icon={CalendarDays} count={rows.length}>
+      {#snippet actions()}{#if view === 'week'}<Button size="sm" variant="ghost" onclick={() => { date = day; view = 'day'; }}>{tr.agendaDay}</Button>{/if}{/snippet}
       <div class="divide-y divide-border">{#each rows as item (item.appointment.id)}<AppointmentItem {item} {busy} {now} onedit={edit} onstatus={status} />{:else}<p class="py-4 text-fg-muted">{tr.agendaDayEmpty}</p>{/each}</div>
     </Card>
   {/each}</div>{/if}
