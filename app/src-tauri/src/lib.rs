@@ -2,6 +2,7 @@ mod billing;
 mod clinical;
 mod import;
 mod inventory;
+mod lock;
 mod settings;
 mod vaccines;
 
@@ -745,7 +746,12 @@ pub fn run() {
             clinical::attachment_open,
             clinical::attachment_export,
             clinical::patient_photo,
-            clinical::patient_mark_deceased
+            clinical::patient_mark_deceased,
+            lock::lock_status,
+            lock::lock_set_pin,
+            lock::lock_disable,
+            lock::lock_verify,
+            lock::lock_set_idle
         ])
         .run(tauri::generate_context!())
         .expect("error while running Baytar");

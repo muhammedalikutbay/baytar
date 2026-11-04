@@ -369,3 +369,13 @@ export interface CommandMap {
   vaccines_calendar: { args: { from: string; to: string }; result: VaccineCalendarEvent[] };
   vaccines_postpone: { args: { appointmentId: number | null; vaccinationId: number | null; on: string }; result: Appointment };
 }
+
+export interface LockStatus { enabled: boolean; idleMinutes: number; waitSeconds: number }
+export interface LockVerifyResult { ok: boolean; waitSeconds: number }
+export interface CommandMap {
+  lock_status: { args: Record<string, never>; result: LockStatus };
+  lock_set_pin: { args: { pin: string; currentPin?: string | null }; result: null };
+  lock_disable: { args: { pin: string }; result: null };
+  lock_verify: { args: { pin: string }; result: LockVerifyResult };
+  lock_set_idle: { args: { minutes: number }; result: null };
+}
