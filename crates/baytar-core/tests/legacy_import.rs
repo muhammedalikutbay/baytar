@@ -159,10 +159,13 @@ fn full_import_maps_every_table() {
         )
         .unwrap();
     assert_eq!(name, "Synthetic Owner Alpha");
-    assert_eq!(phone, "05321234567", "lost leading zero restored");
+    assert_eq!(
+        phone, "+905321234567",
+        "lost leading zero restored, stored as E.164"
+    );
     assert_eq!(phone_raw, "5321234567", "INTEGER rendered without decimals");
     assert_eq!(address, "Synthetic Address 1");
-    assert_eq!(search, "synthetic owner alpha 05321234567");
+    assert_eq!(search, "synthetic owner alpha 905321234567 05321234567");
 
     let beta_phone: String = conn
         .query_row(
@@ -172,8 +175,8 @@ fn full_import_maps_every_table() {
         )
         .unwrap();
     assert_eq!(
-        beta_phone, "05327654321",
-        "name trimmed, +90 prefix replaced"
+        beta_phone, "+905327654321",
+        "name trimmed, already international"
     );
 
     let (blank_name, blank_phone, blank_raw): (String, String, String) = conn
@@ -298,7 +301,7 @@ fn preview_writes_nothing_and_matches_the_report() {
         (3, 3, 3)
     );
     assert_eq!(preview.to_import, preview.found);
-    assert_eq!(preview.phones_adjusted, 2);
+    assert_eq!(preview.phones_adjusted, 1);
     assert_eq!(preview.phones_unparsed, 1);
     assert_eq!((preview.orphan_patients, preview.orphan_todos), (1, 1));
     assert!(preview.orphan_owner_needed);
@@ -408,7 +411,7 @@ fn column_and_table_names_are_case_insensitive() {
         .conn()
         .query_row("SELECT phone FROM owners", [], |r| r.get(0))
         .unwrap();
-    assert_eq!(phone, "05320000000");
+    assert_eq!(phone, "+905320000000");
 }
 
 #[test]
@@ -668,7 +671,7 @@ fn duplicate_looking_owners_are_reported_not_skipped() {
     target
         .conn()
         .execute(
-            "INSERT INTO owners (full_name, phone) VALUES ('SYNTHETIC OWNER ALPHA', '05321234567')",
+            "INSERT INTO owners (full_name, phone) VALUES ('SYNTHETIC OWNER ALPHA', '+905321234567')",
             [],
         )
         .unwrap();

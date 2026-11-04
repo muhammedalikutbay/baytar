@@ -172,8 +172,10 @@ fn is_weekday(word: &str) -> bool {
     )
 }
 
-/// Normalize Turkish mobile and area-code landline numbers to digits for display.
-/// Removing display separators alone does not produce an adjustment warning.
+/// Normalize Turkish mobile and area-code landline numbers to E.164 (`+90` followed by ten digits).
+/// Removing display separators from an already international `+90` number, or from the local
+/// `0` + ten digits form, does not produce an adjustment warning; restoring a lost zero or a
+/// bare `90` country code does.
 pub fn phone(raw: Raw<'_>) -> Normalized<String> {
     let original = raw.original();
     let result = match raw {
@@ -211,14 +213,14 @@ fn parse_phone(text: &str) -> Option<(String, bool)> {
     });
     if let Some(national) = national {
         if national.len() == 10 && national.bytes().all(|byte| byte.is_ascii_digit()) {
-            return Some((format!("0{national}"), true));
+            return Some((format!("+90{national}"), !digits.starts_with("+90")));
         }
         return None;
     }
     match digits.len() {
-        10 if valid_national(&digits) => Some((format!("0{digits}"), true)),
-        11 if digits.starts_with("05") && digits.bytes().all(|byte| byte.is_ascii_digit()) => {
-            Some((digits, false))
+        10 if valid_national(&digits) => Some((format!("+90{digits}"), true)),
+        11 if digits.starts_with('0') && valid_national(&digits[1..]) => {
+            Some((format!("+90{}", &digits[1..]), false))
         }
         _ => None,
     }
@@ -500,12 +502,34 @@ mod tests {
             "0 (532) 123-45-67",
             "0532.123.45.67",
             " \t0532\u{a0}123 45 67\n",
+            "+905321234567",
+            "+90 (532) 123-45-67",
         ] {
             check_text(
                 phone(Raw::Text(input)),
                 input,
-                Some("05321234567".to_owned()),
+                Some("+905321234567".to_owned()),
                 None,
+            );
+        }
+    }
+
+    #[test]
+    fn local_landlines_are_recognized_like_mobiles() {
+        for input in ["02121234567", "0 (212) 123-45-67", "+90 (212) 123 45 67"] {
+            check_text(
+                phone(Raw::Text(input)),
+                input,
+                Some("+902121234567".to_owned()),
+                None,
+            );
+        }
+        for input in ["01211234567", "06121234567", "00121234567"] {
+            check_text(
+                phone(Raw::Text(input)),
+                input,
+                None,
+                Some(Warning::Unparsed),
             );
         }
     }
@@ -513,18 +537,14 @@ mod tests {
     #[test]
     fn phones_restore_lost_zero_and_replace_country_code() {
         for (input, expected) in [
-            ("5321234567", "05321234567"),
-            ("532 123 45 67", "05321234567"),
-            ("+905321234567", "05321234567"),
-            ("905321234567", "05321234567"),
-            ("+90 (532) 123-45-67", "05321234567"),
-            ("90 532.123.45.67", "05321234567"),
-            ("2121234567", "02121234567"),
-            ("3121234567", "03121234567"),
-            ("4121234567", "04121234567"),
-            ("+90 (212) 123 45 67", "02121234567"),
-            ("903121234567", "03121234567"),
-            ("+904121234567", "04121234567"),
+            ("5321234567", "+905321234567"),
+            ("532 123 45 67", "+905321234567"),
+            ("905321234567", "+905321234567"),
+            ("90 532.123.45.67", "+905321234567"),
+            ("2121234567", "+902121234567"),
+            ("3121234567", "+903121234567"),
+            ("4121234567", "+904121234567"),
+            ("903121234567", "+903121234567"),
         ] {
             check_text(
                 phone(Raw::Text(input)),
@@ -537,14 +557,18 @@ mod tests {
 
     #[test]
     fn country_code_requires_exactly_ten_ascii_digits() {
-        for input in ["+901234567890", "901234567890"] {
-            check_text(
-                phone(Raw::Text(input)),
-                input,
-                Some("01234567890".to_owned()),
-                Some(Warning::Adjusted),
-            );
-        }
+        check_text(
+            phone(Raw::Text("+901234567890")),
+            "+901234567890",
+            Some("+901234567890".to_owned()),
+            None,
+        );
+        check_text(
+            phone(Raw::Text("901234567890")),
+            "901234567890",
+            Some("+901234567890".to_owned()),
+            Some(Warning::Adjusted),
+        );
     }
 
     #[test]
@@ -584,7 +608,7 @@ mod tests {
             assert_eq!(
                 phone(raw),
                 Normalized {
-                    value: Some("05321234567".to_owned()),
+                    value: Some("+905321234567".to_owned()),
                     raw: Some("5321234567".to_owned()),
                     warning: Some(Warning::Adjusted),
                 }
@@ -592,11 +616,11 @@ mod tests {
         }
         assert_eq!(
             phone(Raw::Integer(905_321_234_567)).value.as_deref(),
-            Some("05321234567")
+            Some("+905321234567")
         );
         assert_eq!(
             phone(Raw::Integer(2_121_234_567)).value.as_deref(),
-            Some("02121234567")
+            Some("+902121234567")
         );
     }
 

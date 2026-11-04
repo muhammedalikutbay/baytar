@@ -23,6 +23,12 @@ pub struct NewVisit {
     #[serde(default)]
     pub temperature_c: Option<f64>,
     #[serde(default)]
+    pub heart_rate_bpm: Option<i64>,
+    #[serde(default)]
+    pub resp_rate_bpm: Option<i64>,
+    #[serde(default)]
+    pub body_condition: Option<i64>,
+    #[serde(default)]
     pub notes: Option<String>,
 }
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -79,9 +85,27 @@ pub struct VisitPatch {
         skip_serializing_if = "Option::is_none",
         deserialize_with = "super::nullable"
     )]
+    pub heart_rate_bpm: Option<Option<i64>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub resp_rate_bpm: Option<Option<i64>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub body_condition: Option<Option<i64>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
     pub notes: Option<Option<String>>,
 }
-const COLUMNS: &str = "id, patient_id, visit_on, visit_time, reason, findings, diagnosis, treatment, weight_kg, temperature_c, notes, created_at, updated_at, deleted_at";
+const COLUMNS: &str = "id, patient_id, visit_on, visit_time, reason, findings, diagnosis, treatment, weight_kg, temperature_c, notes, created_at, updated_at, deleted_at, heart_rate_bpm, resp_rate_bpm, body_condition";
 pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<Visit> {
     Ok(Visit {
         id: r.get(0)?,
@@ -98,6 +122,9 @@ pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<Visit> {
         created_at: r.get(11)?,
         updated_at: r.get(12)?,
         deleted_at: r.get(13)?,
+        heart_rate_bpm: r.get(14)?,
+        resp_rate_bpm: r.get(15)?,
+        body_condition: r.get(16)?,
     })
 }
 pub fn get(conn: &Connection, id: i64) -> Result<Visit> {
@@ -117,7 +144,7 @@ pub fn create(conn: &Connection, mut input: NewVisit) -> Result<Visit> {
     Ok(result)
 }
 fn insert(conn: &Connection, input: NewVisit) -> Result<Visit> {
-    conn.execute("INSERT INTO visits (patient_id, visit_on, visit_time, reason, findings, diagnosis, treatment, weight_kg, temperature_c, notes, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)", params![input.patient_id, input.visit_on, input.visit_time, input.reason, input.findings, input.diagnosis, input.treatment, input.weight_kg, input.temperature_c, input.notes, now()])?;
+    conn.execute("INSERT INTO visits (patient_id, visit_on, visit_time, reason, findings, diagnosis, treatment, weight_kg, temperature_c, heart_rate_bpm, resp_rate_bpm, body_condition, notes, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)", params![input.patient_id, input.visit_on, input.visit_time, input.reason, input.findings, input.diagnosis, input.treatment, input.weight_kg, input.temperature_c, input.heart_rate_bpm, input.resp_rate_bpm, input.body_condition, input.notes, now()])?;
     get(conn, conn.last_insert_rowid())
 }
 pub fn update(conn: &Connection, id: i64, patch: VisitPatch) -> Result<Visit> {
@@ -136,10 +163,13 @@ pub fn update(conn: &Connection, id: i64, patch: VisitPatch) -> Result<Visit> {
         treatment: patch.treatment.unwrap_or(old.treatment),
         weight_kg: patch.weight_kg.unwrap_or(old.weight_kg),
         temperature_c: patch.temperature_c.unwrap_or(old.temperature_c),
+        heart_rate_bpm: patch.heart_rate_bpm.unwrap_or(old.heart_rate_bpm),
+        resp_rate_bpm: patch.resp_rate_bpm.unwrap_or(old.resp_rate_bpm),
+        body_condition: patch.body_condition.unwrap_or(old.body_condition),
         notes: patch.notes.unwrap_or(old.notes),
     };
     prepare(&tx, &mut input, Some(id))?;
-    tx.execute("UPDATE visits SET patient_id = ?1, visit_on = ?2, visit_time = ?3, reason = ?4, findings = ?5, diagnosis = ?6, treatment = ?7, weight_kg = ?8, temperature_c = ?9, notes = ?10, updated_at = ?11 WHERE id = ?12", params![input.patient_id, input.visit_on, input.visit_time, input.reason, input.findings, input.diagnosis, input.treatment, input.weight_kg, input.temperature_c, input.notes, now(), id])?;
+    tx.execute("UPDATE visits SET patient_id = ?1, visit_on = ?2, visit_time = ?3, reason = ?4, findings = ?5, diagnosis = ?6, treatment = ?7, weight_kg = ?8, temperature_c = ?9, heart_rate_bpm = ?10, resp_rate_bpm = ?11, body_condition = ?12, notes = ?13, updated_at = ?14 WHERE id = ?15", params![input.patient_id, input.visit_on, input.visit_time, input.reason, input.findings, input.diagnosis, input.treatment, input.weight_kg, input.temperature_c, input.heart_rate_bpm, input.resp_rate_bpm, input.body_condition, input.notes, now(), id])?;
     let result = get(&tx, id)?;
     tx.commit()?;
     Ok(result)
@@ -172,6 +202,11 @@ fn prepare(conn: &Connection, input: &mut NewVisit, id: Option<i64>) -> Result<(
     super::positive("weightKg", input.weight_kg)?;
     if input.temperature_c.is_some_and(|v| !v.is_finite()) {
         return Err(super::invalid("temperatureC", "must be finite"));
+    }
+    super::positive_days("heartRateBpm", input.heart_rate_bpm)?;
+    super::positive_days("respRateBpm", input.resp_rate_bpm)?;
+    if input.body_condition.is_some_and(|v| !(1..=9).contains(&v)) {
+        return Err(super::invalid("bodyCondition", "must be between 1 and 9"));
     }
     super::active_patient(conn, input.patient_id)?;
     if let Some(id) = id {

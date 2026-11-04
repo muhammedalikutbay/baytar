@@ -21,11 +21,18 @@ pub struct Migration {
     pub sql: &'static str,
 }
 
-static MIGRATIONS: &[Migration] = &[Migration {
-    version: 1,
-    name: "init",
-    sql: include_str!("migrations/0001_init.sql"),
-}];
+static MIGRATIONS: &[Migration] = &[
+    Migration {
+        version: 1,
+        name: "init",
+        sql: include_str!("migrations/0001_init.sql"),
+    },
+    Migration {
+        version: 2,
+        name: "v2",
+        sql: include_str!("migrations/0002_v2.sql"),
+    },
+];
 
 /// Ordered list of all known migrations.
 pub fn migrations() -> &'static [Migration] {

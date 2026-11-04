@@ -46,10 +46,13 @@ fn crud_and_nullable_patches_preserve_raw_phone() {
         },
     )
     .unwrap();
-    assert_eq!(o.phone.as_deref(), Some("905321234567"));
+    assert_eq!(o.phone.as_deref(), Some("+905321234567"));
     assert_eq!(o.phone_raw.as_deref(), Some("+90 (532) 123-45-67"));
-    assert_eq!(o.phone_alt.as_deref(), Some("05447654321"));
-    assert_eq!(o.search_text, "cagri simsek 905321234567 05447654321");
+    assert_eq!(o.phone_alt.as_deref(), Some("+905447654321"));
+    assert_eq!(
+        o.search_text,
+        "cagri simsek 905321234567 05321234567 905447654321 05447654321"
+    );
     let patch: OwnerPatch =
         serde_json::from_value(json!({"fullName":"İpek Işık", "email":null})).unwrap();
     let o2 = owners::update(c, o.id, patch).unwrap();
@@ -325,4 +328,103 @@ fn unrelated_owner_edit_preserves_legacy_normalized_phone_and_raw_value() {
     assert_eq!(updated.phone.as_deref(), Some("05321234567"));
     assert_eq!(updated.phone_raw.as_deref(), Some("5321234567"));
     assert_eq!(updated.search_text, "updated owner 05321234567");
+}
+
+#[test]
+fn owner_v2_fields_phone_forms_and_city_search() {
+    let db = Database::open_in_memory().unwrap();
+    let c = db.conn();
+    let o = owners::create(
+        c,
+        NewOwner {
+            full_name: "Synthetic Ada".into(),
+            phone: Some("0532 123 45 67".into()),
+            phone_alt: Some("+49 151 1234 5678".into()),
+            national_id: Some(" 12345678901 ".into()),
+            city: Some("  Eskişehir ".into()),
+            district: Some("   ".into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(o.phone.as_deref(), Some("+905321234567"));
+    assert_eq!(o.phone_raw.as_deref(), Some("0532 123 45 67"));
+    assert_eq!(o.phone_alt.as_deref(), Some("+4915112345678"));
+    assert_eq!(o.national_id.as_deref(), Some("12345678901"));
+    assert_eq!(o.city.as_deref(), Some("Eskişehir"));
+    assert_eq!(o.district, None, "blank free text is stored as NULL");
+    assert!(o.search_text.contains("eskisehir"));
+
+    // Both the local and the international digit forms find the owner, as does the city.
+    for query in ["0532", "532123", "90532", "eskisehir", "4915112"] {
+        let hits = search(c, query, 10).unwrap();
+        assert_eq!(hits.len(), 1, "{query}");
+        assert_eq!(hits[0].owner.id, o.id);
+    }
+
+    let patch: OwnerPatch = serde_json::from_value(
+        json!({"city": "Ankara", "district": "Çankaya", "nationalId": null}),
+    )
+    .unwrap();
+    let updated = owners::update(c, o.id, patch).unwrap();
+    assert_eq!(updated.city.as_deref(), Some("Ankara"));
+    assert_eq!(updated.district.as_deref(), Some("Çankaya"));
+    assert_eq!(updated.national_id, None);
+    assert_eq!(updated.phone, o.phone, "unrelated edit keeps the phone");
+    assert!(updated.search_text.contains("ankara"));
+    assert!(!updated.search_text.contains("eskisehir"));
+
+    // Soft delete and restore rebuild the same key, including the city.
+    owners::soft_delete(c, o.id).unwrap();
+    let deleted = owners::get(c, o.id).unwrap();
+    assert!(deleted.search_text.contains("ankara"));
+    assert!(deleted.search_text.contains("0532"));
+    let restored = owners::restore(c, o.id).unwrap();
+    assert_eq!(restored.search_text, updated.search_text);
+}
+
+#[test]
+fn patient_alerts_round_trip() {
+    let db = Database::open_in_memory().unwrap();
+    let c = db.conn();
+    let o = owner(c, "Synthetic Owner");
+    let p = patients::create(
+        c,
+        NewPatient {
+            owner_id: o.id,
+            name: "Synthetic Tortoise".into(),
+            species: "other".into(),
+            alerts: Some("  bites  ".into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(p.alerts.as_deref(), Some("bites"));
+    assert_eq!(p.species, baytar_core::model::Species::Other);
+    let p = patients::update(
+        c,
+        p.id,
+        serde_json::from_value(json!({"alerts": "allergic to penicillin", "species": "reptile"}))
+            .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(p.alerts.as_deref(), Some("allergic to penicillin"));
+    assert_eq!(p.species, baytar_core::model::Species::Reptile);
+    let p = patients::update(
+        c,
+        p.id,
+        serde_json::from_value(json!({"alerts": null})).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(p.alerts, None);
+    assert!(patients::create(
+        c,
+        NewPatient {
+            owner_id: o.id,
+            name: "X".into(),
+            species: "dragon".into(),
+            ..Default::default()
+        }
+    )
+    .is_err());
 }

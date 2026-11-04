@@ -19,7 +19,7 @@ fn seed_owner_and_patient(conn: &Connection) {
 #[test]
 fn fresh_database_has_all_tables_strict_types_indexes_and_no_triggers() {
     let db = Database::open_in_memory().unwrap();
-    assert_eq!(db.schema_version().unwrap(), 1);
+    assert_eq!(db.schema_version().unwrap(), 2);
     let conn = db.conn();
     let mut stmt = conn
         .prepare("SELECT name, strict FROM pragma_table_list WHERE schema = 'main' AND name NOT LIKE 'sqlite_%' ORDER BY name")
@@ -31,15 +31,24 @@ fn fresh_database_has_all_tables_strict_types_indexes_and_no_triggers() {
         .unwrap();
     let expected = [
         "appointments",
+        "attachment_data",
+        "attachments",
+        "charges",
         "import_runs",
+        "inventory_items",
+        "inventory_lots",
         "legacy_map",
         "medications",
         "owners",
         "patients",
+        "payments",
         "prescription_items",
+        "services",
         "settings",
+        "stock_movements",
         "vaccinations",
         "vaccine_types",
+        "visit_templates",
         "visits",
     ];
     assert_eq!(tables.len(), expected.len());
@@ -69,10 +78,28 @@ fn fresh_database_has_all_tables_strict_types_indexes_and_no_triggers() {
         indexes,
         [
             "appointments_starts_on_idx",
+            "appointments_vaccination_id_idx",
+            "appointments_vaccine_type_id_idx",
+            "attachments_patient_id_idx",
+            "attachments_visit_id_idx",
+            "charges_charged_on_idx",
+            "charges_inventory_item_id_idx",
+            "charges_owner_id_idx",
+            "charges_patient_id_idx",
+            "charges_service_id_idx",
+            "charges_visit_id_idx",
+            "inventory_items_medication_id_idx",
+            "inventory_items_vaccine_type_id_idx",
+            "inventory_lots_expires_on_idx",
+            "inventory_lots_item_id_idx",
             "owners_search_text_idx",
             "patients_owner_id_idx",
             "patients_search_text_idx",
+            "payments_owner_id_idx",
+            "payments_paid_on_idx",
             "prescription_items_visit_id_idx",
+            "stock_movements_item_id_idx",
+            "stock_movements_lot_id_idx",
             "vaccinations_next_due_on_idx",
             "vaccinations_patient_id_idx",
             "vaccine_types_name_idx",

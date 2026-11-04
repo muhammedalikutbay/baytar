@@ -14,6 +14,18 @@ pub struct NewVaccineType {
     pub notes: Option<String>,
     #[serde(default = "default_is_active")]
     pub is_active: bool,
+    #[serde(default)]
+    pub is_builtin: bool,
+    #[serde(default)]
+    pub manufacturer: Option<String>,
+    #[serde(default)]
+    pub diseases: Option<String>,
+    #[serde(default)]
+    pub primary_doses: Option<i64>,
+    #[serde(default)]
+    pub primary_interval_days: Option<i64>,
+    #[serde(default)]
+    pub min_age_weeks: Option<i64>,
 }
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -40,6 +52,36 @@ pub struct VaccineTypePatch {
     pub notes: Option<Option<String>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub is_active: Option<bool>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub manufacturer: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub diseases: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub primary_doses: Option<Option<i64>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub primary_interval_days: Option<Option<i64>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub min_age_weeks: Option<Option<i64>>,
 }
 fn default_is_active() -> bool {
     true
@@ -52,10 +94,16 @@ impl Default for NewVaccineType {
             default_interval_days: Default::default(),
             notes: Default::default(),
             is_active: true,
+            is_builtin: false,
+            manufacturer: Default::default(),
+            diseases: Default::default(),
+            primary_doses: Default::default(),
+            primary_interval_days: Default::default(),
+            min_age_weeks: Default::default(),
         }
     }
 }
-const COLUMNS: &str = "id, name, species, default_interval_days, notes, is_active, created_at, updated_at, deleted_at";
+const COLUMNS: &str = "id, name, species, default_interval_days, notes, is_active, created_at, updated_at, deleted_at, is_builtin, manufacturer, diseases, primary_doses, primary_interval_days, min_age_weeks";
 pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<VaccineType> {
     Ok(VaccineType {
         id: r.get(0)?,
@@ -77,6 +125,12 @@ pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<VaccineType> {
         created_at: r.get(6)?,
         updated_at: r.get(7)?,
         deleted_at: r.get(8)?,
+        is_builtin: r.get(9)?,
+        manufacturer: r.get(10)?,
+        diseases: r.get(11)?,
+        primary_doses: r.get(12)?,
+        primary_interval_days: r.get(13)?,
+        min_age_weeks: r.get(14)?,
     })
 }
 pub fn get(conn: &Connection, id: i64) -> Result<VaccineType> {
@@ -96,7 +150,7 @@ pub fn create(conn: &Connection, mut input: NewVaccineType) -> Result<VaccineTyp
     Ok(result)
 }
 fn insert(conn: &Connection, input: NewVaccineType) -> Result<VaccineType> {
-    conn.execute("INSERT INTO vaccine_types (name, species, default_interval_days, notes, is_active, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)", params![input.name, input.species, input.default_interval_days, input.notes, input.is_active, now()])?;
+    conn.execute("INSERT INTO vaccine_types (name, species, default_interval_days, notes, is_active, is_builtin, manufacturer, diseases, primary_doses, primary_interval_days, min_age_weeks, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)", params![input.name, input.species, input.default_interval_days, input.notes, input.is_active, input.is_builtin, input.manufacturer, input.diseases, input.primary_doses, input.primary_interval_days, input.min_age_weeks, now()])?;
     get(conn, conn.last_insert_rowid())
 }
 pub fn update(conn: &Connection, id: i64, patch: VaccineTypePatch) -> Result<VaccineType> {
@@ -115,9 +169,17 @@ pub fn update(conn: &Connection, id: i64, patch: VaccineTypePatch) -> Result<Vac
             .unwrap_or(old.default_interval_days),
         notes: patch.notes.unwrap_or(old.notes),
         is_active: patch.is_active.unwrap_or(old.is_active),
+        is_builtin: old.is_builtin,
+        manufacturer: patch.manufacturer.unwrap_or(old.manufacturer),
+        diseases: patch.diseases.unwrap_or(old.diseases),
+        primary_doses: patch.primary_doses.unwrap_or(old.primary_doses),
+        primary_interval_days: patch
+            .primary_interval_days
+            .unwrap_or(old.primary_interval_days),
+        min_age_weeks: patch.min_age_weeks.unwrap_or(old.min_age_weeks),
     };
     prepare(&tx, &mut input, Some(id))?;
-    tx.execute("UPDATE vaccine_types SET name = ?1, species = ?2, default_interval_days = ?3, notes = ?4, is_active = ?5, updated_at = ?6 WHERE id = ?7", params![input.name, input.species, input.default_interval_days, input.notes, input.is_active, now(), id])?;
+    tx.execute("UPDATE vaccine_types SET name = ?1, species = ?2, default_interval_days = ?3, notes = ?4, is_active = ?5, manufacturer = ?6, diseases = ?7, primary_doses = ?8, primary_interval_days = ?9, min_age_weeks = ?10, updated_at = ?11 WHERE id = ?12", params![input.name, input.species, input.default_interval_days, input.notes, input.is_active, input.manufacturer, input.diseases, input.primary_doses, input.primary_interval_days, input.min_age_weeks, now(), id])?;
     let result = get(&tx, id)?;
     tx.commit()?;
     Ok(result)
@@ -152,6 +214,11 @@ fn prepare(_conn: &Connection, input: &mut NewVaccineType, _id: Option<i64>) -> 
             .map_err(|_| super::invalid("species", "unknown species"))?;
     }
     super::positive_days("defaultIntervalDays", input.default_interval_days)?;
+    super::positive_days("primaryDoses", input.primary_doses)?;
+    super::positive_days("primaryIntervalDays", input.primary_interval_days)?;
+    if input.min_age_weeks.is_some_and(|v| v < 0) {
+        return Err(super::invalid("minAgeWeeks", "must not be negative"));
+    }
     Ok(())
 }
 /// The marker is recorded even if a preexisting catalog prevents initial seeding.

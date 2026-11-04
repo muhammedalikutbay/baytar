@@ -22,6 +22,18 @@ pub struct NewMedication {
     pub route: Option<String>,
     #[serde(default)]
     pub notes: Option<String>,
+    #[serde(default)]
+    pub is_builtin: bool,
+    #[serde(default)]
+    pub category: Option<String>,
+    #[serde(default)]
+    pub manufacturer: Option<String>,
+    #[serde(default)]
+    pub target_species: Option<String>,
+    #[serde(default)]
+    pub prescription_required: Option<bool>,
+    #[serde(default)]
+    pub pack_unit: Option<String>,
 }
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -76,8 +88,38 @@ pub struct MedicationPatch {
         deserialize_with = "super::nullable"
     )]
     pub notes: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub category: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub manufacturer: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub target_species: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub prescription_required: Option<Option<bool>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub pack_unit: Option<Option<String>>,
 }
-const COLUMNS: &str = "id, name, active_ingredient, form, concentration_mg_per_ml, strength_mg_per_unit, dose_mg_per_kg_min, dose_mg_per_kg_max, route, notes, created_at, updated_at, deleted_at";
+const COLUMNS: &str = "id, name, active_ingredient, form, concentration_mg_per_ml, strength_mg_per_unit, dose_mg_per_kg_min, dose_mg_per_kg_max, route, notes, created_at, updated_at, deleted_at, is_builtin, category, manufacturer, target_species, prescription_required, pack_unit";
 pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<Medication> {
     Ok(Medication {
         id: r.get(0)?,
@@ -103,6 +145,22 @@ pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<Medication> {
         created_at: r.get(10)?,
         updated_at: r.get(11)?,
         deleted_at: r.get(12)?,
+        is_builtin: r.get(13)?,
+        category: r
+            .get::<_, Option<String>>(14)?
+            .map(|v| v.parse())
+            .transpose()
+            .map_err(|e| {
+                rusqlite::Error::FromSqlConversionFailure(
+                    14,
+                    rusqlite::types::Type::Text,
+                    Box::new(e),
+                )
+            })?,
+        manufacturer: r.get(15)?,
+        target_species: r.get(16)?,
+        prescription_required: r.get(17)?,
+        pack_unit: r.get(18)?,
     })
 }
 pub fn get(conn: &Connection, id: i64) -> Result<Medication> {
@@ -122,7 +180,7 @@ pub fn create(conn: &Connection, mut input: NewMedication) -> Result<Medication>
     Ok(result)
 }
 fn insert(conn: &Connection, input: NewMedication) -> Result<Medication> {
-    conn.execute("INSERT INTO medications (name, active_ingredient, form, concentration_mg_per_ml, strength_mg_per_unit, dose_mg_per_kg_min, dose_mg_per_kg_max, route, notes, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)", params![input.name, input.active_ingredient, input.form, input.concentration_mg_per_ml, input.strength_mg_per_unit, input.dose_mg_per_kg_min, input.dose_mg_per_kg_max, input.route, input.notes, now()])?;
+    conn.execute("INSERT INTO medications (name, active_ingredient, form, concentration_mg_per_ml, strength_mg_per_unit, dose_mg_per_kg_min, dose_mg_per_kg_max, route, notes, is_builtin, category, manufacturer, target_species, prescription_required, pack_unit, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16)", params![input.name, input.active_ingredient, input.form, input.concentration_mg_per_ml, input.strength_mg_per_unit, input.dose_mg_per_kg_min, input.dose_mg_per_kg_max, input.route, input.notes, input.is_builtin, input.category, input.manufacturer, input.target_species, input.prescription_required, input.pack_unit, now()])?;
     get(conn, conn.last_insert_rowid())
 }
 pub fn update(conn: &Connection, id: i64, patch: MedicationPatch) -> Result<Medication> {
@@ -147,9 +205,19 @@ pub fn update(conn: &Connection, id: i64, patch: MedicationPatch) -> Result<Medi
         dose_mg_per_kg_max: patch.dose_mg_per_kg_max.unwrap_or(old.dose_mg_per_kg_max),
         route: patch.route.unwrap_or(old.route),
         notes: patch.notes.unwrap_or(old.notes),
+        is_builtin: old.is_builtin,
+        category: patch
+            .category
+            .unwrap_or(old.category.map(|v| v.as_str().to_string())),
+        manufacturer: patch.manufacturer.unwrap_or(old.manufacturer),
+        target_species: patch.target_species.unwrap_or(old.target_species),
+        prescription_required: patch
+            .prescription_required
+            .unwrap_or(old.prescription_required),
+        pack_unit: patch.pack_unit.unwrap_or(old.pack_unit),
     };
     prepare(&tx, &mut input, Some(id))?;
-    tx.execute("UPDATE medications SET name = ?1, active_ingredient = ?2, form = ?3, concentration_mg_per_ml = ?4, strength_mg_per_unit = ?5, dose_mg_per_kg_min = ?6, dose_mg_per_kg_max = ?7, route = ?8, notes = ?9, updated_at = ?10 WHERE id = ?11", params![input.name, input.active_ingredient, input.form, input.concentration_mg_per_ml, input.strength_mg_per_unit, input.dose_mg_per_kg_min, input.dose_mg_per_kg_max, input.route, input.notes, now(), id])?;
+    tx.execute("UPDATE medications SET name = ?1, active_ingredient = ?2, form = ?3, concentration_mg_per_ml = ?4, strength_mg_per_unit = ?5, dose_mg_per_kg_min = ?6, dose_mg_per_kg_max = ?7, route = ?8, notes = ?9, category = ?10, manufacturer = ?11, target_species = ?12, prescription_required = ?13, pack_unit = ?14, updated_at = ?15 WHERE id = ?16", params![input.name, input.active_ingredient, input.form, input.concentration_mg_per_ml, input.strength_mg_per_unit, input.dose_mg_per_kg_min, input.dose_mg_per_kg_max, input.route, input.notes, input.category, input.manufacturer, input.target_species, input.prescription_required, input.pack_unit, now(), id])?;
     let result = get(&tx, id)?;
     tx.commit()?;
     Ok(result)
@@ -181,6 +249,11 @@ fn prepare(_conn: &Connection, input: &mut NewMedication, _id: Option<i64>) -> R
     if let Some(form) = &input.form {
         form.parse::<crate::model::MedicationForm>()
             .map_err(|_| super::invalid("form", "unknown medication form"))?;
+    }
+    if let Some(category) = &input.category {
+        category
+            .parse::<crate::model::MedicationCategory>()
+            .map_err(|_| super::invalid("category", "unknown medication category"))?;
     }
     for (field, value) in [
         ("concentrationMgPerMl", input.concentration_mg_per_ml),

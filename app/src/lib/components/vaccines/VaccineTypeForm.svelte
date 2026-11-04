@@ -12,7 +12,7 @@
   let notes = $state(initial?.notes ?? '');
   let errors = $state<Record<string, string>>({});
   let saving = $state(false);
-  const options = [{ value: '', label: tr.anySpecies }, ...(['cat', 'dog', 'bird', 'rabbit', 'other'] as Species[]).map(value => ({ value, label: tr[value] }))];
+  const options = [{ value: '', label: tr.anySpecies }, ...(['cat', 'dog', 'bird', 'rabbit', 'rodent', 'ferret', 'reptile', 'other'] as Species[]).map(value => ({ value, label: tr[value] }))];
   async function submit(event: SubmitEvent) {
     event.preventDefault(); if (saving) return;
     errors = {};

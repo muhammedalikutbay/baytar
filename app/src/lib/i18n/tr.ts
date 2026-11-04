@@ -113,7 +113,7 @@ export const tr = {
   address: 'Adres', notes: 'Not', patientName: 'Ad', species: 'Tür', speciesNote: 'Tür açıklaması',
   breed: 'Irk', sex: 'Cinsiyet', neutered: 'Kısırlaştırıldı', birthDate: 'Doğum tarihi',
   estimate: 'Tahmini', color: 'Renk', microchip: 'Mikroçip no', cat: 'Kedi', dog: 'Köpek',
-  bird: 'Kuş', rabbit: 'Tavşan', other: 'Diğer', male: 'Erkek', female: 'Dişi', unknown: 'Bilinmiyor',
+  bird: 'Kuş', rabbit: 'Tavşan', rodent: 'Kemirgen', ferret: 'Gelincik (ferret)', reptile: 'Sürüngen', other: 'Diğer', male: 'Erkek', female: 'Dişi', unknown: 'Bilinmiyor',
   yes: 'Evet', no: 'Hayır', requiredField: 'Bu alanı doldurun.', invalidField: 'Bu alanı kontrol edin.',
   invalidEmail: 'Geçerli bir e-posta adresi girin.', invalidDate: 'Geçerli, gelecekte olmayan bir tarih girin.',
   saveError: 'Kayıt kaydedilemedi. Yeniden deneyin.', loadError: 'Kayıtlar yüklenemedi. Yeniden deneyin.',

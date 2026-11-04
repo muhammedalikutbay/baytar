@@ -41,6 +41,7 @@ function ownerCreate(input: NewOwner): Owner {
   const stamp = now();
   const owner: Owner = { id: nextId++, fullName: input.fullName, phone: digits(input.phone), phoneRaw: input.phone ?? null,
     phoneAlt: digits(input.phoneAlt), email: input.email ?? null, address: input.address ?? null, notes: input.notes ?? null,
+    nationalId: input.nationalId ?? null, city: input.city ?? null, district: input.district ?? null,
     searchText: '', createdAt: stamp, updatedAt: stamp, deletedAt: null };
   ownerKey(owner); owners.push(owner); return owner;
 }
@@ -54,7 +55,7 @@ function ownerUpdate(id: number, patch: OwnerPatch): Owner {
 }
 function validatePatient(input: NewPatient) {
   required('name', input.name);
-  if (!['cat', 'dog', 'bird', 'rabbit', 'other'].includes(input.species)) fail('invalid', 'Unknown species.', 'species');
+  if (!['cat', 'dog', 'bird', 'rabbit', 'rodent', 'ferret', 'reptile', 'other'].includes(input.species)) fail('invalid', 'Unknown species.', 'species');
   if (!['male', 'female', 'unknown'].includes(input.sex ?? 'unknown')) fail('invalid', 'Unknown sex.', 'sex');
   for (const field of ['birthDate', 'deceasedOn'] as const) {
     const value = input[field];
@@ -69,6 +70,7 @@ function patientCreate(input: NewPatient): Patient {
     speciesNote: input.speciesNote ?? null, breed: input.breed ?? null, sex: input.sex ?? 'unknown', neutered: input.neutered ?? null,
     birthDate: input.birthDate ?? null, birthDateIsEstimate: input.birthDateIsEstimate ?? false, color: input.color ?? null,
     microchip: input.microchip ?? null, notes: input.notes ?? null, deceasedOn: input.deceasedOn ?? null,
+    alerts: input.alerts ?? null,
     searchText: '', createdAt: stamp, updatedAt: stamp, deletedAt: null };
   patientKey(patient); patients.push(patient); return patient;
 }

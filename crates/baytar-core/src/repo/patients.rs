@@ -1,4 +1,4 @@
-use super::{invalid, owners};
+use super::{clean, invalid, owners};
 use super::{now, required, transaction, RepoError, Result};
 use crate::{model::Patient, text::fold};
 use rusqlite::{params, Connection, OptionalExtension, Row};
@@ -29,6 +29,8 @@ pub struct NewPatient {
     pub notes: Option<String>,
     #[serde(default)]
     pub deceased_on: Option<String>,
+    #[serde(default)]
+    pub alerts: Option<String>,
 }
 fn unknown_sex() -> String {
     "unknown".into()
@@ -95,6 +97,12 @@ pub struct PatientPatch {
         deserialize_with = "super::nullable"
     )]
     pub deceased_on: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "super::nullable"
+    )]
+    pub alerts: Option<Option<String>>,
 }
 pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<Patient> {
     Ok(Patient {
@@ -120,9 +128,10 @@ pub(crate) fn row(r: &Row<'_>) -> rusqlite::Result<Patient> {
         created_at: r.get(15)?,
         updated_at: r.get(16)?,
         deleted_at: r.get(17)?,
+        alerts: r.get(18)?,
     })
 }
-const COLUMNS: &str = "id, owner_id, name, species, species_note, breed, sex, neutered, birth_date, birth_date_is_estimate, color, microchip, notes, deceased_on, search_text, created_at, updated_at, deleted_at";
+const COLUMNS: &str = "id, owner_id, name, species, species_note, breed, sex, neutered, birth_date, birth_date_is_estimate, color, microchip, notes, deceased_on, search_text, created_at, updated_at, deleted_at, alerts";
 pub fn get(conn: &Connection, id: i64) -> Result<Patient> {
     conn.query_row(
         &format!("SELECT {COLUMNS} FROM patients WHERE id = ?1"),
@@ -179,7 +188,7 @@ pub fn create(conn: &Connection, input: NewPatient) -> Result<Patient> {
     }
     let stamp = now();
     let key = search_text(&input);
-    tx.execute("INSERT INTO patients (owner_id, name, species, species_note, breed, sex, neutered, birth_date, birth_date_is_estimate, color, microchip, notes, deceased_on, search_text, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15)", params![input.owner_id, input.name, input.species, input.species_note, input.breed, input.sex, input.neutered, input.birth_date, input.birth_date_is_estimate, input.color, input.microchip, input.notes, input.deceased_on, key, stamp])?;
+    tx.execute("INSERT INTO patients (owner_id, name, species, species_note, breed, sex, neutered, birth_date, birth_date_is_estimate, color, microchip, notes, deceased_on, alerts, search_text, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16)", params![input.owner_id, input.name, input.species, input.species_note, input.breed, input.sex, input.neutered, input.birth_date, input.birth_date_is_estimate, input.color, input.microchip, input.notes, input.deceased_on, clean(input.alerts), key, stamp])?;
     let id = tx.last_insert_rowid();
     let result = get(&tx, id)?;
     tx.commit()?;
@@ -207,6 +216,7 @@ pub fn update(conn: &Connection, id: i64, patch: PatientPatch) -> Result<Patient
         microchip: patch.microchip.unwrap_or(old.microchip),
         notes: patch.notes.unwrap_or(old.notes),
         deceased_on: patch.deceased_on.unwrap_or(old.deceased_on),
+        alerts: patch.alerts.unwrap_or(old.alerts),
     };
     validate(&input)?;
     if owners::get(&tx, input.owner_id)?.deleted_at.is_some() {
@@ -214,7 +224,7 @@ pub fn update(conn: &Connection, id: i64, patch: PatientPatch) -> Result<Patient
     }
     let stamp = now();
     let key = search_text(&input);
-    tx.execute("UPDATE patients SET owner_id = ?1, name = ?2, species = ?3, species_note = ?4, breed = ?5, sex = ?6, neutered = ?7, birth_date = ?8, birth_date_is_estimate = ?9, color = ?10, microchip = ?11, notes = ?12, deceased_on = ?13, search_text = ?14, updated_at = ?15 WHERE id = ?16", params![input.owner_id, input.name, input.species, input.species_note, input.breed, input.sex, input.neutered, input.birth_date, input.birth_date_is_estimate, input.color, input.microchip, input.notes, input.deceased_on, key, stamp, id])?;
+    tx.execute("UPDATE patients SET owner_id = ?1, name = ?2, species = ?3, species_note = ?4, breed = ?5, sex = ?6, neutered = ?7, birth_date = ?8, birth_date_is_estimate = ?9, color = ?10, microchip = ?11, notes = ?12, deceased_on = ?13, alerts = ?14, search_text = ?15, updated_at = ?16 WHERE id = ?17", params![input.owner_id, input.name, input.species, input.species_note, input.breed, input.sex, input.neutered, input.birth_date, input.birth_date_is_estimate, input.color, input.microchip, input.notes, input.deceased_on, clean(input.alerts), key, stamp, id])?;
     let result = get(&tx, id)?;
     tx.commit()?;
     Ok(result)
@@ -279,6 +289,7 @@ impl Default for NewPatient {
             microchip: None,
             notes: None,
             deceased_on: None,
+            alerts: None,
         }
     }
 }
