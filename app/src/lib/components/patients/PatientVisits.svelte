@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Stethoscope, Syringe, CalendarDays, ChevronDown } from '@lucide/svelte';
   import { Button, Card, Dialog, EmptyState, Toast } from '$lib/components/ui';
+  import PrintButton from '$lib/components/print/PrintButton.svelte';
   import VisitForm from '$lib/components/visits/VisitForm.svelte';
   import HistoryRecordForm from './HistoryRecordForm.svelte';
   import { tr } from '$lib/i18n/tr';
@@ -104,6 +105,7 @@
   <Card>
     <div class="flex flex-wrap items-center justify-between gap-4">
       <h2 class="type-section">{tr.history}</h2>
+      <PrintButton kind="vaccination" id={patientId} />
       {#if !loading && !failed}
         {#if weights.length}
           <div class="flex items-center gap-3" aria-label={tr.weightTrend}>
@@ -153,7 +155,7 @@
                       </ul>
                     </section>
                   {/if}
-                  <div class="flex flex-wrap gap-2"><Button variant="secondary" size="sm" onclick={() => { editing = entry; editOpen = true; }}>{tr.edit}</Button><Button variant="danger" size="sm" disabled={busy} onclick={() => { actionError = ''; deleting = entry; deleteOpen = true; }}>{tr.delete}</Button></div>
+                  <div class="flex flex-wrap gap-2">{#if entry.kind === 'visit'}<PrintButton kind="prescription" id={entry.record.id} /><PrintButton kind="summary" id={entry.record.id} />{/if}<Button variant="secondary" size="sm" onclick={() => { editing = entry; editOpen = true; }}>{tr.edit}</Button><Button variant="danger" size="sm" disabled={busy} onclick={() => { actionError = ''; deleting = entry; deleteOpen = true; }}>{tr.delete}</Button></div>
                 </div>
               </details>
             {/each}

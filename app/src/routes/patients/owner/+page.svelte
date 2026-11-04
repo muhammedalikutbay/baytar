@@ -7,6 +7,7 @@
   import { formatAge, formatPhone } from '$lib/format';
   import * as owners from '$lib/api/owners';
   import type { OwnerDetail } from '$lib/api/types';
+  import PrintButton from '$lib/components/print/PrintButton.svelte';
   import OwnerForm from '$lib/components/patients/OwnerForm.svelte';
   import PatientForm from '$lib/components/patients/PatientForm.svelte';
   import SpeciesIcon from '$lib/components/patients/SpeciesIcon.svelte';
@@ -55,7 +56,7 @@
   {:else if detail}
     <div class="flex flex-wrap items-start justify-between gap-4">
       <h1 class="type-page break-words">{detail.owner.fullName}</h1>
-      <div class="flex flex-wrap gap-2"><Button variant="secondary" onclick={() => edit = true}>{tr.edit}</Button><Button variant="danger" onclick={() => { actionError = ''; confirm = true; }}>{tr.deleteOwner}</Button><Button onclick={() => add = true}>{tr.addPet}</Button></div>
+      <div class="flex flex-wrap gap-2"><PrintButton kind="statement" id={detail.owner.id} /><Button variant="secondary" onclick={() => edit = true}>{tr.edit}</Button><Button variant="danger" onclick={() => { actionError = ''; confirm = true; }}>{tr.deleteOwner}</Button><Button onclick={() => add = true}>{tr.addPet}</Button></div>
     </div>
     <Card><dl class="grid gap-5 sm:grid-cols-2">
       {#each [{label:tr.phone,value:detail.owner.phoneRaw ?? detail.owner.phone},{label:tr.phoneAlt,value:detail.owner.phoneAlt}] as phone}

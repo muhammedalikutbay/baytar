@@ -14,6 +14,12 @@ const KEYS: &[&str] = &[
     "vet_name",
     "clinic_phone",
     "clinic_address",
+    "clinic_title",
+    "clinic_registry_no",
+    "clinic_email",
+    "clinic_tax_office",
+    "clinic_tax_no",
+    "clinic_logo",
     "update_check_enabled",
 ];
 

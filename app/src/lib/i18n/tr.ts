@@ -334,6 +334,24 @@ export const tr = {
   inputNumberInvalid: 'Geçerli bir sayı girin; izin verilen aralık ve adımı kontrol edin',
   inputCountry: 'Ülke', inputCountrySearch: 'Ülke ara', inputToday: 'Bugün',
   inputDayUnit: 'gün', inputMinuteUnit: 'dk', inputTemperatureUnit: '°C',
+  // Clinic profile and printable documents
+  documentsClinic: 'Klinik bilgileri', documentsVetTitle: 'Unvan', documentsRegistry: 'Sicil / diploma no',
+  documentsTaxOffice: 'Vergi dairesi (isteğe bağlı)', documentsTaxNo: 'Vergi no (isteğe bağlı)',
+  documentsLogo: 'Klinik logosu', documentsLogoHint: 'PNG, JPEG veya WebP seçin (en çok 20 MB). Logo küçültülerek en çok 512 KB veri olarak saklanır.',
+  documentsLogoError: 'Logo işlenemedi. PNG, JPEG veya WebP biçiminde daha küçük bir görsel seçin.', documentsRemoveLogo: 'Logoyu kaldır',
+  documentsPrint: 'Yazdır', documentsVaccination: 'Aşı karnesi', documentsSummary: 'Muayene özeti', documentsStatement: 'Hesap ekstresi',
+  documentsSignature: 'Hekim imzası', documentsStamp: 'Klinik kaşesi', documentsPrepared: 'Baytar ile hazırlandı', documentsPage: 'Sayfa',
+  documentsError: 'Belge hazırlanamadı. Kaydın kullanılabilir olduğunu kontrol edip yeniden deneyin.',
+  documentsPopupError: 'Yazdırma penceresi açılamadı. Açılır pencerelere izin verip yeniden deneyin.',
+  documentsEmptyVaccines: 'Kayıtlı aşı uygulaması yok.', documentsEmptyPrescription: 'Bu muayenede reçete satırı yok.',
+  documentsNextAppointment: 'Sonraki randevu', documentsNoAppointment: 'Planlanmış randevu yok.',
+  documentsHeartRate: 'Kalp hızı (atım/dk)', documentsRespRate: 'Solunum hızı (/dk)', documentsBodyCondition: 'Vücut kondisyonu (1–9)',
+  documentsDebit: 'Borç', documentsCredit: 'Ödeme', documentsBalance: 'Bakiye', documentsDescription: 'Açıklama',
+  documentsBillingUnavailable: 'Hesap hareketleri bu sürümde henüz kullanılamıyor. Bakiye hesaplanmadı.',
+  documentsNoTransactions: 'Hesap hareketi yok.', documentsDemo: 'Örnek hesap hareketleri — gerçek kayıt değildir.',
+  documentsDemoCharge: 'Muayene hizmeti', documentsDemoPayment: 'Nakit tahsilat', documentsDose: 'Doz',
+  documentsPaper: 'Kağıt boyutu', documentsPrintHint: 'Yazdırma penceresinde kağıt boyutunu seçiminizle eşleştirin.',
+  documentsTaxDetails: 'Vergi dairesi / no',
 } as const satisfies Record<string, string>;
 
 export type TranslationKey = keyof typeof tr;
