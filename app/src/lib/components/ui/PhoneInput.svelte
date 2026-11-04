@@ -10,6 +10,7 @@
     Omit<HTMLInputAttributes, 'value'> & { value?: string; valid?: boolean; label: string; error?: string } = $props();
   let country = $state<CountryCode>('TR');
   let text = $state('');
+  let accepted = '';
   let lastBound = '';
   let ref = $state<HTMLInputElement | null>(null);
   let searchRef = $state<HTMLInputElement | null>(null);
@@ -25,8 +26,13 @@
   function format(raw: string, limit = true) {
     let input = raw.trim().replace(/^00/, '+').replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
     // Preserve the previous text when adding digits beyond the selected numbering plan.
-    if (limit && input.replace(/\D/g, '').length > 15) return;
-    if (limit && validatePhoneNumberLength(input, country) === 'TOO_LONG') return;
+    const digitCount = input.replace(/\D/g, '').length;
+    // Block extra digits once the number is complete, as well as anything the numbering plan calls too long.
+    const completeBefore = !!accepted && !!toE164(accepted, country) && digitCount > accepted.replace(/\D/g, '').length && !toE164(input, country);
+    if (limit && (digitCount > 15 || completeBefore || validatePhoneNumberLength(input, country) === 'TOO_LONG')) {
+      text = accepted;
+      return;
+    }
     const formatter = new AsYouType(country);
     const display = formatter.input(input);
     if (input.startsWith('+')) {
@@ -34,6 +40,7 @@
       if (inferred) country = inferred;
     }
     text = display || input;
+    accepted = text;
     value = toE164(input, country);
     lastBound = value;
   }
@@ -41,7 +48,8 @@
   $effect(() => { if (value !== lastBound) untrack(() => format(value, false)); });
   const message = $derived(!text ? (required ? tr.requiredField : '') : !toE164(text, country) ? tr.inputPhoneInvalid : '');
   $effect(() => { valid = !message; ref?.setCustomValidity(message); });
-  function input(event: Event) { const target = event.currentTarget as HTMLInputElement; format(target.value); target.value = text; }
+  // The inner Input binds `text` first; format on the next microtask so the accepted text wins.
+  function input(event: Event) { const raw = (event.currentTarget as HTMLInputElement).value; queueMicrotask(() => format(raw)); }
   async function toggle() { open = !open; query = ''; if (open) { await tick(); searchRef?.focus(); } }
   function select(c: CountryCode) {
     const current = new AsYouType(country); current.input(text);
@@ -55,7 +63,7 @@
 <div class="relative" bind:this={picker} role="group" aria-label={label}>
   <div class="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-2">
     <button type="button" class="mt-6 min-h-11 rounded-md border border-border-control bg-surface px-3 text-fg" aria-label={tr.inputCountry} aria-expanded={open} aria-controls={id + '-countries'} disabled={rest.disabled} onclick={toggle}>{flag(country)} +{getCountryCallingCode(country)}</button>
-    <Input {...rest} {id} {label} {required} type="tel" autocomplete="tel" inputmode="tel" bind:ref value={text} oninput={input}
+    <Input {...rest} {id} {label} {required} type="tel" autocomplete="tel" inputmode="tel" bind:ref bind:value={text} oninput={input}
       onblur={() => { touched = true; }} error={error || (touched ? message : '')} />
   </div>
   {#if open}
