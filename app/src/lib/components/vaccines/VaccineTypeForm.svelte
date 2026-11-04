@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { Syringe, PawPrint, Repeat, StickyNote } from '@lucide/svelte';
   import { validateForm, parseDecimal } from '$lib/validation';
   import { tick, untrack } from 'svelte';
-  import { Button, Input, Select, Textarea, NumberInput } from '$lib/components/ui';
+  import { Button, Input, Select, Textarea, NumberInput, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import * as types from '$lib/api/vaccine_types';
   import type { VaccineType, Species, ApiError } from '$lib/api/types';
@@ -37,10 +38,11 @@
   }
 </script>
 <form onsubmit={submit} class="grid gap-4" novalidate>
-  <Input label={tr.vaccineTypeName + ' *'} bind:value={name} required error={errors.name} />
-  <Select label={tr.species} bind:value={species} {options} error={errors.species} />
-  <NumberInput label={tr.vaccineInterval} bind:value={() => parseDecimal(interval), n => interval = n === null ? '' : String(n)} error={errors.defaultIntervalDays} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} />
-  <Textarea label={tr.notes} bind:value={notes} error={errors.notes} />
+  <RequiredNote />
+  <Input icon={Syringe} label={tr.vaccineTypeName} bind:value={name} required error={errors.name} />
+  <Select icon={PawPrint} label={tr.species} bind:value={species} {options} error={errors.species} />
+  <NumberInput icon={Repeat} label={tr.vaccineInterval} bind:value={() => parseDecimal(interval), n => interval = n === null ? '' : String(n)} error={errors.defaultIntervalDays} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} />
+  <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} error={errors.notes} />
   {#if errors.form}<p role="alert" class="text-danger">{errors.form}</p>{/if}
   <div class="flex justify-end gap-2"><Button variant="secondary" onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving}>{saving ? tr.saving : tr.save}</Button></div>
 </form>

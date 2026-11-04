@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { Package, List, Ruler, TurkishLira, TriangleAlert, StickyNote } from '@lucide/svelte';
   import { untrack } from 'svelte';
-  import { Button, Input, Select, NumberInput, MoneyInput, Textarea, Checkbox } from '$lib/components/ui';
+  import { Button, Input, Select, NumberInput, MoneyInput, Textarea, Checkbox, RequiredNote } from '$lib/components/ui';
   import { validateForm } from '$lib/validation';
   import { tr } from '$lib/i18n/tr';
   import * as inventory from '$lib/api/inventory';
@@ -21,14 +22,15 @@
   }
 </script>
 <form onsubmit={submit} class="grid gap-4">
+  <RequiredNote />
   <fieldset disabled={saving} class="grid min-w-0 gap-4">
-    <Input label={tr.inventoryName} bind:value={name} required />
-    <Select label={tr.inventoryKind} bind:value={kind} options={kindOptions} disabled={!!initial?.medicationId || !!initial?.vaccineTypeId} />
-    <Input label={tr.inventoryUnit} bind:value={unit} required />
-    <MoneyInput label={tr.inventoryPrice} bind:value={price} />
-    <NumberInput label={tr.inventoryReorder} bind:value={reorder} min={0} unit={unit} />
+    <Input icon={Package} label={tr.inventoryName} bind:value={name} required />
+    <Select icon={List} label={tr.inventoryKind} bind:value={kind} options={kindOptions} disabled={!!initial?.medicationId || !!initial?.vaccineTypeId} />
+    <Input icon={Ruler} label={tr.inventoryUnit} bind:value={unit} required />
+    <MoneyInput icon={TurkishLira} label={tr.inventoryPrice} bind:value={price} />
+    <NumberInput icon={TriangleAlert} label={tr.inventoryReorder} bind:value={reorder} min={0} unit={unit} />
     <Checkbox label={tr.inventoryActive} bind:checked={active} />
-    <Textarea label={tr.inventoryNotes} bind:value={notes} />
+    <Textarea icon={StickyNote} label={tr.inventoryNotes} bind:value={notes} />
   </fieldset>
   {#if error}<p role="alert" class="text-danger">{error}</p>{/if}
   <div class="flex justify-end gap-2"><Button variant="secondary" disabled={saving} onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving}>{saving ? tr.saving : tr.save}</Button></div>

@@ -22,3 +22,7 @@ export { default as MicrochipInput } from './MicrochipInput.svelte';
 export { default as NumberInput } from './NumberInput.svelte';
 export { default as MoneyInput } from './MoneyInput.svelte';
 export { default as DateInput } from './DateInput.svelte';
+
+export { default as RequiredNote } from './RequiredNote.svelte';
+export { default as Combobox } from './Combobox.svelte';
+export { default as TimeInput } from './TimeInput.svelte';

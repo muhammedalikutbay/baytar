@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { Search, Package } from '@lucide/svelte';
   import { onMount } from 'svelte';
-  import { Button, Input, Select } from '$lib/components/ui';
+  import { Button, Input, Select, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { call } from '$lib/api/client';
   import * as inventory from '$lib/api/inventory';
@@ -23,8 +24,9 @@
   }
 </script>
 <form onsubmit={submit} class="grid gap-4">
-  <Input label={tr.inventoryCatalogSearch} type="search" bind:value={query} />
-  {#if loading}<p role="status">{tr.loading}</p>{:else}<Select label={tr.inventoryCatalogEntry} bind:value={selection} options={options} placeholder={tr.inventoryCatalogEntry} required />{/if}
+  <RequiredNote />
+  <Input icon={Search} label={tr.inventoryCatalogSearch} type="search" bind:value={query} />
+  {#if loading}<p role="status">{tr.loading}</p>{:else}<Select icon={Package} label={tr.inventoryCatalogEntry} bind:value={selection} options={options} placeholder={tr.inventoryCatalogEntry} required />{/if}
   {#if !loading && options.length === 0}<p class="text-fg-muted">{tr.noResults}</p>{/if}
   {#if error}<p role="alert" class="text-danger">{error}</p><Button variant="secondary" onclick={load}>{tr.retry}</Button>{/if}
   <div class="flex justify-end gap-2"><Button variant="secondary" disabled={saving} onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving || loading || !selection}>{saving ? tr.saving : tr.inventoryCatalog}</Button></div>

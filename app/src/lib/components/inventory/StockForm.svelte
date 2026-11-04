@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { Package, ScanLine, TurkishLira, ClipboardList, Hash, StickyNote } from '@lucide/svelte';
   import { untrack } from 'svelte';
-  import { Button, Input, Select, NumberInput, MoneyInput, DateInput, Textarea, Checkbox } from '$lib/components/ui';
+  import { Button, Input, Select, NumberInput, MoneyInput, DateInput, Textarea, Checkbox, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { localToday, formatNumber } from '$lib/format';
   import { validateForm } from '$lib/validation';
@@ -30,19 +31,20 @@
   }
 </script>
 <form onsubmit={submit} class="grid gap-4">
+  <RequiredNote />
   <fieldset disabled={saving} class="grid min-w-0 gap-4">
-    {#if mode === 'receive'}<Select label={tr.inventoryLot} bind:value={selected} options={[{ value: '', label: tr.inventoryNewLot }, ...options]} />{/if}
-    {#if mode === 'adjust'}<Select label={tr.inventoryLot} bind:value={selected} options={options} required />{/if}
+    {#if mode === 'receive'}<Select icon={Package} label={tr.inventoryLot} bind:value={selected} options={[{ value: '', label: tr.inventoryNewLot }, ...options]} />{/if}
+    {#if mode === 'adjust'}<Select icon={Package} label={tr.inventoryLot} bind:value={selected} options={options} required />{/if}
     {#if mode === 'lot' || mode === 'receive' && !selected}
-      <Input label={tr.inventoryLotNo} bind:value={lotNo} />
+      <Input icon={ScanLine} label={tr.inventoryLotNo} bind:value={lotNo} />
       <DateInput label={tr.inventoryExpiry} bind:value={expiresOn} />
       <DateInput label={tr.inventoryReceivedOn} bind:value={receivedOn} />
-      <MoneyInput label={tr.inventoryCost} bind:value={cost} />
+      <MoneyInput icon={TurkishLira} label={tr.inventoryCost} bind:value={cost} />
     {/if}
-    {#if mode === 'consume'}<Select label={tr.inventoryMovementReason} bind:value={reason} options={[{ value: 'use', label: tr.inventoryUse }, { value: 'sale', label: tr.inventorySale }]} />{/if}
-    <NumberInput label={mode === 'adjust' ? tr.inventoryDelta : tr.inventoryQuantity} bind:value={quantity} required min={mode === 'adjust' ? undefined : mode === 'lot' ? 0 : Number.MIN_VALUE} unit={item.unit} />
+    {#if mode === 'consume'}<Select icon={ClipboardList} label={tr.inventoryMovementReason} bind:value={reason} options={[{ value: 'use', label: tr.inventoryUse }, { value: 'sale', label: tr.inventorySale }]} />{/if}
+    <NumberInput icon={Hash} label={mode === 'adjust' ? tr.inventoryDelta : tr.inventoryQuantity} bind:value={quantity} required min={mode === 'adjust' ? undefined : mode === 'lot' ? 0 : Number.MIN_VALUE} unit={item.unit} />
     <DateInput label={tr.inventoryMovedOn} bind:value={movedOn} required />
-    <Textarea label={mode === 'adjust' || mode === 'lot' ? tr.inventoryReason : tr.inventoryNotes} bind:value={notes} required={mode === 'adjust' || mode === 'lot' && initial?.quantity !== quantity} />
+    <Textarea icon={StickyNote} label={mode === 'adjust' || mode === 'lot' ? tr.inventoryReason : tr.inventoryNotes} bind:value={notes} required={mode === 'adjust' || mode === 'lot' && initial?.quantity !== quantity} />
     {#if mode === 'consume'}<Checkbox label={tr.inventoryAllowNegative} bind:checked={allowNegative} /><p class="type-caption text-fg-muted">{tr.inventoryDeductHint}</p>{/if}
   </fieldset>
   {#if error}<p role="alert" class="text-danger">{error}</p>{/if}

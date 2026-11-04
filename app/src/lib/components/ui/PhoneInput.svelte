@@ -1,4 +1,5 @@
 <script lang="ts">
+  // Validated Input wrapper; bind value/valid, with native attributes forwarded to the control.
   import { untrack, tick } from 'svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
   import { AsYouType, getCountries, getCountryCallingCode, validatePhoneNumberLength, type CountryCode } from 'libphonenumber-js/min';
@@ -74,7 +75,7 @@
 <svelte:window onkeydown={event => { if (open && event.key === 'Escape') { open = false; ref?.focus(); } }} onclick={event => { if (open && picker && !picker.contains(event.target as Node)) open = false; }} />
 <div class="relative" bind:this={picker} role="group" aria-label={label}>
   <div class="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-2">
-    <button type="button" class="mt-6 min-h-11 rounded-md border border-border-control bg-surface px-3 text-fg" aria-label={tr.inputCountry} aria-expanded={open} aria-controls={id + '-countries'} disabled={rest.disabled} onclick={toggle}>{flag(country)} +{getCountryCallingCode(country)}</button>
+    <button type="button" class="mt-[26px] min-h-10 text-sm rounded-md border border-border-control bg-surface px-3 text-fg" aria-label={tr.inputCountry} aria-expanded={open} aria-controls={id + '-countries'} disabled={rest.disabled} onclick={toggle}>{flag(country)} +{getCountryCallingCode(country)}</button>
     <Input {...rest} {id} {label} {required} type="tel" autocomplete="tel" inputmode="tel" bind:ref bind:value={text} oninput={input}
       onblur={() => { touched = true; }} error={error || (touched ? message : '')} />
   </div>

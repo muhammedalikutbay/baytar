@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { ClipboardList, List, Hourglass, Search, StickyNote, Repeat } from '@lucide/svelte';
   import { validateForm, parseDecimal } from '$lib/validation';
   import { untrack, tick } from 'svelte';
-  import { Button, Checkbox, Input, Select, Textarea, DateInput, NumberInput } from '$lib/components/ui';
+  import { Button, Checkbox, Input, Select, Textarea, DateInput, NumberInput, RequiredNote, TimeInput } from '$lib/components/ui';
   import * as appointments from '$lib/api/appointments';
   import { search } from '$lib/api/search';
   import { detail } from '$lib/api/owners';
@@ -104,26 +105,27 @@
   }
 </script>
 <form bind:this={form} onsubmit={submit} novalidate class="grid gap-4">
-  <Input label={tr.appointmentTitle + ' *'} bind:value={title} required error={errors.title} />
-  <Select label={tr.appointmentKind} bind:value={kind} options={Object.entries(kindLabels).map(([value, label]) => ({ value, label }))} />
-  <DateInput label={tr.appointmentDate + ' *'} min="0001-01-01" max="9999-12-31" bind:value={startsOn} required error={errors.startsOn} />
-  <div class="grid grid-cols-2 gap-4"><Input label={tr.appointmentTime} type="time" bind:value={startsTime} hint={tr.appointmentTimeHint} error={errors.startsTime} /><NumberInput label={tr.appointmentDuration} bind:value={() => parseDecimal(duration), n => duration = n === null ? '' : String(n)} error={errors.durationMin} min={1} max={2147483647} step={1} unit={tr.inputMinuteUnit} /></div>
-  <fieldset class="grid min-w-0 gap-2"><legend class="type-caption mb-2">{tr.appointmentPatient}</legend>
+  <RequiredNote />
+  <Input icon={ClipboardList} label={tr.appointmentTitle} bind:value={title} required error={errors.title} />
+  <Select icon={List} label={tr.appointmentKind} bind:value={kind} options={Object.entries(kindLabels).map(([value, label]) => ({ value, label }))} />
+  <DateInput label={tr.appointmentDate} min="0001-01-01" max="9999-12-31" bind:value={startsOn} required error={errors.startsOn} />
+  <div class="grid grid-cols-2 gap-4"><TimeInput label={tr.appointmentTime} optional bind:value={startsTime} hint={tr.appointmentTimeHint} error={errors.startsTime} /><NumberInput icon={Hourglass} label={tr.appointmentDuration} bind:value={() => parseDecimal(duration), n => duration = n === null ? '' : String(n)} error={errors.durationMin} min={1} max={2147483647} step={1} unit={tr.inputMinuteUnit} /></div>
+  <fieldset class="grid min-w-0 gap-2"><legend class="text-sm font-medium text-fg mb-2">{tr.appointmentPatient}</legend>
     {#if contextLoading}<p role="status">{tr.loading}</p>{/if}
     {#if contextFailed}<p role="alert" class="text-danger">{tr.loadError}</p>{/if}
     {#if selectedPatient || selectedOwner}<p class="break-words">{selectedPatient?.name}{selectedPatient && selectedOwner ? ' · ' : ''}{selectedOwner?.fullName}</p>
       <Button variant="ghost" size="sm" disabled={saving || contextLoading} onclick={() => { selectedPatient = null; selectedOwner = null; patientId = null; ownerId = null; }}>{tr.appointmentClearPatient}</Button>
     {:else}<p class="type-caption text-fg-muted">{tr.appointmentNoPatient}</p>{/if}
-    <Input label={tr.appointmentSearch} type="search" bind:value={query} autocomplete="off" disabled={saving || contextLoading} />
+    <Input icon={Search} label={tr.appointmentSearch} type="search" bind:value={query} autocomplete="off" disabled={saving || contextLoading} />
     {#if query.trim()}<div class="max-h-48 overflow-y-auto rounded-md border border-border p-2" aria-live="polite">
       {#if searchLoading}<p role="status">{tr.loading}</p>{:else if searchFailed}<p role="alert" class="text-danger">{tr.loadError}</p>{:else if !options.length}<p>{tr.noResults}</p>{/if}
       {#each options as option (option.patient.id)}<Button variant="ghost" class="w-full justify-start text-left" disabled={saving} onclick={() => { selectedPatient = option.patient; selectedOwner = option.owner; patientId = option.patient.id; ownerId = option.owner.id; query = ''; }}>{option.patient.name} · {option.owner.fullName}</Button>{/each}
     </div>{/if}
     {#if errors.patientId || errors.ownerId}<p role="alert" class="text-danger">{tr.invalidField}</p>{/if}
   </fieldset>
-  <Textarea label={tr.notes} bind:value={notes} />
+  <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />
   {#if !initial.appointment}<Checkbox label={tr.appointmentRepeat} bind:checked={repeat} />
-    {#if repeat}<div class="grid grid-cols-2 gap-4"><NumberInput label={tr.appointmentCount} bind:value={() => parseDecimal(count), n => count = n === null ? '' : String(n)} error={errors.count} hint={tr.appointmentRepeatHint} min={2} max={52} step={1} /><NumberInput label={tr.appointmentInterval} bind:value={() => parseDecimal(interval), n => interval = n === null ? '' : String(n)} error={errors.everyDays} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} /></div>
+    {#if repeat}<div class="grid grid-cols-2 gap-4"><NumberInput icon={Repeat} label={tr.appointmentCount} bind:value={() => parseDecimal(count), n => count = n === null ? '' : String(n)} error={errors.count} hint={tr.appointmentRepeatHint} min={2} max={52} step={1} /><NumberInput icon={Repeat} label={tr.appointmentInterval} bind:value={() => parseDecimal(interval), n => interval = n === null ? '' : String(n)} error={errors.everyDays} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} /></div>
       <div aria-live="polite"><h3 class="type-caption">{tr.appointmentPreview}</h3><ol class="mt-2 max-h-40 list-inside list-decimal overflow-y-auto text-fg-muted tabular-nums">{#each preview as day}<li>{formatDate(day)}</li>{/each}</ol></div>
     {/if}
   {:else}<p class="type-caption text-fg-muted">{tr.appointmentEditHint}</p>{/if}

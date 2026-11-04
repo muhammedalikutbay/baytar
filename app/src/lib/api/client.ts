@@ -25,7 +25,7 @@ function fail(kind: ApiError['kind'], message: string, field?: string): never {
 function required(field: string, value: string) {
   if (typeof value !== 'string' || !value.trim()) fail('invalid', 'Must not be empty.', field);
 }
-function fold(value: string): string {
+export function fold(value: string): string {
   return value.replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase()
     .replace(/[çğıöşü]/g, c => ({ ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u' })[c] ?? c)
     .trim().replace(/\s+/gu, ' ');
@@ -245,6 +245,16 @@ function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['arg
     case 'patient_create': return patientCreate((args as { input: NewPatient }).input);
     case 'patient_update': { const { id, patch } = args as { id: number; patch: PatientPatch }; return patientUpdate(id, patch); }
     case 'patients_by_owner': return patientsByOwner((args as { ownerId: number }).ownerId);
+    case 'directory_list': {
+      const { query, limit } = args as CommandMap['directory_list']['args'];
+      const text = fold(query), digits = text.replace(/\D/g, '');
+      const phone = !!digits && /^[\d+ ()./\-]+$/.test(text);
+      const active = owners.filter(o => !o.deletedAt).sort(byText);
+      return { total: active.length, owners: active.filter(o => !text || o.searchText.includes(text)
+        || (phone && [o.phone, o.phoneAlt].some(p => p?.replace(/\D/g, '').includes(digits)))
+        || patientsByOwner(o.id).some(p => p.searchText.includes(text)))
+        .slice(0, Math.max(0, Math.min(1000, limit))).map(owner => ({ owner, patients: patientsByOwner(owner.id) })) };
+    }
     case 'search': { const { query, limit } = args as { query: string; limit: number }; return search(query, limit); }
     default: {
       const { id } = args as { id: number };

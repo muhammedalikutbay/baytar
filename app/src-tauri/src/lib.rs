@@ -1,5 +1,6 @@
 mod billing;
 mod clinical;
+mod directory;
 mod import;
 mod inventory;
 mod lock;
@@ -694,6 +695,7 @@ pub fn run() {
             patient_delete,
             patient_restore,
             search,
+            directory::directory_list,
             billing::service_get,
             billing::service_create,
             billing::service_update,

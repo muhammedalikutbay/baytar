@@ -581,6 +581,17 @@ export const tr = {
   whatsappTest: 'Deneme mesajı aç', whatsappTestText: 'Merhaba, bu Baytar’dan bir deneme mesajıdır.',
   whatsappPhoneHint: 'Denemek için klinik telefonunu girip kaydedin.', whatsappCurrentMode: 'Açılış modu', whatsappChangeSettings: 'Ayarları değiştir',
   whatsappOpenSend: "WhatsApp'ta aç ve gönder", whatsappPreviewHint: 'Mesaj WhatsApp’ta gönderilmeye hazır açılır. Göndermek için WhatsApp’ta Gönder’e basın.', whatsappAddPhone: 'Telefon ekle',
+  // Shared selection and form controls (bay-ux1).
+  formRequiredNote: '* ile işaretli alanlar zorunludur.',
+  comboboxCustom: '“{text}” olarak kullan', comboboxClear: 'Seçimi temizle',
+  timeInvalid: 'Geçerli bir saat girin (SS:DD)', timeAllDay: 'Saat yok / tüm gün', timePlaceholder: 'SS:DD',
+  directorySearch: 'Sahip, telefon veya hasta ara', directoryNewOwner: 'Yeni sahip',
+  directoryAddOwner: 'Yeni sahip ekle', directoryNewPatient: 'Bu sahibe yeni hasta',
+  directoryEmpty: 'Henüz sahip kaydı yok.', directoryChange: 'Değiştir', directoryDeceased: 'Vefat',
+  directoryLimit: 'Daha fazla kayıt için aramayı daraltın.',
+  directoryPetCount: '{count} hasta', directoryAge: '{age} yaş', directoryLabel: 'Sahip ve hastalar',
+  gallerySelection: 'Aranabilir seçimler', galleryVaccineRabies: 'Kuduz aşısı', galleryVaccineMixed: 'Karma aşı',
+  city: 'İl', district: 'İlçe', nationalId: 'TCKN / VKN',
 } as const satisfies Record<string, string>;
 
 export type TranslationKey = keyof typeof tr;

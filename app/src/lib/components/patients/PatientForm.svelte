@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { PawPrint, Dna, Palette, ScanLine, TriangleAlert, StickyNote } from '@lucide/svelte';
   import { validateForm } from '$lib/validation';
   import { onMount, untrack, tick } from 'svelte';
-  import { Button, Input, Textarea, Select, Checkbox, DateInput, MicrochipInput } from '$lib/components/ui';
+  import { Button, Input, Textarea, Select, Checkbox, DateInput, MicrochipInput, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import * as patients from '$lib/api/patients';
   import type { Patient, Species, Sex, ApiError } from '$lib/api/types';
@@ -43,20 +44,21 @@
   }
 </script>
 <form onsubmit={submit} novalidate class="grid gap-4">
-  <Input label={tr.patientName + ' *'} bind:value={name} bind:ref={first} required error={errors.name} />
-  <Select label={tr.species + ' *'} bind:value={species} options={speciesOptions} placeholder={tr.galleryChoose} required error={errors.species} />
-  {#if species === 'other'}<Input label={tr.speciesNote} bind:value={speciesNote} error={errors.speciesNote} />{/if}
-  <Input label={tr.breed} bind:value={breed} error={errors.breed} />
+  <RequiredNote />
+  <Input icon={PawPrint} label={tr.patientName} bind:value={name} bind:ref={first} required error={errors.name} />
+  <Select icon={PawPrint} label={tr.species} bind:value={species} options={speciesOptions} placeholder={tr.galleryChoose} required error={errors.species} />
+  {#if species === 'other'}<Input icon={PawPrint} label={tr.speciesNote} bind:value={speciesNote} error={errors.speciesNote} />{/if}
+  <Input icon={Dna} label={tr.breed} bind:value={breed} error={errors.breed} />
   <div class="grid gap-4 sm:grid-cols-2">
-    <Select label={tr.sex} bind:value={sex} options={sexOptions} error={errors.sex} />
-    <Select label={tr.neutered} bind:value={neutered} options={[{value:'true',label:tr.yes},{value:'false',label:tr.no},{value:'unknown',label:tr.unknown}]} error={errors.neutered} />
+    <Select icon={PawPrint} label={tr.sex} bind:value={sex} options={sexOptions} error={errors.sex} />
+    <Select icon={PawPrint} label={tr.neutered} bind:value={neutered} options={[{value:'true',label:tr.yes},{value:'false',label:tr.no},{value:'unknown',label:tr.unknown}]} error={errors.neutered} />
   </div>
   <DateInput label={tr.birthDate} bind:value={birthDate} max={new Date().toLocaleDateString('sv-SE')} hint={tr.birthDateHint} error={errors.birthDate} />
   <Checkbox label={tr.estimate} bind:checked={estimate} />
-  <Input label={tr.color} bind:value={color} error={errors.color} />
-  <MicrochipInput label={tr.microchip} bind:value={microchip} error={errors.microchip} />
-  <Textarea label={tr.clinicalAlerts} bind:value={alerts} placeholder={tr.clinicalAlertsPlaceholder} error={errors.alerts} />
-  <Textarea label={tr.notes} bind:value={notes} error={errors.notes} />
+  <Input icon={Palette} label={tr.color} bind:value={color} error={errors.color} />
+  <MicrochipInput icon={ScanLine} label={tr.microchip} bind:value={microchip} error={errors.microchip} />
+  <Textarea icon={TriangleAlert} label={tr.clinicalAlerts} bind:value={alerts} placeholder={tr.clinicalAlertsPlaceholder} error={errors.alerts} />
+  <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} error={errors.notes} />
   {#if errors.form}<p role="alert" class="text-danger">{errors.form}</p>{/if}
   <div class="mt-2 flex justify-end gap-2"><Button variant="secondary" onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving}>{saving ? tr.saving : tr.save}</Button></div>
 </form>

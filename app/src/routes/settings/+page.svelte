@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { ExternalLink, Settings2, Moon, Stethoscope, ShieldCheck, Import, RefreshCw, Info, Upload, MessageCircle } from '@lucide/svelte';
-  import { PageHeader, IconChip, Card, EmailInput } from '$lib/components/ui';
+  import { User, Building2, IdCard, MapPin, ExternalLink, Settings2, Moon, Stethoscope, ShieldCheck, Import, RefreshCw, Info, Upload, MessageCircle } from '@lucide/svelte';
+  import { PageHeader, IconChip, Card, EmailInput, Input, Textarea } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { applyBranding } from '$lib/branding.svelte';
   import { whatsappPhone } from '$lib/format';
@@ -98,22 +98,22 @@
     <form class="grid gap-4 sm:grid-cols-2" onsubmit={(e) => { e.preventDefault(); if (validateForm(e.currentTarget)) void saveClinic(); }}>
       <fieldset disabled={!clinicReady || clinicBusy} class="contents">
       {#each [['clinic_name', tr.settingsClinicName], ['vet_name', tr.settingsVetName], ['clinic_title', tr.documentsVetTitle], ['clinic_registry_no', tr.documentsRegistry], ['clinic_tax_office', tr.documentsTaxOffice], ['clinic_tax_no', tr.documentsTaxNo]] as [key, label]}
-        <label class="grid gap-1 text-sm">{label}<input class="min-h-11 rounded-md border border-border-control bg-surface px-3 text-fg" bind:value={clinic[key as keyof typeof clinic]} /></label>
+        <Input {label} icon={key === 'vet_name' ? User : key === 'clinic_name' || key === 'clinic_tax_office' ? Building2 : IdCard} bind:value={clinic[key as keyof typeof clinic]} />
       {/each}
       <PhoneInput label={tr.settingsPhone} bind:value={clinic.clinic_phone} />
       <EmailInput label={tr.email} bind:value={clinic.clinic_email} />
-      <label class="grid gap-1 text-sm sm:col-span-2">{tr.settingsAddress}<textarea class="min-h-22 rounded-md border border-border-control bg-surface p-3 text-fg" bind:value={clinic.clinic_address}></textarea></label>
+      <div class="sm:col-span-2"><Textarea label={tr.settingsAddress} icon={MapPin} bind:value={clinic.clinic_address} /></div>
       <div class="grid gap-3 sm:col-span-2">
         <span class="text-sm font-medium">{tr.documentsLogo}</span>
         <input bind:this={logoInput} type="file" class="hidden" accept="image/png,image/jpeg,image/webp" disabled={logoBusy} onchange={selectLogo} />
         <div class="flex flex-wrap items-center gap-4">
-          <button type="button" class="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-control bg-surface-muted" aria-label={tr.brandingDrop} disabled={logoBusy} onclick={() => logoInput.click()} ondragover={e => e.preventDefault()} ondrop={e => { e.preventDefault(); const file = e.dataTransfer?.files[0]; if (file) void prepareLogo(file); }}>
+          <button type="button" class="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-control bg-surface-muted" aria-label={tr.brandingUpload} disabled={logoBusy} onclick={() => logoInput.click()}>
             {#if api.safeClinicLogo(clinic.clinic_logo)}<img src={api.safeClinicLogo(clinic.clinic_logo)} alt={tr.documentsLogo} class="size-24 object-contain" />{:else}<Upload size={24} class="text-fg-muted" />{/if}
           </button>
           <div class="grid gap-2"><div class="flex flex-wrap gap-2">
             <button type="button" class={buttonStyles('secondary')} disabled={logoBusy} onclick={() => logoInput.click()}><Upload size={16} />{clinic.clinic_logo ? tr.brandingChange : tr.brandingUpload}</button>
             {#if clinic.clinic_logo}<button type="button" disabled={logoBusy} class={buttonStyles('ghost')} onclick={() => clinic.clinic_logo = ''}>{tr.brandingRemove}</button>{/if}
-          </div><p class="text-sm text-fg-muted">{tr.brandingDrop}</p></div>
+          </div></div>
         </div>
         <p class="text-sm text-fg-muted">{tr.documentsLogoHint}</p>
       </div>

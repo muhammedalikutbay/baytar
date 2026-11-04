@@ -7,7 +7,7 @@
   import Logo from '$lib/components/brand/Logo.svelte';
   import GlobalSearch from '$lib/components/patients/GlobalSearch.svelte';
 
-  let { title }: { title: string } = $props();
+  let { title: _title }: { title: string } = $props();
   let maximized = $state(false);
   let mac = $state(false);
   let bar: HTMLElement;
@@ -56,11 +56,6 @@
     <span class="brand-logo" data-tauri-drag-region><Logo size={24} /></span>
     <span class="brand-name truncate" title={branding.name || tr.appName} data-tauri-drag-region>{branding.name || tr.appName}</span>
   </div>
-  <div class="breadcrumb" data-tauri-drag-region>
-    <span class="text-fg-subtle" data-tauri-drag-region>{tr.workspace}</span>
-    <span class="text-fg-subtle" data-tauri-drag-region aria-hidden="true">/</span>
-    <span class="truncate font-medium" data-tauri-drag-region>{title}</span>
-  </div>
   <div class="window-search"><GlobalSearch /></div>
   {#if !mac}
     <div class="window-controls" role="group" aria-label={tr.windowControls}>
@@ -79,9 +74,8 @@
   .brand-name { font-size: 14px; font-weight: 700; letter-spacing: -0.03em; }
   .brand-logo { display: flex; }
   .brand-logo :global(svg) { pointer-events: none; }
-  .breadcrumb { display: flex; width: calc(50% - 432px); min-width: 120px; align-items: center; gap: 10px; padding-left: 20px; font-size: 12px; }
-  .breadcrumb > :first-child, .breadcrumb > :nth-child(2) { display: none; }
-  .window-search { position: absolute; left: 50%; width: 32%; max-width: 360px; transform: translateX(-50%); }
+  .window-search { flex: 1; min-width: 0; padding: 0 24px; display: flex; justify-content: center; }
+  .window-search :global(form) { max-width: 560px; }
   .window-search :global(input) { height: 28px; min-height: 28px; border-color: var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface-muted); font-size: 12px; }
   .window-search :global(form > div.grid) { gap: 0; }
   .window-search :global(kbd) { padding-top: 0; padding-bottom: 0; font-size: 10px; }
@@ -95,9 +89,7 @@
   @media (max-width: 1099px) {
     .brand { width: 76px; justify-content: center; padding-left: 0; }
     .brand-name { display: none; }
-    .breadcrumb { width: calc(50% - 276px); }
     .mac .brand { width: 76px; padding-left: 0; }
-    .mac .breadcrumb { width: calc(50% - 354px); }
   }
-  @media (max-width: 639px) { .breadcrumb { display: none; } .window-search { left: 40%; width: 34%; } }
+  @media (max-width: 639px) { .window-search { padding: 0 8px; } }
 </style>

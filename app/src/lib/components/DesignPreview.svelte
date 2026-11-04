@@ -1,11 +1,18 @@
 <script lang="ts">
   import { Archive, Check, Plus, CalendarDays, Syringe, TriangleAlert } from '@lucide/svelte';
+  import RecordPicker from '$lib/components/pickers/RecordPicker.svelte';
+  import type { RecordSelection } from '$lib/api/types';
+  import { Combobox, TimeInput, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import type { ResolvedTheme } from '$lib/theme.svelte';
   import Logo from '$lib/components/brand/Logo.svelte';
   import { PageHeader, IconChip, StatTile, Badge, Button, Card, Checkbox, Dialog, EmptyState, IconButton, Input, Kbd, Select, Separator, Textarea, Toast } from '$lib/components/ui';
 
   let { mode }: { mode: ResolvedTheme } = $props();
+  let vaccine = $state('');
+  let time = $state('09:30');
+  let record = $state<RecordSelection | null>(null);
+  let ownerRecord = $state<RecordSelection | null>(null);
   let name = $state(tr.galleryExampleName as string);
   let checked = $state(true);
   let unchecked = $state(false);
@@ -37,6 +44,18 @@
   </header>
 
   <div class="grid gap-8">
+    <section class="grid gap-4" aria-label={tr.gallerySelection}>
+      <h3 class="type-section">{tr.gallerySelection}</h3>
+      <RequiredNote />
+      <Combobox label={tr.vaccineName} icon={Syringe} bind:value={vaccine} required allowCustom items={[
+        {value:'rabies', label:tr.galleryVaccineRabies, hint:tr.galleryCat, group:tr.vaccination},
+        {value:'mixed', label:tr.galleryVaccineMixed, hint:tr.galleryDog, group:tr.vaccination},
+        {value:'disabled', label:tr.galleryDisabled, disabled:true}
+      ]} />
+      <TimeInput label={tr.time} bind:value={time} optional />
+      <RecordPicker bind:selected={record} />
+      <RecordPicker mode="owner" bind:selected={ownerRecord} />
+    </section>
     <section aria-label={tr.galleryBrand}>
       <h3 class="type-section mb-4">{tr.galleryBrand}</h3>
       <div class="flex items-center gap-5"><Logo size={16} /><Logo size={20} /><Logo size={28} /><Logo size={40} /></div>
