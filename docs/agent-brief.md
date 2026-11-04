@@ -12,8 +12,8 @@ an issue ID, the files you may touch, and acceptance criteria.
   Run cargo from PowerShell (MSVC linker). Keep the `CARGO_TARGET_DIR` you were given; it is shared by all workers,
   so a "Blocking waiting for file lock" message just means waiting. Never kill processes by image name.
 - Run the checks your task lists (usually `cargo test -p baytar-core`, `npm run check` in `app/`). Fix what fails.
-- Finish with exactly one commit on your branch: `<type>(<scope>): <summary>` in English, e.g.
-  `feat(core): schema v1 and migration runner`. Add the line `Refs: <issue>`.
+- Do not commit: the sandbox cannot write to `.git`. Leave your changes in the working tree; the orchestrator
+  reviews and commits them with the message your task names.
 - If you are blocked, stop and explain why instead of guessing at data, credentials or product decisions.
 
 ## Report (your final message)
