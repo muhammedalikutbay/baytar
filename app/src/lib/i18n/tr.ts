@@ -23,7 +23,7 @@ export const tr = {
   flowGoPatient: 'Hasta sayfasına git', flowPickOwner: '1. Sahip seçin',
   flowPatientDetails: '2. Hasta bilgileri', flowDirectoryCounts: '{owners} sahip · {patients} hasta',
   flowMoreActions: 'Diğer işlemler', flowSpeciesVaccines: 'Bu türe uygun', flowAllSpecies: 'Tüm türler',
-  flowUpcoming: 'Yaklaşan', flowNextAppointment: 'Sonraki randevu', flowNextVaccine: 'Sıradaki aşı',
+  flowUpcoming: 'Yaklaşan', flowNextAppointment: 'Sonraki randevu', flowNextVaccine: 'Sıradaki aşı', flowOverdueVaccine: 'Geciken aşı',
   flowLastVisit: 'Son muayene', flowWeightChange: 'Önceki ölçüme göre',
   flowHistory: 'Klinik geçmiş', flowNoUpcoming: 'Yaklaşan kayıt yok.',
   flowCall: 'Ara', flowWhatsApp: 'WhatsApp', flowNoPatient: 'Hastasız kayıt',

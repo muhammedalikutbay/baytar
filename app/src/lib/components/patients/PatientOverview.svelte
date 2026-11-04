@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { localToday } from '$lib/format';
   import { Card, Button } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { formatDate, formatNumber, todayDate } from '$lib/format';
@@ -28,7 +29,7 @@
     {#if loading}<p role="status">{tr.loading}</p>{:else if failed}<p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" onclick={() => refresh++}>{tr.retry}</Button>
     {:else}<div class="grid gap-3 text-sm">
       {#if next}<button type="button" class="min-h-10 text-left text-accent underline" onclick={onappointments}>{tr.flowNextAppointment}: {formatDate(next.startsOn)} {next.startsTime ?? ''} · {next.title}</button>{/if}
-      {#if vaccine}<button type="button" class="min-h-10 text-left text-accent underline" onclick={onvaccines}>{tr.flowNextVaccine}: {vaccine.vaccineName} · {formatDate(vaccine.dueOn)}</button>{/if}
+      {#if vaccine}<button type="button" class={`min-h-10 text-left underline ${vaccine.dueOn < localToday() ? "text-highlight" : "text-accent"}`} onclick={onvaccines}>{vaccine.dueOn < localToday() ? tr.flowOverdueVaccine : tr.flowNextVaccine}: {vaccine.vaccineName} · {formatDate(vaccine.dueOn)}</button>{/if}
       {#if !next && !vaccine}<p class="text-fg-muted">{tr.flowNoUpcoming}</p>{/if}
     </div>{/if}
   </Card>

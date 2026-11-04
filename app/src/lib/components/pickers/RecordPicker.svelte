@@ -101,7 +101,7 @@
               </button>
               <button type="button" tabindex="-1" class="min-h-10 min-w-0 flex-1 px-2 py-2 text-left text-sm hover:bg-surface-muted" onclick={() => { active = index; choose(hit.owner, null); if (!selected) void focusRow(index); }}>
                 <span class="block font-medium">{hit.owner.fullName}</span>
-                <span class="type-caption text-fg-muted">{tr.directoryPetCount.replace('{count}', String(hit.patients.length))} · {formatPhone(hit.owner.phone ?? hit.owner.phoneRaw)}</span>
+                <span class="type-caption text-fg-muted">{[tr.directoryPetCount.replace('{count}', String(hit.patients.length)), formatPhone(hit.owner.phone ?? hit.owner.phoneRaw)].filter(Boolean).join(' · ')}</span>
               </button>
             </div>
             {#if expanded.has(hit.owner.id)}

@@ -1,5 +1,6 @@
 <script lang="ts" module>
   export type HomeDialog = 'owner' | 'patient' | 'visit' | 'vaccine' | 'collect' | 'appointment';
+  let ownerStage = $state<'owner' | 'patient'>('owner');
 </script>
 
 <script lang="ts">
@@ -45,9 +46,9 @@
 
 <Dialog bind:open={() => dialog !== null, value => { if (!value) dialog = null; }}
   wide={dialog === 'visit' && !!picked?.patient}
-  title={dialog === 'visit' && picked?.patient ? tr.visit + ' — ' + picked.patient.name : dialog ? titles[dialog] : ''}
+  title={dialog === 'visit' && picked?.patient ? tr.visit + ' — ' + picked.patient.name : dialog === 'owner' && ownerStage === 'patient' ? tr.newPatient : dialog ? titles[dialog] : ''}
   description={dialog === 'visit' && picked ? tr.visitFormDescription : dialog ? descriptions[dialog] : ''}>
-  {#if dialog === 'owner'}<OwnerForm {onchanged} onsaved={done} oncancel={() => dialog = null} />
+  {#if dialog === 'owner'}<OwnerForm bind:stage={ownerStage} {onchanged} onsaved={done} oncancel={() => dialog = null} />
   {:else if dialog === 'patient'}<NewPatientFlow ondone={done} onchanged={onchanged} />
   {:else if dialog === 'appointment'}<AppointmentForm {date} onsaved={done} oncancel={() => dialog = null} />
   {:else if dialog === 'vaccine'}<VaccinationForm mode="give" onsaved={done} oncancel={() => dialog = null} />

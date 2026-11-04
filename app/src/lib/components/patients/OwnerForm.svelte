@@ -7,7 +7,9 @@
   import { tr } from '$lib/i18n/tr';
   import * as owners from '$lib/api/owners';
   import type { Owner, ApiError } from '$lib/api/types';
-  let { owner, onsaved, oncancel, oncreated, onchanged = () => {} }: { owner?: Owner; onsaved: (owner: Owner) => void; oncancel: () => void; oncreated?: (owner: Owner) => void; onchanged?: () => void } = $props();
+  // `stage` lets the parent dialog retitle itself while the follow-up adds a pet to the new owner.
+  let { owner, onsaved, oncancel, oncreated, onchanged = () => {}, stage = $bindable('owner') }: { owner?: Owner; onsaved: (owner: Owner) => void; oncancel: () => void; oncreated?: (owner: Owner) => void; onchanged?: () => void; stage?: 'owner' | 'patient' } = $props();
+  $effect(() => { stage = addingPatient ? 'patient' : 'owner'; });
   // Each dialog mounts a fresh draft so refreshes cannot overwrite typing.
   const initial = untrack(() => owner);
   let created = $state<Owner | null>(null), addingPatient = $state(false);

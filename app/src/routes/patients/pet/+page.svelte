@@ -97,7 +97,7 @@
         ]} />
       {/snippet}
     </PageHeader>
-    <div class="flex items-center gap-3"><PatientAvatar patientId={patient.id} species={patient.species} name={patient.name} revision={historyRevision} />{#if patient.deceasedOn}<Badge>{tr.clinicalDeceased} · {formatDate(patient.deceasedOn)}</Badge>{/if}</div>
+    <div class="flex items-center gap-3"><PatientAvatar patientId={patient.id} species={patient.species} name={patient.name} revision={historyRevision} large fallback={false} />{#if patient.deceasedOn}<Badge>{tr.clinicalDeceased} · {formatDate(patient.deceasedOn)}</Badge>{/if}</div>
     <PatientOverview patientId={patient.id} revision={historyRevision} onappointments={() => tab = 'appointments'} onvaccines={() => tab = 'vaccines'} />
     {#if patient.alerts?.trim()}<div role="alert" class="flex items-start gap-3 rounded-md border border-highlight p-4 text-highlight"><TriangleAlert size={20} aria-hidden="true" class="mt-0.5 shrink-0" /><div><p class="type-caption">{tr.clinicalAlerts}</p><p class="whitespace-pre-wrap break-words">{patient.alerts}</p></div></div>{/if}
     <Card><dl class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

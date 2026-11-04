@@ -14,12 +14,12 @@
   ] as const;
 </script>
 
-<section aria-label={tr.cockpitQuickActions} class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+<section aria-label={tr.cockpitQuickActions} class="grid grid-cols-2 gap-3 md:grid-cols-3 2xl:grid-cols-6">
   {#each actions as action (action.id)}
     <button type="button" onclick={() => onaction(action.id)}
       class="flex min-h-20 items-center gap-3 rounded-lg border border-border bg-surface p-4 text-left font-medium hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2">
       <IconChip icon={action.icon} tone={action.tone} />
-      <span>{action.label}</span>
+      <span class="whitespace-nowrap">{action.label}</span>
     </button>
   {/each}
 </section>

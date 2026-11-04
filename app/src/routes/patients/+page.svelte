@@ -43,6 +43,7 @@
     replaceState(url, page.state);
   }
   function saved(owner: Owner) { open = false; void goto(`/patients/owner?id=${owner.id}`); }
+  let ownerStage = $state<'owner' | 'patient'>('owner');
 </script>
 
 <div class="grid gap-8">
@@ -69,8 +70,8 @@
     <Button variant="secondary" disabled={!more} onclick={() => offset += size}>{tr.next}</Button>
   </nav>{/if}
 </div>
-<Dialog bind:open title={tr.newOwner} description={tr.ownerFormDescription}>
-  {#if open}<OwnerForm onchanged={() => refresh++} onsaved={saved} oncancel={() => open = false} />{/if}
+<Dialog bind:open title={ownerStage === 'patient' ? tr.newPatient : tr.newOwner} description={ownerStage === 'patient' ? tr.patientFormDescription : tr.ownerFormDescription}>
+  {#if open}<OwnerForm bind:stage={ownerStage} onchanged={() => refresh++} onsaved={saved} oncancel={() => open = false} />{/if}
   {#snippet footer()}{/snippet}
 </Dialog>
 
