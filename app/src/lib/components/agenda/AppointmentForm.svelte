@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { validateForm, parseDecimal } from '$lib/validation';
   import { untrack, tick } from 'svelte';
-  import { Button, Checkbox, Input, Select, Textarea } from '$lib/components/ui';
+  import { Button, Checkbox, Input, Select, Textarea, DateInput, NumberInput } from '$lib/components/ui';
   import * as appointments from '$lib/api/appointments';
   import { search } from '$lib/api/search';
   import { detail } from '$lib/api/owners';
@@ -78,6 +79,7 @@
   });
   async function submit(event: SubmitEvent) {
     event.preventDefault();
+    if (!validateForm(event.currentTarget as HTMLFormElement)) return;
     if (saving || contextLoading) return;
     errors = {};
     if (!title.trim()) errors.title = tr.requiredField;
@@ -104,8 +106,8 @@
 <form bind:this={form} onsubmit={submit} novalidate class="grid gap-4">
   <Input label={tr.appointmentTitle + ' *'} bind:value={title} required error={errors.title} />
   <Select label={tr.appointmentKind} bind:value={kind} options={Object.entries(kindLabels).map(([value, label]) => ({ value, label }))} />
-  <Input label={tr.appointmentDate + ' *'} type="date" min="0001-01-01" max="9999-12-31" bind:value={startsOn} required error={errors.startsOn} />
-  <div class="grid grid-cols-2 gap-4"><Input label={tr.appointmentTime} type="time" bind:value={startsTime} hint={tr.appointmentTimeHint} error={errors.startsTime} /><Input label={tr.appointmentDuration} inputmode="numeric" bind:value={duration} error={errors.durationMin} /></div>
+  <DateInput label={tr.appointmentDate + ' *'} min="0001-01-01" max="9999-12-31" bind:value={startsOn} required error={errors.startsOn} />
+  <div class="grid grid-cols-2 gap-4"><Input label={tr.appointmentTime} type="time" bind:value={startsTime} hint={tr.appointmentTimeHint} error={errors.startsTime} /><NumberInput label={tr.appointmentDuration} bind:value={() => parseDecimal(duration), n => duration = n === null ? '' : String(n)} error={errors.durationMin} min={1} max={2147483647} step={1} unit={tr.inputMinuteUnit} /></div>
   <fieldset class="grid min-w-0 gap-2"><legend class="type-caption mb-2">{tr.appointmentPatient}</legend>
     {#if contextLoading}<p role="status">{tr.loading}</p>{/if}
     {#if contextFailed}<p role="alert" class="text-danger">{tr.loadError}</p>{/if}
@@ -121,7 +123,7 @@
   </fieldset>
   <Textarea label={tr.notes} bind:value={notes} />
   {#if !initial.appointment}<Checkbox label={tr.appointmentRepeat} bind:checked={repeat} />
-    {#if repeat}<div class="grid grid-cols-2 gap-4"><Input label={tr.appointmentCount} inputmode="numeric" bind:value={count} error={errors.count} hint={tr.appointmentRepeatHint} /><Input label={tr.appointmentInterval} inputmode="numeric" bind:value={interval} error={errors.everyDays} /></div>
+    {#if repeat}<div class="grid grid-cols-2 gap-4"><NumberInput label={tr.appointmentCount} bind:value={() => parseDecimal(count), n => count = n === null ? '' : String(n)} error={errors.count} hint={tr.appointmentRepeatHint} min={2} max={52} step={1} /><NumberInput label={tr.appointmentInterval} bind:value={() => parseDecimal(interval), n => interval = n === null ? '' : String(n)} error={errors.everyDays} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} /></div>
       <div aria-live="polite"><h3 class="type-caption">{tr.appointmentPreview}</h3><ol class="mt-2 max-h-40 list-inside list-decimal overflow-y-auto text-fg-muted tabular-nums">{#each preview as day}<li>{formatDate(day)}</li>{/each}</ol></div>
     {/if}
   {:else}<p class="type-caption text-fg-muted">{tr.appointmentEditHint}</p>{/if}

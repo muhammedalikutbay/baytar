@@ -316,6 +316,14 @@ export const tr = {
   updateBackupError: 'Güncelleme öncesi yedek alınamadı. Güncelleme kurulmadı. Boş disk alanını ve yedek klasörünün izinlerini kontrol edip yeniden deneyin.',
   updateInstallError: 'Güncelleme kurulamadı. İnternet bağlantınızı kontrol edip yeniden deneyin.',
   updateRestartError: 'Güncelleme kuruldu. Baytar yeniden başlatılamadı. Yeniden başlatmayı deneyin veya uygulamayı kapatıp açın.',
+  // Validated inputs
+  inputPhoneInvalid: 'Geçerli bir telefon numarası girin',
+  inputEmailInvalid: 'Geçerli bir e-posta adresi girin',
+  inputIdInvalid: 'Geçerli bir 11 haneli TCKN veya 10 haneli VKN girin',
+  inputChipWarning: 'Mikroçip numarası genellikle 15 hanedir. Eski çipler için bu değer kaydedilebilir.',
+  inputNumberInvalid: 'Geçerli bir sayı girin; izin verilen aralık ve adımı kontrol edin',
+  inputCountry: 'Ülke', inputCountrySearch: 'Ülke ara', inputToday: 'Bugün',
+  inputDayUnit: 'gün', inputMinuteUnit: 'dk', inputTemperatureUnit: '°C',
 } as const satisfies Record<string, string>;
 
 export type TranslationKey = keyof typeof tr;

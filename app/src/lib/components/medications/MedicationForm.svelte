@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { validateForm } from '$lib/validation';
   import { onMount, tick, untrack } from 'svelte';
-  import { Button, Input, Select, Textarea } from '$lib/components/ui';
+  import { Button, Input, Select, Textarea, NumberInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { parseDecimal } from '$lib/format';
   import * as medications from '$lib/api/medications';
@@ -31,7 +32,8 @@
   let first = $state<HTMLInputElement | null>(null);
   onMount(() => first?.focus());
   async function submit(event: SubmitEvent) {
-    event.preventDefault(); if (saving) return;
+    event.preventDefault();
+    if (!validateForm(event.currentTarget as HTMLFormElement)) return; if (saving) return;
     errors = {};
     if (!name.trim()) errors.name = tr.requiredField;
     const values = Object.fromEntries(numericFields.map(({ key }) => [key, parseDecimal(numbers[key])])) as Record<NumericKey, number | null>;
@@ -59,7 +61,7 @@
     <Input label={tr.activeIngredient} bind:value={activeIngredient} error={errors.activeIngredient} />
     <Select label={tr.medicationForm} bind:value={form} options={formOptions} error={errors.form} />
     {#each numericFields as field (field.key)}
-      <Input label={field.label} inputmode="decimal" bind:value={numbers[field.key]} error={errors[field.key]} />
+      <NumberInput label={field.label} bind:value={() => parseDecimal(numbers[field.key]), n => numbers[field.key] = n === null ? '' : String(n)} error={errors[field.key]} min={Number.MIN_VALUE} unit={field.key === 'concentrationMgPerMl' ? 'mg/ml' : field.key === 'strengthMgPerUnit' ? 'mg' : 'mg/kg'} />
     {/each}
     <Input label={tr.medicationRoute} bind:value={route} error={errors.route} />
     <Textarea label={tr.medicationNote} bind:value={notes} error={errors.notes} />

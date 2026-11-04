@@ -6,6 +6,8 @@
   import { updater } from '$lib/updater.svelte';
   import * as api from '$lib/api/settings';
   import type { AppInfo, BackupInfo } from '$lib/api/types';
+  import { PhoneInput } from '$lib/components/ui';
+  import { validateForm } from '$lib/validation';
   import Dialog from '$lib/components/ui/Dialog.svelte';
   import { buttonStyles } from '$lib/components/ui/button';
 
@@ -52,9 +54,9 @@
     </div>
   </section>
   <section class="rounded-lg border border-border bg-surface p-5 sm:p-6"><h2 class="type-section">{tr.settingsClinic}</h2>
-    <form class="mt-4 grid gap-4 sm:grid-cols-2" onsubmit={(e) => { e.preventDefault(); void saveClinic(); }}>
+    <form class="mt-4 grid gap-4 sm:grid-cols-2" onsubmit={(e) => { e.preventDefault(); if (validateForm(e.currentTarget)) void saveClinic(); }}>
       {#each [['clinic_name', tr.settingsClinicName], ['vet_name', tr.settingsVetName], ['clinic_phone', tr.settingsPhone], ['clinic_address', tr.settingsAddress]] as [key, label]}
-        <label class="grid gap-1 text-sm">{label}<input class="min-h-11 rounded-md border border-border-control bg-surface px-3 text-fg" bind:value={clinic[key as keyof typeof clinic]} /></label>
+        {#if key === 'clinic_phone'}<PhoneInput {label} bind:value={clinic.clinic_phone} />{:else}<label class="grid gap-1 text-sm">{label}<input class="min-h-11 rounded-md border border-border-control bg-surface px-3 text-fg" bind:value={clinic[key as keyof typeof clinic]} /></label>{/if}
       {/each}
       <div class="sm:col-span-2"><button class={buttonStyles('primary')} type="submit">{tr.save}</button></div>
     </form>

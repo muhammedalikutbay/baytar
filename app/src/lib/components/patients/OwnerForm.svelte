@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { validateForm } from '$lib/validation';
   import { onMount, untrack, tick } from 'svelte';
-  import { Button, Input, Textarea } from '$lib/components/ui';
+  import { Button, Input, Textarea, PhoneInput, EmailInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import * as owners from '$lib/api/owners';
   import type { Owner, ApiError } from '$lib/api/types';
@@ -8,7 +9,7 @@
   // Each dialog mounts a fresh draft so refreshes cannot overwrite typing.
   const initial = untrack(() => owner);
   let fullName = $state(initial?.fullName ?? '');
-  let phone = $state(initial?.phoneRaw ?? initial?.phone ?? '');
+  let phone = $state(initial?.phone ?? initial?.phoneRaw ?? '');
   let phoneAlt = $state(initial?.phoneAlt ?? '');
   let email = $state(initial?.email ?? '');
   let address = $state(initial?.address ?? '');
@@ -19,6 +20,7 @@
   onMount(() => first?.focus());
   async function submit(event: SubmitEvent) {
     event.preventDefault();
+    if (!validateForm(event.currentTarget as HTMLFormElement)) return;
     if (saving) return;
     errors = {};
     if (!fullName.trim()) errors.fullName = tr.requiredField;
@@ -34,9 +36,9 @@
 </script>
 <form onsubmit={submit} novalidate class="grid gap-4">
   <Input label={tr.fullName + ' *'} bind:value={fullName} bind:ref={first} required autocomplete="name" error={errors.fullName} />
-  <Input label={tr.phone} type="tel" bind:value={phone} autocomplete="tel" error={errors.phone} />
-  <Input label={tr.phoneAlt} type="tel" bind:value={phoneAlt} error={errors.phoneAlt} />
-  <Input label={tr.email} type="email" bind:value={email} autocomplete="email" error={errors.email} />
+  <PhoneInput label={tr.phone} bind:value={phone} autocomplete="tel" error={errors.phone} />
+  <PhoneInput label={tr.phoneAlt} bind:value={phoneAlt} error={errors.phoneAlt} />
+  <EmailInput label={tr.email} bind:value={email} autocomplete="email" error={errors.email} />
   <Textarea label={tr.address} bind:value={address} autocomplete="street-address" error={errors.address} />
   <Textarea label={tr.notes} bind:value={notes} error={errors.notes} />
   {#if errors.form}<p role="alert" class="text-danger">{errors.form}</p>{/if}

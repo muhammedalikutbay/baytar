@@ -1,3 +1,4 @@
+import { toE164 } from '$lib/validation';
 import { tr, importIssueKeys } from '$lib/i18n/tr';
 import { createClinicalMock } from './clinical-mock';
 import { calculateMock } from './dose-mock';
@@ -21,7 +22,7 @@ function fold(value: string): string {
     .replace(/[çğıöşü]/g, c => ({ ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u' })[c] ?? c)
     .trim().replace(/\s+/gu, ' ');
 }
-const digits = (value: string | null | undefined) => value?.replace(/[^0-9]/g, '') || null;
+const normalizePhone = (value: string | null | undefined) => value ? toE164(value) || value : null;
 let lastStamp = 0;
 function now() { lastStamp = Math.max(Date.now(), lastStamp + 1); return new Date(lastStamp).toISOString(); }
 let nextId = 1;
@@ -39,8 +40,8 @@ function patientKey(p: Patient) { p.searchText = fold([p.name, p.breed, p.specie
 function ownerCreate(input: NewOwner): Owner {
   required('fullName', input.fullName);
   const stamp = now();
-  const owner: Owner = { id: nextId++, fullName: input.fullName, phone: digits(input.phone), phoneRaw: input.phone ?? null,
-    phoneAlt: digits(input.phoneAlt), email: input.email ?? null, address: input.address ?? null, notes: input.notes ?? null,
+  const owner: Owner = { id: nextId++, fullName: input.fullName, phone: normalizePhone(input.phone), phoneRaw: input.phone ?? null,
+    phoneAlt: normalizePhone(input.phoneAlt), email: input.email ?? null, address: input.address ?? null, notes: input.notes ?? null,
     searchText: '', createdAt: stamp, updatedAt: stamp, deletedAt: null };
   ownerKey(owner); owners.push(owner); return owner;
 }
@@ -48,8 +49,8 @@ function ownerUpdate(id: number, patch: OwnerPatch): Owner {
   const owner = activeOwner(id);
   if (patch.fullName !== undefined) required('fullName', patch.fullName);
   Object.assign(owner, patch);
-  if (patch.phone !== undefined) { owner.phoneRaw = patch.phone; owner.phone = digits(patch.phone); }
-  if (patch.phoneAlt !== undefined) owner.phoneAlt = digits(patch.phoneAlt);
+  if (patch.phone !== undefined) { owner.phoneRaw = patch.phone; owner.phone = normalizePhone(patch.phone); }
+  if (patch.phoneAlt !== undefined) owner.phoneAlt = normalizePhone(patch.phoneAlt);
   owner.updatedAt = now(); ownerKey(owner); return owner;
 }
 function validatePatient(input: NewPatient) {
@@ -105,8 +106,8 @@ function search(query: string, limit: number): SearchHit[] {
   const prefix = (h: SearchHit) => h.owner.searchText.startsWith(query) || h.patients.some(p => p.searchText.startsWith(query));
   return hits.sort((a, b) => Number(prefix(b)) - Number(prefix(a)) || byText(a.owner, b.owner)).slice(0, limit);
 }
-const first = ownerCreate({ fullName: 'Çağrı Şimşek', phone: '0532 111 22 33' });
-const second = ownerCreate({ fullName: 'İpek Öztürk', phone: '0544 222 33 44' });
+const first = ownerCreate({ fullName: 'Çağrı Şimşek', phone: '+905321112233' });
+const second = ownerCreate({ fullName: 'İpek Öztürk', phone: '+905442223344' });
 const third = ownerCreate({ fullName: 'Ayşe Işık' });
 patientCreate({ ownerId: first.id, name: 'Pamuk', species: 'cat', breed: 'Ankara kedisi', sex: 'female', neutered: true, birthDate: '2022-04-12', color: 'Beyaz', microchip: '900108001234567' });
 patientCreate({ ownerId: first.id, name: 'Şimşek', species: 'dog', breed: 'Golden retriever', sex: 'male', neutered: false, birthDate: '2024-09-01', birthDateIsEstimate: true, color: 'Sarı' });

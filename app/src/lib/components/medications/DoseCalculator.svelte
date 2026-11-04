@@ -1,6 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { Card, Input, Select, Button } from '$lib/components/ui';
+  import { Card, Select, Button, NumberInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { formatDate, formatNumber, formatUnits, parseDecimal } from '$lib/format';
   import * as medicationApi from '$lib/api/medications';
@@ -107,15 +107,15 @@
     <p class="text-fg-muted">{tr.doseDisclaimer}</p>
     <Select label={tr.doseMedication} bind:value={selectedId} options={[{ value: '', label: tr.doseManual }, ...catalog.map(m => ({ value: String(m.id), label: m.name }))]} />
     {#if loadError}<div><p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" size="sm" onclick={() => reload++}>{tr.retry}</Button></div>{/if}
-    <Input label={tr.doseWeight} inputmode="decimal" bind:value={weight} disabled={weightLoading} error={errors.weight} hint={recorded ? `${tr.doseWeightDate}: ${formatDate(recorded.visitOn)} · ${formatNumber(recorded.weightKg)} kg` : undefined} />
+    <NumberInput label={tr.doseWeight} bind:value={() => parseDecimal(weight), n => weight = n === null ? '' : String(n)} disabled={weightLoading} error={errors.weight} hint={recorded ? `${tr.doseWeightDate}: ${formatDate(recorded.visitOn)} · ${formatNumber(recorded.weightKg)} kg` : undefined} min={Number.MIN_VALUE} max={1500} unit={'kg'} />
     {#if weightLoading}<p role="status" class="text-fg-muted">{tr.loading}</p>
     {:else if weightError}<div><p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" size="sm" onclick={() => weightReload++}>{tr.retry}</Button></div>
     {:else if patientId !== undefined && !recorded}<p class="type-caption text-fg-muted">{tr.doseNoWeight}</p>{/if}
     <div class="grid gap-4 sm:grid-cols-2">
-      <Input label={tr.doseMinimum} inputmode="decimal" bind:value={minimum} error={errors.minimum} />
-      <Input label={tr.doseMaximum} inputmode="decimal" bind:value={maximum} error={errors.maximum} />
-      <Input label={tr.medicationConcentration} inputmode="decimal" bind:value={concentration} error={errors.concentration} />
-      <Input label={tr.medicationStrength} inputmode="decimal" bind:value={strength} error={errors.strength} />
+      <NumberInput label={tr.doseMinimum} bind:value={() => parseDecimal(minimum), n => minimum = n === null ? '' : String(n)} error={errors.minimum} min={Number.MIN_VALUE} unit={'mg/kg'} />
+      <NumberInput label={tr.doseMaximum} bind:value={() => parseDecimal(maximum), n => maximum = n === null ? '' : String(n)} error={errors.maximum} min={Number.MIN_VALUE} unit={'mg/kg'} />
+      <NumberInput label={tr.medicationConcentration} bind:value={() => parseDecimal(concentration), n => concentration = n === null ? '' : String(n)} error={errors.concentration} min={Number.MIN_VALUE} unit={'mg/ml'} />
+      <NumberInput label={tr.medicationStrength} bind:value={() => parseDecimal(strength), n => strength = n === null ? '' : String(n)} error={errors.strength} min={Number.MIN_VALUE} unit={'mg'} />
     </div>
     <div role="status" aria-live="polite" aria-atomic="true" class="border-t border-border pt-4 tabular-nums">
       {#if calculating}<p class="text-fg-muted">{tr.loading}</p>
