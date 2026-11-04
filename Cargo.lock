@@ -171,8 +171,10 @@ dependencies = [
 name = "baytar-cli"
 version = "0.2.0"
 dependencies = [
+ "anyhow",
  "baytar-core",
  "clap",
+ "serde_json",
 ]
 
 [[package]]
@@ -182,6 +184,8 @@ dependencies = [
  "chrono",
  "log",
  "rusqlite",
+ "serde",
+ "serde_json",
  "tempfile",
  "thiserror 2.0.21",
 ]

@@ -8,3 +8,5 @@ repository.workspace = true
 [dependencies]
 baytar-core = { path = "../baytar-core" }
 clap.workspace = true
+anyhow.workspace = true
+serde_json.workspace = true
