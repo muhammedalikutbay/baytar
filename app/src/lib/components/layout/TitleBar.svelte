@@ -79,7 +79,7 @@
   .brand-logo { display: flex; }
   .brand-logo :global(svg) { pointer-events: none; }
   .breadcrumb { display: flex; width: calc(50% - 432px); min-width: 120px; align-items: center; gap: 10px; padding-left: 20px; font-size: 12px; }
-  .breadcrumb > :first-child { display: none; }
+  .breadcrumb > :first-child, .breadcrumb > :nth-child(2) { display: none; }
   .window-search { position: absolute; left: 50%; width: 32%; max-width: 360px; transform: translateX(-50%); }
   .window-search :global(input) { height: 28px; min-height: 28px; border-color: var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface-muted); font-size: 12px; }
   .window-search :global(form > div.grid) { gap: 0; }
