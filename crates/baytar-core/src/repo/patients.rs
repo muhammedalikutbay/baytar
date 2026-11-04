@@ -172,6 +172,27 @@ fn validate(input: &NewPatient) -> Result<()> {
     }
     Ok(())
 }
+/// Record a death without deleting the patient's clinical history.
+pub fn mark_deceased(conn: &Connection, id: i64, deceased_on: &str) -> Result<Patient> {
+    let date = super::date("deceasedOn", deceased_on)?;
+    let patient = get(conn, id)?;
+    if date > chrono::Local::now().date_naive()
+        || patient
+            .birth_date
+            .as_deref()
+            .is_some_and(|birth| deceased_on < birth)
+    {
+        return Err(invalid("deceasedOn", "must be between birth and today"));
+    }
+    update(
+        conn,
+        id,
+        PatientPatch {
+            deceased_on: Some(Some(deceased_on.into())),
+            ..Default::default()
+        },
+    )
+}
 fn search_text(input: &NewPatient) -> String {
     fold(&format!(
         "{} {} {}",

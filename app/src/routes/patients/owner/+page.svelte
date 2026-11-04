@@ -9,7 +9,8 @@
   import type { OwnerDetail } from '$lib/api/types';
   import OwnerForm from '$lib/components/patients/OwnerForm.svelte';
   import PatientForm from '$lib/components/patients/PatientForm.svelte';
-  import SpeciesIcon from '$lib/components/patients/SpeciesIcon.svelte';
+  import PatientAvatar from '$lib/components/patients/PatientAvatar.svelte';
+  import PatientStatus from '$lib/components/patients/PatientStatus.svelte';
   let detail = $state<OwnerDetail | null>(null);
   let loading = $state(true);
   let failed = $state(false);
@@ -67,8 +68,8 @@
     </dl></Card>
     <Card><h2 class="type-section mb-4">{tr.pets}</h2>
       {#if detail.patients.length}<ul class="divide-y divide-border">
-        {#each detail.patients as pet (pet.id)}<li><a href={`/patients/pet?id=${pet.id}`} class="flex min-h-16 flex-wrap items-center gap-3 rounded-sm p-3 hover:bg-surface-muted">
-          <SpeciesIcon species={pet.species} /><span class="min-w-28 font-medium">{pet.name}</span><span class="flex-1 text-fg-muted">{tr[pet.species]}{pet.breed ? ` · ${pet.breed}` : ''}</span>{#if pet.birthDate}<span class="text-fg-muted">{formatAge(pet.birthDate, pet.birthDateIsEstimate)}</span>{/if}
+        {#each detail.patients as pet (pet.id)}<li><a href={`/patients/pet?id=${pet.id}`} class={`flex min-h-16 flex-wrap items-center gap-3 rounded-sm p-3 hover:bg-surface-muted ${pet.deceasedOn ? 'opacity-70' : ''}`}>
+          <PatientAvatar patientId={pet.id} species={pet.species} name={pet.name} /><span class="min-w-28 font-medium">{pet.name}</span><PatientStatus alerts={pet.alerts} deceasedOn={pet.deceasedOn} /><span class="flex-1 text-fg-muted">{tr[pet.species]}{pet.breed ? ` · ${pet.breed}` : ''}</span>{#if pet.birthDate}<span class="text-fg-muted">{formatAge(pet.birthDate, pet.birthDateIsEstimate)}</span>{/if}
         </a></li>{/each}
       </ul>{:else}<EmptyState icon={PawPrint} title={tr.noPets} description={tr.noPetsDescription} />{/if}
     </Card>

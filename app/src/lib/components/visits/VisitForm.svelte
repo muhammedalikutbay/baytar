@@ -1,13 +1,18 @@
 <script lang="ts">
   import { validateForm } from '$lib/validation';
   import { onMount, untrack, tick } from 'svelte';
-  import { Button, Input, Textarea, Select, DateInput, NumberInput } from '$lib/components/ui';
+  import { Button, Input, Textarea, Select, DateInput, NumberInput, Dialog } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { isValidDate, localToday, parseDecimal } from '$lib/format';
   import * as visits from '$lib/api/visits';
   import * as prescriptions from '$lib/api/prescriptions';
   import * as medications from '$lib/api/medications';
-  import type { Visit, Medication, PrescriptionItem } from '$lib/api/types';
+  import type { Visit, Medication, PrescriptionItem, Patient, VisitTemplate, AttachmentKind } from '$lib/api/types';
+  import * as patients from '$lib/api/patients';
+  import * as attachments from '$lib/api/attachments';
+  import VitalFields from './VitalFields.svelte';
+  import TemplatePicker from './TemplatePicker.svelte';
+  import PatientAttachments from '$lib/components/patients/PatientAttachments.svelte';
   import DoseCalculator from '$lib/components/medications/DoseCalculator.svelte';
   import { formatUnits } from '$lib/format';
 
@@ -26,6 +31,33 @@
   let weight = $state(String(initial?.weightKg ?? '').replace('.', ','));
   let temperature = $state(String(initial?.temperatureC ?? '').replace('.', ','));
   let notes = $state(initial?.notes ?? '');
+  let heartRate = $state<number | null>(initial?.heartRateBpm ?? null);
+  let respRate = $state<number | null>(initial?.respRateBpm ?? null);
+  let bodyCondition = $state<number | null>(initial?.bodyCondition ?? null);
+  let patient = $state<Patient | null>(null);
+  let pendingTemplate = $state<VisitTemplate | null>(null);
+  let overwriteOpen = $state(false);
+  let fileKind = $state<AttachmentKind>('document');
+  let pendingFiles = $state<{ path: string; kind: AttachmentKind }[]>([]);
+  let fileError = $state('');
+  function applyTemplate(template: VisitTemplate, overwrite: boolean) {
+    if (template.reason?.trim() && (overwrite || !reason.trim())) reason = template.reason;
+    if (template.findings?.trim() && (overwrite || !findings.trim())) findings = template.findings;
+    if (template.diagnosis?.trim() && (overwrite || !diagnosis.trim())) diagnosis = template.diagnosis;
+    if (template.treatment?.trim() && (overwrite || !treatment.trim())) treatment = template.treatment;
+    if (template.notes?.trim() && (overwrite || !notes.trim())) notes = template.notes;
+    overwriteOpen = false; pendingTemplate = null;
+  }
+  function chooseTemplate(template: VisitTemplate) {
+    if ([[template.reason, reason], [template.findings, findings], [template.diagnosis, diagnosis], [template.treatment, treatment], [template.notes, notes]].some(([source, target]) => source?.trim() && target?.trim())) {
+      pendingTemplate = template; overwriteOpen = true;
+    } else applyTemplate(template, false);
+  }
+  async function pickFiles() {
+    fileError = '';
+    try { const paths = await attachments.pickPaths(); pendingFiles = [...pendingFiles, ...paths.map(path => ({ path, kind: fileKind }))]; }
+    catch { fileError = tr.clinicalFileError; }
+  }
   interface Line {
     key: number; id?: number; medicationId: string; name: string; doseMg: string; doseMl: string;
     doseText: string; frequency: string; duration: string; notes: string;
@@ -49,8 +81,8 @@
   async function load() {
     loading = true; loadFailed = false;
     try {
-      const [list, items] = await Promise.all([medications.list(), initial ? prescriptions.listByVisit(initial.id) : Promise.resolve([])]);
-      catalog = list; lines = items.map(draft);
+      const [list, items, pet] = await Promise.all([medications.list(), initial ? prescriptions.listByVisit(initial.id) : Promise.resolve([]), patients.get(patientId)]);
+      catalog = list; lines = items.map(draft); patient = pet;
     } catch { loadFailed = true; } finally { loading = false; }
   }
   onMount(() => { void load(); });
@@ -87,7 +119,7 @@
     try {
       const input = { patientId, visitOn, visitTime: visitTime || null, reason: reason.trim() || null,
         findings: findings.trim() || null, diagnosis: diagnosis.trim() || null, treatment: treatment.trim() || null,
-        weightKg: parseDecimal(weight), temperatureC: parseDecimal(temperature), notes: notes.trim() || null };
+        weightKg: parseDecimal(weight), temperatureC: parseDecimal(temperature), heartRateBpm: heartRate, respRateBpm: respRate, bodyCondition, notes: notes.trim() || null };
       savedVisit = savedVisit ? await visits.update(savedVisit.id, input) : await visits.create(input);
       // Keep returned IDs immediately: a retry after an interrupted multi-command save must not duplicate records.
       partial = true;
@@ -100,6 +132,11 @@
         line.id = saved.id;
       }
       while (removed.length) { await prescriptions.softDelete(removed[0]); removed.shift(); }
+      while (pendingFiles.length) {
+        const file = pendingFiles[0];
+        await attachments.addFromPath(patientId, savedVisit.id, file.kind, file.path);
+        pendingFiles = pendingFiles.slice(1);
+      }
       partial = false; onsaved(savedVisit);
     } catch { errors.form = partial ? tr.partialVisitSave : tr.saveError; }
     finally { saving = false; }
@@ -112,14 +149,13 @@
       <DateInput label={tr.date + ' *'} bind:value={visitOn} required error={errors.visitOn} />
       <Input label={tr.time} type="time" bind:value={visitTime} error={errors.visitTime} />
     </div>
-    <Textarea label={tr.reason} bind:value={reason} />
-    <Textarea label={tr.findings} bind:value={findings} />
-    <Textarea label={tr.diagnosis} bind:value={diagnosis} />
-    <Textarea label={tr.treatment} bind:value={treatment} />
-    <div class="grid gap-4 sm:grid-cols-2">
-      <NumberInput label={tr.weight} bind:value={() => parseDecimal(weight), n => weight = n === null ? '' : String(n)} error={errors.weight} min={Number.MIN_VALUE} max={1500} unit={'kg'} />
-      <NumberInput label={tr.temperature} bind:value={() => parseDecimal(temperature), n => temperature = n === null ? '' : String(n)} error={errors.temperature} unit={tr.inputTemperatureUnit} />
-    </div>
+    <TemplatePicker onselect={chooseTemplate} />
+    <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapSubjective}</h3><Textarea label={tr.reason} bind:value={reason} /></section>
+    <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapObjective}</h3>
+      <VitalFields species={patient?.species} bind:weightKg={() => parseDecimal(weight), n => weight = n === null ? '' : String(n)} bind:temperatureC={() => parseDecimal(temperature), n => temperature = n === null ? '' : String(n)} bind:heartRateBpm={heartRate} bind:respRateBpm={respRate} bind:bodyCondition />
+      <Textarea label={tr.findings} bind:value={findings} /></section>
+    <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapAssessment}</h3><Textarea label={tr.diagnosis} bind:value={diagnosis} /></section>
+    <section class="grid gap-3 border-t border-border pt-4"><h3 class="type-section text-accent">{tr.clinicalSoapPlan}</h3><Textarea label={tr.treatment} bind:value={treatment} /></section>
     <Textarea label={tr.notes} bind:value={notes} />
     <section class="grid gap-4 border-t border-border pt-4" aria-label={tr.prescription}>
       <h3 class="type-section">{tr.prescription}</h3>
@@ -160,6 +196,17 @@
         <Button variant="secondary" onclick={() => lines = [...lines, draft()]}>{tr.addPrescription}</Button>
       {/if}
     </section>
+    <section class="grid gap-3 border-t border-border pt-4" aria-label={tr.clinicalFiles}>
+      <h3 class="type-section text-accent">{tr.clinicalFiles}</h3>
+      {#if initial}<PatientAttachments {patientId} visitId={initial.id} allowDrop={false} />{/if}
+      <Select label={tr.clinicalKind} bind:value={fileKind} options={[
+        { value: 'document', label: tr.clinicalKindDocument }, { value: 'photo', label: tr.clinicalKindPhoto }, { value: 'lab', label: tr.clinicalKindLab }, { value: 'imaging', label: tr.clinicalKindImaging }, { value: 'other', label: tr.clinicalKindOther }
+      ]} />
+      <p class="type-caption text-fg-muted">{tr.clinicalVisitFilesHint} {tr.clinicalFileLimit}</p>
+      <Button variant="secondary" onclick={pickFiles}>{tr.clinicalAddFiles}</Button>
+      {#if pendingFiles.length}<ul aria-label={tr.clinicalPendingFiles} class="grid gap-2">{#each pendingFiles as file, index}<li class="flex items-center justify-between gap-2"><span class="truncate">{tr.clinicalPendingFiles} {index + 1}</span><Button variant="ghost" size="sm" onclick={() => pendingFiles = pendingFiles.filter((_, i) => i !== index)}>{tr.removeLine}</Button></li>{/each}</ul>{/if}
+      {#if fileError}<p role="alert" class="text-danger">{fileError}</p>{/if}
+    </section>
   </fieldset>
   {#if errors.form}<p role="alert" class="text-danger">{errors.form}</p>{/if}
   <div class="flex justify-end gap-2">
@@ -167,3 +214,6 @@
     <Button type="submit" disabled={saving || loading || loadFailed}>{saving ? tr.saving : tr.save}</Button>
   </div>
 </form>
+<Dialog bind:open={overwriteOpen} title={tr.clinicalTemplateOverwrite} description={tr.clinicalTemplateOverwriteDescription}>
+  {#snippet footer()}<Button variant="secondary" onclick={() => overwriteOpen = false}>{tr.cancel}</Button><Button variant="secondary" onclick={() => { if (pendingTemplate) applyTemplate(pendingTemplate, false); }}>{tr.clinicalFillEmpty}</Button><Button onclick={() => { if (pendingTemplate) applyTemplate(pendingTemplate, true); }}>{tr.clinicalOverwrite}</Button>{/snippet}
+</Dialog>

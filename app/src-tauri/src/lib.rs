@@ -1,3 +1,4 @@
+mod clinical;
 mod import;
 mod settings;
 
@@ -675,7 +676,24 @@ pub fn run() {
             patient_update,
             patient_delete,
             patient_restore,
-            search
+            search,
+            clinical::visit_templates_list,
+            clinical::visit_template_get,
+            clinical::visit_template_create,
+            clinical::visit_template_update,
+            clinical::visit_template_delete,
+            clinical::visit_template_restore,
+            clinical::attachments_list,
+            clinical::attachment_add_from_path,
+            clinical::attachment_rename,
+            clinical::attachment_delete,
+            clinical::attachment_restore,
+            clinical::attachment_read_bytes,
+            clinical::attachment_thumbnail,
+            clinical::attachment_open,
+            clinical::attachment_export,
+            clinical::patient_photo,
+            clinical::patient_mark_deceased
         ])
         .run(tauri::generate_context!())
         .expect("error while running Baytar");

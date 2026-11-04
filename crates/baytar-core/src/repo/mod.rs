@@ -78,10 +78,12 @@ impl From<rusqlite::Error> for RepoError {
 }
 
 pub mod appointments;
+pub mod attachments;
 pub mod medications;
 pub mod prescriptions;
 pub mod vaccinations;
 pub mod vaccine_types;
+pub mod visit_templates;
 pub mod visits;
 
 pub(crate) fn date(field: &str, value: &str) -> Result<chrono::NaiveDate> {

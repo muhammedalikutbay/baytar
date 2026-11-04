@@ -1,6 +1,8 @@
 import { toE164 } from '$lib/validation';
 import { tr, importIssueKeys } from '$lib/i18n/tr';
 import { createClinicalMock } from './clinical-mock';
+import { createAttachmentsMock } from './attachments-mock';
+import { createTemplatesMock } from './templates-mock';
 import { calculateMock } from './dose-mock';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import type { ImportPreview, ImportReport, ApiError, CommandMap, ListQuery, NewOwner, NewPatient, Owner, OwnerPatch, Patient, PatientPatch, SearchHit } from './types';
@@ -9,7 +11,7 @@ export const startupStatus = () => call('startup_status', {});
 export async function call<K extends keyof CommandMap>(command: K, args: CommandMap[K]['args']): Promise<CommandMap[K]['result']> {
   if (isTauri()) return invoke<CommandMap[K]['result']>(command, args);
   // Clone replies so callers cannot mutate the mock's stored rows through returned references.
-  return structuredClone(mock(command, args)) as CommandMap[K]['result'];
+  return structuredClone(await mock(command, args)) as CommandMap[K]['result'];
 }
 function fail(kind: ApiError['kind'], message: string, field?: string): never {
   throw { kind, message, ...(field ? { field } : {}) } satisfies ApiError;
@@ -117,6 +119,8 @@ patientCreate({ ownerId: second.id, name: 'Boncuk', species: 'bird' });
 patientCreate({ ownerId: third.id, name: 'Fındık', species: 'rabbit' });
 
 const clinical = createClinicalMock({ patientGet, ownerGet, fail, fold, now });
+const files = createAttachmentsMock({ patientGet, visitGet: id => clinical.call('visit_get', { id }) as import('./types').Visit, fail, now });
+const templates = createTemplatesMock({ fail, now });
 
 // Synthetic vaccination examples, relative to the local day for useful previews.
 const demoDate = (offset: number) => {
@@ -174,6 +178,14 @@ function mockPreview(path: string): ImportPreview {
 }
 
 function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['args']): unknown {
+  if (files.has(command)) return files.call(command, args);
+  if (templates.has(command)) return templates.call(command, args);
+  if (command === 'patient_mark_deceased') {
+    const { id, date } = args as CommandMap['patient_mark_deceased']['args'];
+    const patient = patientGet(id);
+    if (date > new Date().toLocaleDateString('sv-SE') || (patient.birthDate && date < patient.birthDate)) fail('invalid', 'Must be between birth and today.', 'deceasedOn');
+    return patientUpdate(id, { deceasedOn: date });
+  }
   if (clinical.has(command)) return clinical.call(command, args);
   switch (command) {
     case 'settings_get_all': return settingValues;

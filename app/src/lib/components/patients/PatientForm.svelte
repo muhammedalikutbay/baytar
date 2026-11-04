@@ -19,6 +19,7 @@
   let color = $state(initial?.color ?? '');
   let microchip = $state(initial?.microchip ?? '');
   let notes = $state(initial?.notes ?? '');
+  let alerts = $state(initial?.alerts ?? '');
   let errors = $state<Record<string, string>>({});
   let saving = $state(false);
   let first = $state<HTMLInputElement | null>(null);
@@ -35,9 +36,9 @@
     saving = true;
     const input = { ownerId, name: name.trim(), species: species as Species, speciesNote: speciesNote.trim() || null,
       breed: breed.trim() || null, sex: sex as Sex, neutered: neutered === 'unknown' ? null : neutered === 'true',
-      birthDate: birthDate || null, birthDateIsEstimate: estimate, color: color.trim() || null, microchip: microchip.trim() || null, notes: notes.trim() || null };
+      birthDate: birthDate || null, birthDateIsEstimate: estimate, color: color.trim() || null, microchip: microchip.trim() || null, notes: notes.trim() || null, alerts: alerts.trim() || null };
     try { onsaved(patient ? await patients.update(patient.id, input) : await patients.create(input)); }
-    catch (error) { const e = error as ApiError; errors = e?.field && ["name","species","speciesNote","breed","sex","neutered","birthDate","color","microchip","notes"].includes(e.field) ? { [e.field]: tr.invalidField } : { form: tr.saveError }; }
+    catch (error) { const e = error as ApiError; errors = e?.field && ["name","species","speciesNote","breed","sex","neutered","birthDate","color","microchip","notes","alerts"].includes(e.field) ? { [e.field]: tr.invalidField } : { form: tr.saveError }; }
     finally { saving = false; }
   }
 </script>
@@ -54,6 +55,7 @@
   <Checkbox label={tr.estimate} bind:checked={estimate} />
   <Input label={tr.color} bind:value={color} error={errors.color} />
   <MicrochipInput label={tr.microchip} bind:value={microchip} error={errors.microchip} />
+  <Textarea label={tr.clinicalAlerts} bind:value={alerts} placeholder={tr.clinicalAlertsPlaceholder} error={errors.alerts} />
   <Textarea label={tr.notes} bind:value={notes} error={errors.notes} />
   {#if errors.form}<p role="alert" class="text-danger">{errors.form}</p>{/if}
   <div class="mt-2 flex justify-end gap-2"><Button variant="secondary" onclick={oncancel}>{tr.cancel}</Button><Button type="submit" disabled={saving}>{saving ? tr.saving : tr.save}</Button></div>

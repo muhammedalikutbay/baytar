@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Stethoscope, Syringe, CalendarDays, ChevronDown } from '@lucide/svelte';
   import { Button, Card, Dialog, EmptyState, Toast } from '$lib/components/ui';
+  import VisitVitals from '$lib/components/visits/VisitVitals.svelte';
   import VisitForm from '$lib/components/visits/VisitForm.svelte';
   import HistoryRecordForm from './HistoryRecordForm.svelte';
   import { tr } from '$lib/i18n/tr';
@@ -132,7 +133,7 @@
                   {#if entry.kind === 'visit'}<Stethoscope size={18} class="shrink-0 text-fg-muted" aria-hidden="true" />
                   {:else if entry.kind === 'vaccination'}<Syringe size={18} class="shrink-0 text-fg-muted" aria-hidden="true" />
                   {:else}<CalendarDays size={18} class="shrink-0 text-fg-muted" aria-hidden="true" />{/if}
-                  <div class="min-w-0 flex-1"><p class="type-caption text-fg-muted"><time datetime={date(entry)}>{formatDate(date(entry))}</time>{time(entry) ? ` · ${time(entry)}` : ''} · {tr[entry.kind]}</p><p class="truncate">{summary(entry)}</p></div>
+                  <div class="min-w-0 flex-1"><p class="type-caption text-fg-muted"><time datetime={date(entry)}>{formatDate(date(entry))}</time>{time(entry) ? ` · ${time(entry)}` : ''} · {tr[entry.kind]}</p><p class="truncate">{summary(entry)}</p>{#if entry.kind === 'visit'}<VisitVitals visit={entry.record} />{/if}</div>
                   <ChevronDown size={16} class="shrink-0 text-fg-muted" aria-hidden="true" />
                 </summary>
                 <div class="mt-3 grid gap-4 pl-8">
