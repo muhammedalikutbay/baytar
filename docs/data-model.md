@@ -1,9 +1,10 @@
-# Data model: schema v2
+# Data model: schema v4
 
 The canonical schema is the ordered migration list in `crates/baytar-core/src/db/migrations/`:
-`0001_init.sql` (schema v1, the first public schema) and `0002_v2.sql` (schema v2, the current
-one, `PRAGMA user_version` = 2). The migration runner applies all pending migrations in one
-transaction, backs up an existing versioned database before upgrading it, and checks database
+`0001_init.sql` (schema v1, the first public schema), `0002_v2.sql` (schema v2), `0003_catalog_seed.sql`
+(schema v3, built-in catalogs) and `0004_reminders.sql` (schema v4, the current one, `PRAGMA user_version` = 4;
+it only adds the `reminder_contacts` table and its indexes). The migration runner applies all pending
+migrations in one transaction, backs up an existing versioned database before upgrading it, and checks database
 and foreign-key integrity before committing. A fresh database needs no backup. Legacy
 databases must be copied and read separately, never migrated in place.
 
@@ -384,6 +385,28 @@ Reusable text to prefill a visit. Includes all four shared columns.
 | `name` | TEXT required | Template name. |
 | `reason`, `findings`, `diagnosis`, `treatment`, `notes` | TEXT | Prefill text for the matching visit fields. |
 
+### reminder_contacts
+
+Append-only contact log of the reminders centre (schema v4, `0004_reminders.sql`). Reminder rows
+themselves are never stored: they are derived on demand from vaccinations and planned vaccine
+appointments, appointments, receivables and follow-up visit appointments. This table only
+remembers who was contacted about which reminder, so it is not repeated the same day. It has no
+`deleted_at` or `updated_at`; entries are never edited.
+
+| Column | Type / requirement | Meaning |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY | Local ID. |
+| `kind` | TEXT required | `vaccine`, `appointment`, `debt` or `followup`. |
+| `ref_key` | TEXT required, not blank | Stable key of the reminder, always prefixed by its kind: `vaccine:<patientId>:<vaccineTypeId>:<dueOn>` (`n-<name>` instead of the type id for a dose without catalog type), `appointment:<id>`, `debt:<ownerId>:<YYYY-MM-DD of oldest unpaid charge>`, `followup:<appointmentId>`. A debt key changes when the oldest unpaid charge is paid, which starts a fresh reminder. |
+| `owner_id` | INTEGER required FK -> owners | Who was contacted (archived owners are allowed). |
+| `channel` | TEXT required | `whatsapp`, `phone` or `other`. |
+| `contacted_at` | TEXT required, UTC now | When the contact was recorded. |
+| `note` | TEXT | Optional free text. |
+
+The message templates are plain `settings` rows: `reminder_template_vaccine`,
+`reminder_template_appointment`, `reminder_template_debt` and `reminder_template_followup`
+(blank or missing means the shipped default).
+
 ### settings
 
 Local application preferences. No shared audit columns or numeric ID.
@@ -447,6 +470,7 @@ vaccine_types 1 <-- N appointments      (planned vaccine, optional)
 vaccinations 1 <-- N appointments       (given vaccination, optional)
 owners       1 <-- N charges
 owners       1 <-- N payments
+owners       1 <-- N reminder_contacts
 patients     1 <-- N charges            (optional)
 visits       1 <-- N charges            (optional)
 services     1 <-- N charges            (optional)
@@ -490,6 +514,7 @@ prescription items preserve the historical label even when catalogs change.
 | payments | `paid_on` | Daily cash summary. |
 | attachments | `patient_id`, `visit_id` | Files of a patient or visit. |
 | prescription_items | `visit_id` | Encounter prescription lines. |
+| reminder_contacts | `ref_key, contacted_at`, `owner_id` | Last contact of a reminder; contacts of an owner. |
 | legacy_map | UNIQUE `source_sha256, source_table, source_id` | Import idempotency. |
 
 Primary keys also provide identity lookup. Search-text indexes are ordinary

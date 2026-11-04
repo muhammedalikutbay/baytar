@@ -82,6 +82,7 @@ pub mod appointments;
 pub mod attachments;
 pub mod medications;
 pub mod prescriptions;
+pub mod reminders;
 pub mod vaccinations;
 pub mod vaccine_types;
 pub mod visit_templates;

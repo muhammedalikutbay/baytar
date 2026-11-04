@@ -21,6 +21,10 @@ const KEYS: &[&str] = &[
     "clinic_tax_no",
     "clinic_logo",
     "update_check_enabled",
+    "reminder_template_vaccine",
+    "reminder_template_appointment",
+    "reminder_template_debt",
+    "reminder_template_followup",
 ];
 
 fn paths(app: &tauri::AppHandle) -> Result<(PathBuf, PathBuf, PathBuf), String> {

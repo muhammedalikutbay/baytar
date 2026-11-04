@@ -19,7 +19,7 @@ fn seed_owner_and_patient(conn: &Connection) {
 #[test]
 fn fresh_database_has_all_tables_strict_types_indexes_and_no_triggers() {
     let db = Database::open_in_memory().unwrap();
-    assert_eq!(db.schema_version().unwrap(), 3);
+    assert_eq!(db.schema_version().unwrap(), 4);
     let conn = db.conn();
     let mut stmt = conn
         .prepare("SELECT name, strict FROM pragma_table_list WHERE schema = 'main' AND name NOT LIKE 'sqlite_%' ORDER BY name")
@@ -43,6 +43,7 @@ fn fresh_database_has_all_tables_strict_types_indexes_and_no_triggers() {
         "patients",
         "payments",
         "prescription_items",
+        "reminder_contacts",
         "services",
         "settings",
         "stock_movements",
@@ -98,6 +99,8 @@ fn fresh_database_has_all_tables_strict_types_indexes_and_no_triggers() {
             "payments_owner_id_idx",
             "payments_paid_on_idx",
             "prescription_items_visit_id_idx",
+            "reminder_contacts_owner_id_idx",
+            "reminder_contacts_ref_key_idx",
             "stock_movements_item_id_idx",
             "stock_movements_lot_id_idx",
             "vaccinations_next_due_on_idx",

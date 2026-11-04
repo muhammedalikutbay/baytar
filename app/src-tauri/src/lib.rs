@@ -2,6 +2,7 @@ mod billing;
 mod clinical;
 mod import;
 mod inventory;
+mod reminders;
 mod settings;
 mod vaccines;
 
@@ -745,7 +746,9 @@ pub fn run() {
             clinical::attachment_open,
             clinical::attachment_export,
             clinical::patient_photo,
-            clinical::patient_mark_deceased
+            clinical::patient_mark_deceased,
+            reminders::reminders_overview,
+            reminders::reminders_record_contact
         ])
         .run(tauri::generate_context!())
         .expect("error while running Baytar");

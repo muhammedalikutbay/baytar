@@ -6,6 +6,7 @@ import { createVaccineMock } from './vaccinations-mock';
 import { createInventoryMock } from './inventory-mock';
 import { createAttachmentsMock } from './attachments-mock';
 import { createTemplatesMock } from './templates-mock';
+import { createRemindersMock } from './reminders-mock';
 import { calculateMock } from './dose-mock';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import type { ImportPreview, ImportReport, ApiError, CommandMap, ListQuery, NewOwner, NewPatient, Owner, OwnerPatch, Patient, PatientPatch, SearchHit } from './types';
@@ -151,7 +152,9 @@ for (const input of [
   { title: tr.appointmentSampleVaccine, startsOn: agendaDate(0), startsTime: '14:30', patientId: 5, ownerId: first.id, kind: 'vaccine' },
   { title: tr.appointmentSampleVisit, startsOn: agendaDate(-1), patientId: 4, ownerId: first.id, kind: 'visit' },
   { title: tr.appointmentSampleVaccine, startsOn: agendaDate(2), patientId: 4, ownerId: first.id, kind: 'vaccine' },
-  { title: tr.appointmentSampleVisit, startsOn: agendaDate(-2), patientId: 4, ownerId: first.id, kind: 'visit', status: 'done' }
+  { title: tr.appointmentSampleVisit, startsOn: agendaDate(-2), patientId: 4, ownerId: first.id, kind: 'visit', status: 'done' },
+  { title: tr.appointmentSampleVisit, startsOn: agendaDate(1), startsTime: '11:30', patientId: 5, ownerId: first.id, kind: 'visit' },
+  { title: tr.appointmentSampleVisit, startsOn: agendaDate(5), startsTime: '15:00', patientId: 4, ownerId: first.id, kind: 'visit' }
 ]) clinical.call('appointment_create', { input });
 // Synthetic measurements make the patient history and its weight trend reviewable in a browser.
 for (const [visitOn, weightKg] of [['2026-09-12', 3.9], ['2026-10-03', 4.0], ['2026-10-24', 4.1]] as const) {
@@ -159,6 +162,8 @@ for (const [visitOn, weightKg] of [['2026-09-12', 3.9], ['2026-10-03', 4.0], ['2
 }
 
 const billing = createBillingMock({ owners: () => owners, ownerGet, patientGet, visitGet: id => clinical.call('visit_get', { id }) as import('./types').Visit, now, fail });
+
+const reminders = createRemindersMock({ vaccines, billing, clinical, patientGet, ownerGet, now, fail });
 
 // Dispatch types are checked at the public call boundary and by each handler.
 
@@ -190,6 +195,7 @@ function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['arg
   if (inventory.has(command)) return inventory.call(command, args);
   if (files.has(command)) return files.call(command, args);
   if (templates.has(command)) return templates.call(command, args);
+  if (reminders.has(command)) return reminders.call(command, args);
   if (command === 'patient_mark_deceased') {
     const { id, date } = args as CommandMap['patient_mark_deceased']['args'];
     const patient = patientGet(id);
