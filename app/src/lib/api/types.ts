@@ -379,3 +379,21 @@ export interface CommandMap {
   lock_verify: { args: { pin: string }; result: LockVerifyResult };
   lock_set_idle: { args: { minutes: number }; result: null };
 }
+export interface ReportMonth {
+  /** `YYYY-MM`. */
+  month: string; visits: number; newPatients: number; newOwners: number; vaccinations: number;
+  revenueMinor: number; collectionsMinor: number; outstandingMinor: number;
+}
+export interface ReportSpecies { species: Species; count: number }
+export interface ReportNamedCount { name: string; count: number }
+export interface ReportCoverage { patients: number; rabiesCovered: number; coreCovered: number }
+export interface ReportOverview {
+  from: string; to: string; months: ReportMonth[]; species: ReportSpecies[];
+  diagnoses: ReportNamedCount[]; medicines: ReportNamedCount[]; coverage: ReportCoverage;
+}
+export type ExportTable = 'owners' | 'patients' | 'visits' | 'vaccinations' | 'prescriptions' | 'charges' | 'payments' | 'inventory';
+export interface CommandMap {
+  reports_overview: { args: { from: string; to: string; today: string }; result: ReportOverview };
+  reports_export_csv: { args: { table: ExportTable; path: string }; result: string };
+  reports_export_all: { args: { dir: string; today: string }; result: string[] };
+}
