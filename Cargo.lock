@@ -173,7 +173,9 @@ version = "0.2.0"
 dependencies = [
  "anyhow",
  "baytar-core",
+ "chrono",
  "clap",
+ "env_logger",
  "serde_json",
 ]
 

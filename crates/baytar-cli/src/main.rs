@@ -1,3 +1,7 @@
+use std::path::{Path, PathBuf};
+
+use baytar_core::backup::{self, BackupKind, BackupPolicy};
+use baytar_core::db::Database;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -18,9 +22,48 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Create, inspect, restore, or prune local database backups.
+    Backup {
+        #[command(subcommand)]
+        command: BackupCommand,
+    },
+}
+
+#[derive(Subcommand)]
+enum BackupCommand {
+    /// Create a verified manual backup.
+    Create {
+        #[arg(long)]
+        db: PathBuf,
+    },
+    /// List recognized backups, newest first.
+    List {
+        #[arg(long)]
+        db: PathBuf,
+    },
+    /// Restore a backup after preserving the current database.
+    Restore {
+        #[arg(long)]
+        db: PathBuf,
+        file: PathBuf,
+    },
+    /// Prune daily backups using the default retention policy.
+    Prune {
+        #[arg(long)]
+        db: PathBuf,
+    },
+}
+
+fn backup_dir(db: &Path) -> PathBuf {
+    backup::backups_dir(
+        db.parent()
+            .filter(|parent| !parent.as_os_str().is_empty())
+            .unwrap_or_else(|| Path::new(".")),
+    )
 }
 
 fn main() -> anyhow::Result<()> {
+    env_logger::init();
     match Cli::parse().command {
         Commands::Version => println!("{}", baytar_core::version()),
         Commands::Inspect { path, json } => {
@@ -31,6 +74,44 @@ fn main() -> anyhow::Result<()> {
                 print_report(&report);
             }
         }
+        Commands::Backup { command } => match command {
+            BackupCommand::Create { db } => {
+                // A mistyped source path must not create an empty database.
+                anyhow::ensure!(db.is_file(), "database does not exist: {}", db.display());
+                let dir = backup_dir(&db);
+                let database = Database::open(&db, &dir)?;
+                let info = backup::create(&database, &dir, BackupKind::Manual)?;
+                println!("{}", info.path.display());
+            }
+            BackupCommand::List { db } => {
+                for info in backup::list(&backup_dir(&db))? {
+                    println!(
+                        "{}\t{}\t{} bytes\t{}",
+                        info.created_at,
+                        info.kind.as_str(),
+                        info.size_bytes,
+                        info.path.display()
+                    );
+                }
+            }
+            BackupCommand::Restore { db, file } => {
+                let previous = backup::restore(&db, &file, &backup_dir(&db))?;
+                println!(
+                    "Restored {}. Pre-restore backup: {}",
+                    db.display(),
+                    previous.path.display()
+                );
+            }
+            BackupCommand::Prune { db } => {
+                for path in backup::prune(
+                    &backup_dir(&db),
+                    &BackupPolicy::default(),
+                    chrono::Utc::now(),
+                )? {
+                    println!("Removed {}", path.display());
+                }
+            }
+        },
     }
     Ok(())
 }
