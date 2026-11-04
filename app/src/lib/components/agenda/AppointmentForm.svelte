@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { ClipboardList, List, Hourglass, Search, StickyNote, Repeat } from '@lucide/svelte';
+  import { ClipboardList, List, Hourglass, StickyNote, Repeat } from '@lucide/svelte';
   import { validateForm, parseDecimal } from '$lib/validation';
   import { untrack, tick } from 'svelte';
   import { Button, Checkbox, Input, Select, Textarea, DateInput, NumberInput, RequiredNote, TimeInput } from '$lib/components/ui';
   import * as appointments from '$lib/api/appointments';
-  import { search } from '$lib/api/search';
+  import RecordPicker from '$lib/components/pickers/RecordPicker.svelte';
   import { detail } from '$lib/api/owners';
   import { get as getPatient } from '$lib/api/patients';
-  import type { Appointment, ApiError, Patient, Owner, NewAppointment, AppointmentKind } from '$lib/api/types';
+  import type { Appointment, ApiError, Patient, Owner, NewAppointment, AppointmentKind, RecordSelection } from '$lib/api/types';
   import { addDateDays, formatDate, localDate, parseDate } from '$lib/format';
   import { tr } from '$lib/i18n/tr';
   import { kindLabels } from './appointments';
@@ -21,14 +21,10 @@
   let startsTime = $state(initial.appointment?.startsTime ?? '');
   let duration = $state(String(initial.appointment?.durationMin ?? ''));
   let notes = $state(initial.appointment?.notes ?? '');
-  let selectedPatient = $state(initial.patient ?? null);
-  let selectedOwner = $state(initial.owner ?? null);
   let patientId = $state(initial.appointment?.patientId ?? initial.patient?.id ?? null);
   let ownerId = $state(initial.appointment?.ownerId ?? initial.owner?.id ?? initial.patient?.ownerId ?? null);
-  let query = $state('');
-  let options = $state<{ patient: Patient; owner: Owner }[]>([]);
-  let searchLoading = $state(false);
-  let searchFailed = $state(false);
+  let selected = $state<RecordSelection | null>(initial.patient && initial.owner ? { patient: initial.patient, owner: initial.owner } : null);
+  let noPatient = $state(initial.appointment ? !initial.appointment.patientId : false);
   let contextLoading = $state(false);
   let contextFailed = $state(false);
   let repeat = $state(false);
@@ -53,36 +49,21 @@
         const pet = existing.patientId === null ? null : await getPatient(existing.patientId);
         const id = existing.ownerId ?? pet?.ownerId;
         const person = id == null ? null : (await detail(id)).owner;
-        if (!cancelled) { selectedPatient = pet; selectedOwner = person; }
+        if (!cancelled) { selected = person ? { owner: person, ...(pet ? { patient: pet } : {}) } : null; }
       } catch { if (!cancelled) contextFailed = true; }
       finally { if (!cancelled) contextLoading = false; }
     })();
     return () => { cancelled = true; };
   });
-  $effect(() => {
-    const text = query.trim();
-    let cancelled = false;
-    options = []; searchFailed = false;
-    if (!text) { searchLoading = false; return; }
-    searchLoading = true;
-    const timer = setTimeout(async () => {
-      try {
-        const hits = await search(text, 10);
-        const full = await Promise.all(hits.map(hit => detail(hit.owner.id)));
-        if (!cancelled) options = full.flatMap((hit, index) => {
-          const matchingPatients = hits[index].patients;
-          return (matchingPatients.length ? matchingPatients : hit.patients).map(patient => ({ patient, owner: hit.owner }));
-        });
-      } catch { if (!cancelled) searchFailed = true; }
-      finally { if (!cancelled) searchLoading = false; }
-    }, 200);
-    return () => { cancelled = true; clearTimeout(timer); };
-  });
   async function submit(event: SubmitEvent) {
     event.preventDefault();
     if (!validateForm(event.currentTarget as HTMLFormElement)) return;
-    if (saving || contextLoading) return;
+    if (saving || contextLoading || contextFailed) return;
     errors = {};
+    patientId = noPatient ? null : selected?.patient?.id ?? null;
+    ownerId = noPatient ? null : selected?.owner.id ?? null;
+    if (!noPatient && !patientId) errors.patientId = tr.requiredField;
+    if (!title.trim() && selected?.patient && !noPatient) title = kindLabels[kind as AppointmentKind] + ' — ' + selected.patient.name;
     if (!title.trim()) errors.title = tr.requiredField;
     if (!parseDate(startsOn) || startsOn < '0001-01-01') errors.startsOn = tr.appointmentDateInvalid;
     if (startsTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(startsTime)) errors.startsTime = tr.invalidField;
@@ -106,23 +87,18 @@
 </script>
 <form bind:this={form} onsubmit={submit} novalidate class="grid gap-4">
   <RequiredNote />
-  <Input icon={ClipboardList} label={tr.appointmentTitle} bind:value={title} required error={errors.title} />
+  <fieldset class="grid min-w-0 gap-2"><legend class="mb-2 text-sm font-medium">{tr.appointmentPatient}</legend>
+    {#if contextLoading}<p role="status">{tr.loading}</p>
+    {:else if contextFailed}<p role="alert" class="text-danger">{tr.loadError}</p>
+    {:else if initial.patient}<p class="font-medium">{initial.patient.name} · {initial.owner?.fullName}</p>
+    {:else}<Checkbox label={tr.flowNoPatient} bind:checked={noPatient} />{#if !noPatient}<RecordPicker bind:selected />{/if}{/if}
+    {#if errors.patientId}<p role="alert" class="text-danger">{errors.patientId}</p>{/if}
+  </fieldset>
+
+  <Input icon={ClipboardList} label={tr.appointmentTitle} bind:value={title} required={noPatient} error={errors.title} />
   <Select icon={List} label={tr.appointmentKind} bind:value={kind} options={Object.entries(kindLabels).map(([value, label]) => ({ value, label }))} />
   <DateInput label={tr.appointmentDate} min="0001-01-01" max="9999-12-31" bind:value={startsOn} required error={errors.startsOn} />
   <div class="grid grid-cols-2 gap-4"><TimeInput label={tr.appointmentTime} optional bind:value={startsTime} hint={tr.appointmentTimeHint} error={errors.startsTime} /><NumberInput icon={Hourglass} label={tr.appointmentDuration} bind:value={() => parseDecimal(duration), n => duration = n === null ? '' : String(n)} error={errors.durationMin} min={1} max={2147483647} step={1} unit={tr.inputMinuteUnit} /></div>
-  <fieldset class="grid min-w-0 gap-2"><legend class="text-sm font-medium text-fg mb-2">{tr.appointmentPatient}</legend>
-    {#if contextLoading}<p role="status">{tr.loading}</p>{/if}
-    {#if contextFailed}<p role="alert" class="text-danger">{tr.loadError}</p>{/if}
-    {#if selectedPatient || selectedOwner}<p class="break-words">{selectedPatient?.name}{selectedPatient && selectedOwner ? ' · ' : ''}{selectedOwner?.fullName}</p>
-      <Button variant="ghost" size="sm" disabled={saving || contextLoading} onclick={() => { selectedPatient = null; selectedOwner = null; patientId = null; ownerId = null; }}>{tr.appointmentClearPatient}</Button>
-    {:else}<p class="type-caption text-fg-muted">{tr.appointmentNoPatient}</p>{/if}
-    <Input icon={Search} label={tr.appointmentSearch} type="search" bind:value={query} autocomplete="off" disabled={saving || contextLoading} />
-    {#if query.trim()}<div class="max-h-48 overflow-y-auto rounded-md border border-border p-2" aria-live="polite">
-      {#if searchLoading}<p role="status">{tr.loading}</p>{:else if searchFailed}<p role="alert" class="text-danger">{tr.loadError}</p>{:else if !options.length}<p>{tr.noResults}</p>{/if}
-      {#each options as option (option.patient.id)}<Button variant="ghost" class="w-full justify-start text-left" disabled={saving} onclick={() => { selectedPatient = option.patient; selectedOwner = option.owner; patientId = option.patient.id; ownerId = option.owner.id; query = ''; }}>{option.patient.name} · {option.owner.fullName}</Button>{/each}
-    </div>{/if}
-    {#if errors.patientId || errors.ownerId}<p role="alert" class="text-danger">{tr.invalidField}</p>{/if}
-  </fieldset>
   <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />
   {#if !initial.appointment}<Checkbox label={tr.appointmentRepeat} bind:checked={repeat} />
     {#if repeat}<div class="grid grid-cols-2 gap-4"><NumberInput icon={Repeat} label={tr.appointmentCount} bind:value={() => parseDecimal(count), n => count = n === null ? '' : String(n)} error={errors.count} hint={tr.appointmentRepeatHint} min={2} max={52} step={1} /><NumberInput icon={Repeat} label={tr.appointmentInterval} bind:value={() => parseDecimal(interval), n => interval = n === null ? '' : String(n)} error={errors.everyDays} min={1} max={2147483647} step={1} unit={tr.inputDayUnit} /></div>

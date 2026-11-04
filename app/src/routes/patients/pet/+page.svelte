@@ -1,13 +1,17 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { PawPrint, TriangleAlert } from '@lucide/svelte';
-  import { Button, Card, Dialog, EmptyState, Toast, Badge, DateInput } from '$lib/components/ui';
+  import { Button, PageHeader, MenuButton, Card, Dialog, EmptyState, Toast, Badge, DateInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { formatAge, formatDate } from '$lib/format';
   import * as patients from '$lib/api/patients';
   import * as owners from '$lib/api/owners';
   import type { Patient, Owner } from '$lib/api/types';
   import PatientForm from '$lib/components/patients/PatientForm.svelte';
+  import PatientOverview from '$lib/components/patients/PatientOverview.svelte';
+  import PatientVaccinations from '$lib/components/patients/PatientVaccinations.svelte';
+  import PatientAppointments from '$lib/components/patients/PatientAppointments.svelte';
+  import VaccinationForm from '$lib/components/vaccines/VaccinationForm.svelte';
   import PatientVisits from '$lib/components/patients/PatientVisits.svelte';
   import PatientAvatar from '$lib/components/patients/PatientAvatar.svelte';
   import PatientAttachments from '$lib/components/patients/PatientAttachments.svelte';
@@ -25,7 +29,17 @@
   let actionError = $state('');
   let toast = $state('');
   let toastOpen = $state(false);
-  let tab = $state<'history' | 'files'>('history');
+  let tab = $state<'history' | 'vaccines' | 'appointments' | 'files'>('history');
+  let giveVaccine = $state(false);
+  const tabs = [['history', tr.flowHistory], ['vaccines', tr.vaccines], ['appointments', tr.appointments], ['files', tr.clinicalFiles]] as const;
+  function tabKeydown(event: KeyboardEvent) {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const index = tabs.findIndex(([key]) => key === tab);
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+    tab = tabs[next][0];
+    (event.currentTarget as HTMLElement).querySelector<HTMLButtonElement>('[data-patient-tab="' + tab + '"]')?.focus();
+  }
   let deceasedOpen = $state(false), deceasedDate = $state(''), deceasedError = $state('');
   const today = () => new Date().toLocaleDateString('sv-SE');
   async function markDeceased() {
@@ -72,10 +86,19 @@
   {#if actionError}<p role="alert" class="text-danger">{actionError}</p>{/if}
   {#if loading}<p role="status">{tr.loading}</p>
   {:else if patient && owner}
-    <div class="flex flex-wrap items-start justify-between gap-4">
-      <div class="flex items-start gap-4"><PatientAvatar patientId={patient.id} species={patient.species} name={patient.name} large revision={historyRevision} /><div><h1 class={`type-page break-words ${patient.deceasedOn ? 'text-fg-muted' : ''}`}>{patient.name} {#if patient.deceasedOn}<Badge>{tr.clinicalDeceased} · {formatDate(patient.deceasedOn)}</Badge>{/if}</h1><p class="mt-2 text-fg-muted">{tr[patient.species]}{patient.speciesNote ? ` · ${patient.speciesNote}` : ''}{patient.breed ? ` · ${patient.breed}` : ''}</p></div></div>
-      <div class="flex flex-wrap gap-2">{#if patient.deceasedOn}<Button variant="secondary" disabled={busy} onclick={clearDeceased}>{tr.clinicalClearDeceased}</Button>{:else}<Button variant="secondary" onclick={() => { deceasedDate = today(); deceasedError = ''; deceasedOpen = true; }}>{tr.clinicalMarkDeceased}</Button>{/if}<Button variant="secondary" onclick={() => { actionError = ''; confirm = true; }}>{tr.deletePatient}</Button><Button variant="secondary" onclick={() => edit = true}>{tr.edit}</Button><Button onclick={() => addVisit = true}>{tr.addVisit}</Button></div>
-    </div>
+    <PageHeader title={patient.name} subtitle={[tr[patient.species], patient.breed, formatAge(patient.birthDate, patient.birthDateIsEstimate)].filter(Boolean).join(' · ')} icon={PawPrint}>
+      {#snippet actions()}
+        <Button disabled={!!patient?.deceasedOn} onclick={() => addVisit = true}>{tr.addVisit}</Button>
+        <Button variant="secondary" disabled={!!patient?.deceasedOn} onclick={() => giveVaccine = true}>{tr.vaccineGive}</Button>
+        <Button variant="secondary" onclick={() => edit = true}>{tr.edit}</Button>
+        <MenuButton items={[
+          { label: patient?.deceasedOn ? tr.clinicalClearDeceased : tr.clinicalMarkDeceased, disabled: busy, onselect: () => { if (patient?.deceasedOn) void clearDeceased(); else { deceasedDate = today(); deceasedError = ''; deceasedOpen = true; } } },
+          { label: tr.deletePatient, danger: true, onselect: () => { actionError = ''; confirm = true; } }
+        ]} />
+      {/snippet}
+    </PageHeader>
+    <div class="flex items-center gap-3"><PatientAvatar patientId={patient.id} species={patient.species} name={patient.name} revision={historyRevision} />{#if patient.deceasedOn}<Badge>{tr.clinicalDeceased} · {formatDate(patient.deceasedOn)}</Badge>{/if}</div>
+    <PatientOverview patientId={patient.id} revision={historyRevision} onappointments={() => tab = 'appointments'} onvaccines={() => tab = 'vaccines'} />
     {#if patient.alerts?.trim()}<div role="alert" class="flex items-start gap-3 rounded-md border border-highlight p-4 text-highlight"><TriangleAlert size={20} aria-hidden="true" class="mt-0.5 shrink-0" /><div><p class="type-caption">{tr.clinicalAlerts}</p><p class="whitespace-pre-wrap break-words">{patient.alerts}</p></div></div>{/if}
     <Card><dl class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       <div><dt class="type-caption text-fg-muted">{tr.owner}</dt><dd class="mt-2"><a class="text-accent underline" href={`/patients/owner?id=${owner.id}`}>{owner.fullName}</a></dd></div>
@@ -83,13 +106,17 @@
         <div><dt class="type-caption text-fg-muted">{field.label}</dt><dd class="mt-2 break-words">{field.value}</dd></div>
       {/each}
     </dl>{#if patient.notes}<div class="mt-6 border-t border-border pt-5"><h2 class="type-caption text-fg-muted">{tr.notes}</h2><p class="mt-2 whitespace-pre-wrap break-words">{patient.notes}</p></div>{/if}</Card>
-    <div role="tablist" class="flex gap-2 border-b border-border">{#each [['history', tr.clinicalHistoryTab], ['files', tr.clinicalFiles]] as [key, label]}<button type="button" role="tab" aria-selected={tab === key} class={`min-h-11 px-4 ${tab === key ? 'border-b-2 border-accent text-accent' : 'text-fg-muted'}`} onclick={() => tab = key as 'history' | 'files'}>{label}</button>{/each}</div>
-    {#key patient.id}{#if tab === 'history'}<PatientVisits patientId={patient.id} revision={historyRevision} />{:else}<PatientAttachments patientId={patient.id} onchange={() => historyRevision++} />{/if}{/key}
+    <div role="tablist" tabindex="-1" aria-label={patient.name} onkeydown={tabKeydown} class="flex flex-wrap gap-2 border-b border-border">
+      {#each tabs as [key, label]}<button type="button" role="tab" data-patient-tab={key} id={'patient-tab-' + key} aria-controls={'patient-panel-' + key} tabindex={tab === key ? 0 : -1} aria-selected={tab === key} class={'min-h-11 px-4 ' + (tab === key ? 'border-b-2 border-accent text-accent' : 'text-fg-muted')} onclick={() => tab = key}>{label}</button>{/each}
+    </div>
+    <div role="tabpanel" id={'patient-panel-' + tab} aria-labelledby={'patient-tab-' + tab}>
+    {#key patient.id}{#if tab === 'history'}<PatientVisits patientId={patient.id} patientName={patient.name} revision={historyRevision} onchange={() => historyRevision++} />{:else if tab === 'vaccines'}<PatientVaccinations revision={historyRevision} onchange={() => historyRevision++} />{:else if tab === 'appointments'}<PatientAppointments revision={historyRevision} onchange={() => historyRevision++} />{:else}<PatientAttachments patientId={patient.id} onchange={() => historyRevision++} />{/if}{/key}
+    </div>
   {:else}<Card><EmptyState icon={PawPrint} title={failed ? tr.loadError : tr.recordMissing} description={tr.recordMissingDescription}>
     {#snippet action()}{#if failed}<Button variant="secondary" onclick={() => refresh++}>{tr.retry}</Button>{/if}{/snippet}
   </EmptyState></Card>{/if}
 </div>
-<Dialog bind:open={() => addVisit, setVisitOpen} title={tr.addVisit} description={tr.visitFormDescription}>
+<Dialog wide bind:open={() => addVisit, setVisitOpen} title={tr.visit + ' — ' + (patient?.name ?? '')} description={tr.visitFormDescription}>
   {#if addVisit && patient}<VisitForm patientId={patient.id} onsaved={() => setVisitOpen(false)} oncancel={() => setVisitOpen(false)} />{/if}
   {#snippet footer()}{/snippet}
 </Dialog>
@@ -108,3 +135,8 @@
 <Toast bind:open={toastOpen} message={toast}>
   {#snippet action()}{#if deletedId !== null}<Button variant="secondary" size="sm" disabled={busy} onclick={undo}>{tr.undo}</Button>{/if}{/snippet}
 </Toast>
+
+<Dialog bind:open={giveVaccine} title={tr.vaccineGive} description={tr.vaccineWorkflowDescription}>
+  {#if giveVaccine && patient}<VaccinationForm patientId={patient.id} onsaved={() => { giveVaccine = false; historyRevision++; }} oncancel={() => giveVaccine = false} />{/if}
+  {#snippet footer()}{/snippet}
+</Dialog>

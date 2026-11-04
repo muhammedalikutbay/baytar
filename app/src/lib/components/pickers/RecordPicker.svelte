@@ -80,6 +80,8 @@
   </div>
 {:else}
   <div class="grid gap-3">
+    {#if allowCreate}<Button variant="secondary" class="justify-self-start" onclick={() => oncreateowner?.()}><Plus size={16} aria-hidden="true" />{tr.newOwner}</Button>{/if}
+
     {#if search}<Input label={tr.directorySearch} icon={Search} type="search" bind:value={query} autocomplete="off"
       onkeydown={event => { if (event.key === 'ArrowDown' && rows.length) { event.preventDefault(); void focusRow(0); } }} />{/if}
     {#if loading}<p class="text-sm text-fg-muted" role="status">{tr.loading}</p>
@@ -126,6 +128,5 @@
       </div>
       {#if hits.length >= limit && total > hits.length}<p class="type-caption text-fg-muted">{tr.directoryLimit}</p>{/if}
     {/if}
-    {#if allowCreate}<Button variant="secondary" class="justify-self-start" onclick={() => oncreateowner?.()}><Plus size={16} aria-hidden="true" />{total ? tr.directoryNewOwner : tr.directoryAddOwner}</Button>{/if}
   </div>
 {/if}

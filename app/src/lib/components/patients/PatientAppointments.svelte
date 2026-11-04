@@ -11,6 +11,7 @@
   import AppointmentForm from '$lib/components/agenda/AppointmentForm.svelte';
   import AppointmentItem from '$lib/components/agenda/AppointmentItem.svelte';
   import { compareAppointments, isOverdue, type AgendaItem } from '$lib/components/agenda/appointments';
+  let { revision = 0, onchange = () => {} }: { revision?: number; onchange?: () => void } = $props();
   let items = $state<AgendaItem[]>([]);
   let patient = $state<Patient>();
   let owner = $state<Owner>();
@@ -22,11 +23,11 @@
   let editing = $state<Appointment>();
   let busy = $state(false);
   let actionError = $state('');
-  const upcoming = $derived(items.filter(item => !isOverdue({ ...item.appointment, status: 'planned' }, now)));
-  const past = $derived(items.filter(item => !upcoming.some(next => next.appointment.id === item.appointment.id)).slice().reverse().slice(0, 5));
+  const upcoming = $derived(items.filter(item => item.appointment.status === 'planned' && !isOverdue(item.appointment, now)));
+  const past = $derived(items.filter(item => !upcoming.some(next => next.appointment.id === item.appointment.id)).slice().reverse());
   onMount(() => { const timer = setInterval(() => now = new Date(), 30000); return () => clearInterval(timer); });
   $effect(() => {
-    const id = Number(page.url.searchParams.get('id')); refresh;
+    const id = Number(page.url.searchParams.get('id')); refresh; revision;
     let cancelled = false;
     loading = true; failed = false; items = []; patient = undefined; owner = undefined; open = false;
     (async () => {
@@ -43,7 +44,7 @@
   async function status(id: number, value: AppointmentStatus) {
     if (busy) return;
     busy = true; actionError = '';
-    try { await appointments.setStatus(id, value); refresh++; }
+    try { await appointments.setStatus(id, value); refresh++; onchange(); }
     catch { actionError = tr.actionError; }
     finally { busy = false; }
   }
@@ -60,6 +61,6 @@
   </div>{#if past.length}<h3 class="type-caption mt-5 text-fg-muted">{tr.appointmentPast}</h3><div class="divide-y divide-border">{#each past as item (item.appointment.id)}<AppointmentItem {item} {busy} {now} showDate onedit={edit} onstatus={status} />{/each}</div>{/if}{/if}
 </Card></section>
 <Dialog bind:open title={editing ? tr.appointmentEdit : tr.agendaDialogTitle} description={tr.appointmentFormDescription}>
-  {#if open && patient && owner}<AppointmentForm appointment={editing} {patient} {owner} onsaved={() => { open = false; refresh++; }} oncancel={() => open = false} />{/if}
+  {#if open && patient && owner}<AppointmentForm appointment={editing} {patient} {owner} onsaved={() => { open = false; refresh++; onchange(); }} oncancel={() => open = false} />{/if}
   {#snippet footer()}{/snippet}
 </Dialog>

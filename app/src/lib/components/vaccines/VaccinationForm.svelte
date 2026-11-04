@@ -9,8 +9,8 @@
   import * as vaccineTypes from '$lib/api/vaccine_types';
   import * as patients from '$lib/api/patients';
   import * as owners from '$lib/api/owners';
-  import type { VaccineType, Patient, Owner, ApiError } from '$lib/api/types';
-  import VaccinePatientPicker from './VaccinePatientPicker.svelte';
+  import type { VaccineType, RecordSelection, ApiError } from '$lib/api/types';
+  import RecordPicker from '$lib/components/pickers/RecordPicker.svelte';
   import DateChips from './DateChips.svelte';
   import StockDeduction from '$lib/components/inventory/StockDeduction.svelte';
   let { patientId, vaccineTypeId = null, vaccineName = '', appointmentId = null, mode = 'give', initialDate = todayDate(), onsaved, oncancel }: {
@@ -18,7 +18,7 @@
     mode?: 'give' | 'plan'; initialDate?: string; onsaved: () => void; oncancel: () => void;
   } = $props();
   const initial = untrack(() => ({ patientId, vaccineTypeId, initialDate }));
-  let selected = $state<{ patient: Patient; owner: Owner } | null>(null);
+  let selected = $state<RecordSelection | null>(null);
   let typeId = $state(initial.vaccineTypeId ? String(initial.vaccineTypeId) : '');
   let date = $state(initial.initialDate);
   let nextDueOn = $state('');
@@ -36,7 +36,7 @@
   let revision = 0;
   let savedId: number | null = null;
   let stock = $state<{ consumeAfterSave: (table: 'vaccinations' | 'prescription_items', id: number) => Promise<void> } | undefined>();
-  const available = $derived(types.filter(t => t.isActive && !t.deletedAt && selected && (!t.species || t.species === selected.patient.species)));
+  const available = $derived(types.filter(t => t.isActive && !t.deletedAt && selected?.patient && (!t.species || t.species === selected.patient.species)));
   const vaccine = $derived(available.find(t => t.id === Number(typeId)));
   async function load() {
     loading = true; loadError = false;
@@ -51,7 +51,7 @@
   }
   onMount(() => { void load(); });
   $effect(() => {
-    const patient = selected?.patient.id, type = vaccine?.id, on = date;
+    const patient = selected?.patient?.id, type = vaccine?.id, on = date;
     const request = ++revision;
     nextDueOn = ''; suggestionError = false; suggesting = false;
     if (mode !== 'give' || !patient || !type || !parseDate(on)) return;
@@ -72,10 +72,10 @@
     if (mode === 'give' && nextDueOn && (!parseDate(nextDueOn) || nextDueOn <= date)) { error = tr.vaccineNextAfterGiven; return; }
     saving = true;
     try {
-      if (mode === 'plan') await planVaccine({ patientId: selected.patient.id, vaccineTypeId: vaccine.id, startsOn: date, startsTime: time || null, notes: notes.trim() || null });
+      if (mode === 'plan') await planVaccine({ patientId: selected.patient!.id, vaccineTypeId: vaccine.id, startsOn: date, startsTime: time || null, notes: notes.trim() || null });
       else {
         // Keep the saved id so a retry after a failed stock deduction never gives the vaccine twice.
-        if (savedId === null) savedId = (await vaccinations.give({ vaccination: { patientId: selected.patient.id, vaccineTypeId: vaccine.id, vaccineName: vaccine.name, givenOn: date, nextDueOn: nextDueOn || null, batchNo: batchNo.trim() || null, notes: notes.trim() || null }, appointmentId, planNext })).id;
+        if (savedId === null) savedId = (await vaccinations.give({ vaccination: { patientId: selected.patient!.id, vaccineTypeId: vaccine.id, vaccineName: vaccine.name, givenOn: date, nextDueOn: nextDueOn || null, batchNo: batchNo.trim() || null, notes: notes.trim() || null }, appointmentId, planNext })).id;
         await stock?.consumeAfterSave('vaccinations', savedId);
       }
       onsaved();
@@ -88,9 +88,11 @@
 {:else}
 <form onsubmit={submit} class="grid gap-4">
   <RequiredNote />
-  <VaccinePatientPicker bind:selected locked={!!initial.patientId || !!appointmentId} />
+  {#if (initial.patientId || appointmentId) && selected?.patient}
+    <p class="rounded-md border border-border p-3 font-medium">{selected.patient.name} · {selected.owner.fullName}</p>
+  {:else}<RecordPicker bind:selected />{/if}
   {#if selected}
-    <Combobox icon={Syringe} label={tr.vaccineName} bind:value={typeId} required disabled={!!appointmentId} placeholder={tr.vaccineChoose} items={available.map(t => ({ value: String(t.id), label: t.name }))} />
+    <Combobox icon={Syringe} label={tr.vaccineName} bind:value={typeId} required disabled={!!appointmentId} placeholder={tr.vaccineChoose} items={available.slice().sort((a, b) => Number(!a.species) - Number(!b.species)).map(t => ({ value: String(t.id), label: t.name, hint: [t.manufacturer, t.diseases].filter(Boolean).join(' · '), group: t.species ? tr.flowSpeciesVaccines : tr.flowAllSpecies }))} />
     <p class="type-caption text-fg-muted">{available.length ? tr.vaccineCatalogHint : tr.vaccineNoCatalog}</p>
     {#if vaccineName && !vaccine}<p class="type-caption text-fg-muted">{vaccineName} · {tr.vaccineUntypedPlan}</p>{/if}
   {/if}

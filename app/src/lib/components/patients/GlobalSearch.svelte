@@ -35,8 +35,7 @@
     const timer = setTimeout(async () => {
       try {
         const found = await search(text, 6);
-        const full = await Promise.all(found.map(hit => detail(hit.owner.id)));
-        if (!cancelled) hits = full;
+        if (!cancelled) hits = found;
       } catch { if (!cancelled) failed = true; }
       finally { if (!cancelled) loading = false; }
     }, 200);
@@ -84,7 +83,7 @@
         {#each options as option, i (option.href)}
           <a id={`${uid}-${i}`} role="option" aria-selected={active === i} tabindex="-1" href={option.href}
             onclick={() => open = false} onpointermove={() => active = i}
-            class={`flex min-h-11 items-center gap-2 rounded-sm px-3 py-2 ${active === i ? 'bg-surface-muted' : ''}`}>
+            class={`${option.species ? 'ml-6 border-l border-border' : ''} flex min-h-11 items-center gap-2 rounded-sm px-3 py-2 ${active === i ? 'bg-surface-muted' : ''}`}>
             {#if option.species && option.id !== null}<PatientAvatar patientId={option.id} species={option.species} name={option.label} />{/if}
             <span class="min-w-0"><span class="block break-words font-medium">{option.label}</span><span class="type-caption block text-fg-muted">{option.detail}</span></span>{#if option.species}<PatientStatus alerts={option.alerts} deceasedOn={option.deceasedOn} />{/if}
           </a>

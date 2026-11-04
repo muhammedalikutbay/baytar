@@ -29,10 +29,17 @@ pub fn search(conn: &Connection, query: &str, limit: u32) -> Result<Vec<SearchHi
     ids.into_iter()
         .map(|id| {
             let owner = owners::get(conn, id)?;
-            let patients = patients::list_by_owner(conn, id)?
-                .into_iter()
-                .filter(|p| p.search_text.contains(&query))
-                .collect();
+            let mut patients = patients::list_by_owner(conn, id)?;
+            // Keep siblings reachable; prioritize matching pets for pet-only searches.
+            let owner_matches = owner.search_text.contains(&query)
+                || (phone
+                    && [owner.phone.as_deref(), owner.phone_alt.as_deref()]
+                        .into_iter()
+                        .flatten()
+                        .any(|value| value.contains(&query)));
+            if !owner_matches {
+                patients.sort_by_key(|p| !p.search_text.contains(&query));
+            }
             Ok(SearchHit { owner, patients })
         })
         .collect()
@@ -107,6 +114,39 @@ mod directory_tests {
             },
         )
         .unwrap()
+    }
+    #[test]
+    fn owner_search_keeps_all_active_pets() {
+        let db = Database::open_in_memory().unwrap();
+        let c = db.conn();
+        let o = owner(c, "Synthetic Owner");
+        let a = pet(c, o.id, "Alpha");
+        let b = pet(c, o.id, "Beta");
+        let deleted = pet(c, o.id, "Deleted");
+        patients::soft_delete(c, deleted.id).unwrap();
+        let hits = search(c, "synthetic", 10).unwrap();
+        assert_eq!(hits.len(), 1);
+        assert_eq!(
+            hits[0].patients.iter().map(|p| p.id).collect::<Vec<_>>(),
+            vec![a.id, b.id]
+        );
+    }
+    #[test]
+    fn pet_search_keeps_siblings_after_matching_pets() {
+        let db = Database::open_in_memory().unwrap();
+        let c = db.conn();
+        let o = owner(c, "Synthetic Owner");
+        let sibling = pet(c, o.id, "Alpha");
+        let matched = pet(c, o.id, "Zebra");
+        let deleted = pet(c, o.id, "Zebra deleted");
+        patients::soft_delete(c, deleted.id).unwrap();
+        let hits = search(c, "zebra", 10).unwrap();
+        assert_eq!(hits.len(), 1);
+        assert_eq!(
+            hits[0].patients.iter().map(|p| p.id).collect::<Vec<_>>(),
+            vec![matched.id, sibling.id]
+        );
+        assert!(search(c, "deleted", 10).unwrap().is_empty());
     }
     #[test]
     fn folded_matches_keep_all_pets_and_exclude_deleted_records() {
