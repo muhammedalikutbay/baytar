@@ -1,5 +1,6 @@
+import { tr, importIssueKeys } from '$lib/i18n/tr';
 import { invoke, isTauri } from '@tauri-apps/api/core';
-import type { ApiError, CommandMap, ListQuery, NewOwner, NewPatient, Owner, OwnerPatch, Patient, PatientPatch, SearchHit } from './types';
+import type { ImportPreview, ImportReport, ApiError, CommandMap, ListQuery, NewOwner, NewPatient, Owner, OwnerPatch, Patient, PatientPatch, SearchHit } from './types';
 
 export const startupStatus = () => call('startup_status', {});
 export async function call<K extends keyof CommandMap>(command: K, args: CommandMap[K]['args']): Promise<CommandMap[K]['result']> {
@@ -111,8 +112,43 @@ patientCreate({ ownerId: second.id, name: 'Boncuk', species: 'bird' });
 patientCreate({ ownerId: third.id, name: 'Fındık', species: 'rabbit' });
 
 // Dispatch types are checked at the public call boundary and by each handler.
+
+const importPrepared = new Map<string, ImportPreview>();
+const importReports = new Map<string, ImportReport>();
+const importedFiles = new Set<string>();
+let importSequence = 0;
+function mockPreview(path: string): ImportPreview {
+  const found = { owners: 24, patients: 31, todos: 8 };
+  const empty = { owners: 0, patients: 0, todos: 0 };
+  const imported = importedFiles.has(path);
+  return { sourceName: path, sourceSha256: path, schema: { tables: [], unknownTables: [], missingTables: [], unknownColumns: [], missingColumns: [] },
+    found, alreadyImported: imported ? found : empty, toImport: imported ? empty : found,
+    phonesAdjusted: 12, phonesUnparsed: 1, datesUnparsed: { 'Patient.BirthDate': 1 }, speciesMappedToOther: 1, speciesMissing: 0, sexMappedToUnknown: 2,
+    orphanPatients: 1, orphanTodos: 0, duplicateOwners: 1, todosDone: 3, todosPlanned: 5, orphanOwnerNeeded: true,
+    issues: [
+      { table: 'Patient', sourceId: 7, field: 'BirthDate', kind: 'dateUnparsed', raw: '2019 ilkbahar' },
+      { table: 'Patient', sourceId: 12, field: 'OwnerId', kind: 'orphanPatient', raw: '999' },
+      { table: 'PatientOwner', sourceId: 4, field: 'OwnerName', kind: 'duplicateOwner', raw: 'Örnek Sahip' },
+      { table: 'PatientOwner', sourceId: 9, field: 'OwnerPhone', kind: 'phoneUnparsed', raw: 'telefon yok' }
+    ] };
+}
+
 function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['args']): unknown {
   switch (command) {
+    case 'import_candidates': return [{ path: '/demo/HastaTakipDB.db', fileName: 'HastaTakipDB.db', sizeBytes: 942080, modifiedAt: '2026-10-30T12:00:00Z', location: '/demo' }];
+    case 'import_prepare': { const { path } = args as { path: string }; const token = String(++importSequence); const preview = mockPreview(path); importPrepared.set(token, preview); return { token, preview }; }
+    case 'import_cancel': { importPrepared.delete((args as { token: string }).token); return null; }
+    case 'import_execute': {
+      const { token } = args as { token: string }; const preview = importPrepared.get(token) ?? fail('invalid', 'import_expired');
+      const report: ImportReport = { ...preview, inserted: preview.toImport, skipped: preview.alreadyImported, runId: Number(token), orphanOwnerCreated: true, backupFile: 'baytar-pre-import-20261104-120000.db' };
+      importedFiles.add(preview.sourceSha256); importPrepared.delete(token); importReports.set(token, report); return report;
+    }
+    case 'import_save_report': {
+      const { tokenOrRunId } = args as { tokenOrRunId: string };
+      const report = importReports.get(tokenOrRunId) ?? importPrepared.get(tokenOrRunId) ?? fail('invalid', 'import_expired');
+      const content = [tr.importTitle, tr.importOldSafe, ...('backupFile' in report ? [tr.importBackup + ': ' + report.backupFile] : []), ...(['owners', 'patients', 'todos'] as const).map(k => tr[({ owners: 'importOwners', patients: 'importPatients', todos: 'importTodos' } as const)[k]] + ': ' + report.toImport[k]), ...report.issues.map(i => tr[importIssueKeys[i.kind]] + ': ' + (i.raw ?? tr.importNoValue))].join('\n');
+      const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' })); const link = document.createElement('a'); link.href = url; link.download = 'baytar-aktarma-raporu.txt'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); return null;
+    }
     case 'startup_status': return { ready: true, error: null, code: null, foundVersion: null, supportedVersion: null };
     case 'owners_list': {
       const query = (args as { query: ListQuery }).query;

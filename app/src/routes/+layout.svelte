@@ -14,9 +14,12 @@
   let query = $state('');
   let searchOpen = $state(false);
   let version = $state<string | null>(null);
+  const extraTitles: Record<string, string> = { '/import': tr.importTitle, '/design': tr.galleryTitle };
   const pathname = $derived(page.url.pathname.replace(/\/$/, '') || '/');
   const title = $derived(page.status >= 400 ? (page.status === 404 ? tr.notFoundTitle : tr.errorTitle)
-    : [...navigation, settingsNavigation].find(item => item.href === pathname)?.title ?? tr.galleryTitle);
+    : extraTitles[pathname] ?? [...navigation, settingsNavigation].find(item => item.href !== '/'
+        && (pathname === item.href || pathname.startsWith(`${item.href}/`)))?.title
+      ?? (pathname === '/' ? tr.home : tr.appName));
 
   function focusSearch(event: KeyboardEvent) {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k' && !event.altKey) {

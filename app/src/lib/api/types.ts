@@ -25,6 +25,11 @@ export interface StartupStatus {
   foundVersion: number | null; supportedVersion: number | null;
 }
 export interface CommandMap {
+  import_candidates: { args: Record<string, never>; result: ImportCandidate[] };
+  import_prepare: { args: { path: string }; result: PreparedImport };
+  import_execute: { args: { token: string }; result: ImportReport };
+  import_cancel: { args: { token: string }; result: null };
+  import_save_report: { args: { tokenOrRunId: string; path: string }; result: null };
   startup_status: { args: Record<string, never>; result: StartupStatus };
   owners_list: { args: { query: ListQuery }; result: Owner[] };
   owner_get: { args: { id: number }; result: Owner };
@@ -41,3 +46,20 @@ export interface CommandMap {
   patient_restore: { args: { id: number }; result: Patient };
   search: { args: { query: string; limit: number }; result: SearchHit[] };
 }
+
+export interface ImportCandidate { path: string; fileName: string; sizeBytes: number; modifiedAt: string | null; location: string }
+export interface ImportCounts { owners: number; patients: number; todos: number }
+export type ImportIssueKind = 'phoneUnparsed' | 'dateUnparsed' | 'speciesUnrecognized' | 'sexUnrecognized' | 'missingName' | 'unusableId' | 'orphanPatient' | 'orphanTodo' | 'danglingPatientLink' | 'danglingOwnerLink' | 'ownerMismatch' | 'duplicateOwner';
+export interface ImportIssue { table: string; sourceId: number; field: string; kind: ImportIssueKind; raw: string | null }
+export interface ImportPreview {
+  sourceName: string; sourceSha256: string;
+  schema: { tables: { name: string; known: boolean; rowCount: number; columns: string[] }[]; unknownTables: string[]; missingTables: string[]; unknownColumns: string[]; missingColumns: string[] };
+  found: ImportCounts; alreadyImported: ImportCounts; toImport: ImportCounts;
+  phonesAdjusted: number; phonesUnparsed: number; datesUnparsed: Record<string, number>;
+  speciesMappedToOther: number; speciesMissing: number; sexMappedToUnknown: number;
+  orphanPatients: number; orphanTodos: number; duplicateOwners: number; todosDone: number; todosPlanned: number;
+  orphanOwnerNeeded: boolean; issues: ImportIssue[];
+}
+// The core report flattens its preview into the report.
+export interface ImportReport extends ImportPreview { inserted: ImportCounts; skipped: ImportCounts; runId: number; orphanOwnerCreated: boolean; backupFile: string }
+export interface PreparedImport { token: string; preview: ImportPreview }

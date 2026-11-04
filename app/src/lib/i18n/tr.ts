@@ -1,4 +1,31 @@
 export const tr = {
+  importTitle: 'Eski PatientsCare verisini aktar',
+  importDescription: 'Önce dosyanızın bir kopyasını inceleyin, sonra güvenle aktarın.',
+  importOldSafe: 'Eski dosyanız değiştirilmez.',
+  importBackupSafe: 'Aktarmadan önce Baytar verilerinizin yedeği alınır.',
+  importPick: 'Dosya seç', importPreview: 'Ön izleme', importTransfer: 'Aktar', importResult: 'Sonuç',
+  importOther: 'Başka bir dosya seç', importFileType: 'PatientsCare dosyası', importReportType: 'Metin raporu',
+  importSearch: 'Eski dosyanız aranıyor…', importNoCandidates: 'Dosyanız bulunamadı. Kayıtların bulunduğu dosyayı seçebilirsiniz.',
+  importSelected: 'Seçili dosya', importNext: 'Devam et', importBack: 'Geri', importExecute: 'Verileri aktar',
+  importPreparing: 'Dosyanın kopyası hazırlanıyor…', importRunning: 'Verileriniz aktarılıyor. Lütfen bu pencereyi açık tutun.',
+  importOwners: 'Sahip', importPatients: 'Hayvan', importTodos: 'Hatırlatma',
+  importAutomatic: 'Kendiliğinden düzenlenir', importPhones: 'Telefonlarda eksik baştaki 0 tamamlanır. Düzenlenecek telefon:',
+  importDates: 'Okunabilen tarihler aynı biçimde saklanır.',
+  importAttention: 'Gözden geçirmeniz gerekenler', importValuesKept: 'Okunamayan değerler de saklanır. Sahibi bulunamayan hayvanlar “Sahibi bilinmeyen” altında tutulur. Benzer sahipler birleştirilmez.',
+  importNoIssues: 'Gözden geçirmeniz gereken bir kayıt bulunmadı.', importNoValue: 'Boş değer', importRecord: 'Kayıt',
+  importAlready: 'Daha önce aktarılan kayıtlar atlanır', importNoNew: 'Bu dosya daha önce aktarılmış; yeni kayıt yok.',
+  importEmpty: 'Bu dosyada aktarılacak kayıt yok.', importReady: 'Aktarmaya hazırsınız',
+  importComplete: 'Aktarma tamamlandı', importBackup: 'Aktarma öncesi yedek',
+  importSaveReport: 'Raporu kaydet', importReportSaved: 'Rapor kaydedildi.', importMock: 'Tarayıcı ön izlemesi: örnek veriler gösteriliyor.',
+  importError: 'İşlem tamamlanamadı. Dosyanız güvende. Yeniden deneyebilirsiniz.',
+  importInvalid: 'Bu dosya bir PatientsCare dosyası değil. Lütfen eski kayıtların bulunduğu .db dosyasını seçin.',
+  importBackupError: 'Yedek alınamadığı için aktarma başlamadı. Diskte yer olduğundan emin olup yeniden deneyin.',
+  importExpired: 'Ön izleme artık hazır değil. Dosyanızı yeniden seçin.', importReportError: 'Rapor kaydedilemedi. Başka bir konum seçip yeniden deneyin.',
+  importSchema: 'Dosyanızdaki bazı alanlar tanınmıyor veya eksik. Aşağıdaki bilgileri kontrol edin; eski dosyanız saklanır.',
+  importUnknownTables: 'Tanınmayan kayıt grupları', importMissingTables: 'Bulunmayan kayıt grupları', importUnknownColumns: 'Tanınmayan alanlar', importMissingColumns: 'Bulunmayan alanlar',
+  importPhoneUnparsed: 'Okunamayan telefonlar', importDateUnparsed: 'Okunamayan tarihler', importSpecies: 'Diğer olarak saklanan türler', importSex: 'Bilinmeyen cinsiyetler',
+  importMissingName: 'Eksik adlar', importId: 'Yenilenecek kayıt numaraları', importOrphanPatient: 'Sahibi bilinmeyen hayvanlar', importOrphanTodo: 'Sahibi bilinmeyen hatırlatmalar',
+  importPatientLink: 'Bulunamayan hayvan bağlantıları', importOwnerLink: 'Bulunamayan sahip bağlantıları', importMismatch: 'Farklı sahip bilgileri', importDuplicate: 'Benzer sahipler',
   appName: 'Baytar',
   tagline: 'Kliniğiniz için sade bir çalışma alanı.',
   workspace: 'Klinik çalışma alanı',
@@ -156,3 +183,7 @@ export type TranslationKey = keyof typeof tr;
 export function t<K extends TranslationKey>(key: K): (typeof tr)[K] {
   return tr[key];
 }
+
+export const importIssueKeys = {
+  phoneUnparsed: 'importPhoneUnparsed', dateUnparsed: 'importDateUnparsed', speciesUnrecognized: 'importSpecies', sexUnrecognized: 'importSex', missingName: 'importMissingName', unusableId: 'importId', orphanPatient: 'importOrphanPatient', orphanTodo: 'importOrphanTodo', danglingPatientLink: 'importPatientLink', danglingOwnerLink: 'importOwnerLink', ownerMismatch: 'importMismatch', duplicateOwner: 'importDuplicate'
+} as const;

@@ -1,3 +1,5 @@
+mod import;
+
 use baytar_core::{
     backup,
     db::{Database, DbError},
@@ -263,7 +265,9 @@ pub fn run() {
         baytar_core::version()
     );
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
+            import::initialize(app)?;
             let state = match app.path().app_data_dir() {
                 Ok(dir) => AppDatabase::initialize(&dir),
                 Err(_) => AppDatabase::failed(None),
@@ -272,6 +276,11 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            import::import_candidates,
+            import::import_prepare,
+            import::import_execute,
+            import::import_cancel,
+            import::import_save_report,
             app_version,
             startup_status,
             owners_list,

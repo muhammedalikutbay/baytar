@@ -7,3 +7,5 @@
 <PlaceholderPage title={tr.settings} description={tr.settingsDescription} icon={Settings2}
   emptyTitle={tr.settingsEmptyTitle} emptyDescription={tr.settingsEmptyDescription}
   actionLabel={tr.settingsAction} dialogTitle={tr.settingsDialogTitle} dialogDescription={tr.settingsDialogDescription} settings />
+
+<p class="mt-5"><a class="text-accent underline" href="/import">{tr.importTitle}</a></p>
