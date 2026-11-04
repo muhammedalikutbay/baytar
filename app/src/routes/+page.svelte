@@ -1,33 +1,43 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { House, CalendarDays, Syringe, TriangleAlert, Plus, UserRoundPlus, Search } from '@lucide/svelte';
-  import { PageHeader, StatTile, Button, Card, Dialog, EmptyState, Badge, buttonStyles } from '$lib/components/ui';
+  import { House } from '@lucide/svelte';
+  import { PageHeader, Button, Card, EmptyState, buttonStyles } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
-  import { addDateDays, formatAgendaDate, formatDate, formatPhone, todayDate } from '$lib/format';
+  import { addDateDays, formatAgendaDate, todayDate } from '$lib/format';
   import * as appointments from '$lib/api/appointments';
   import * as vaccinations from '$lib/api/vaccinations';
   import * as owners from '$lib/api/owners';
-  import * as patients from '$lib/api/patients';
+  import * as billing from '$lib/api/billing';
+  import * as inventory from '$lib/api/inventory';
+  import * as settings from '$lib/api/settings';
   import { startupStatus } from '$lib/api/client';
-  import type { CalendarAppointment, DueVaccination, StartupStatus } from '$lib/api/types';
-  import AppointmentForm from '$lib/components/agenda/AppointmentForm.svelte';
-  import OwnerForm from '$lib/components/patients/OwnerForm.svelte';
+  import type { CalendarAppointment, DueVaccination, InventoryAlerts, Receivable, StartupStatus } from '$lib/api/types';
+  import QuickActions from '$lib/components/home/QuickActions.svelte';
+  import ActionDialogs, { type HomeDialog } from '$lib/components/home/ActionDialogs.svelte';
+  import TodayCard from '$lib/components/home/TodayCard.svelte';
+  import AttentionCard from '$lib/components/home/AttentionCard.svelte';
+  import UpcomingVaccinesCard from '$lib/components/home/UpcomingVaccinesCard.svelte';
+  import MonthStats from '$lib/components/home/MonthStats.svelte';
 
-  type VaccineRow = DueVaccination & { phone: string | null };
   let today = $state(todayDate());
   let ownersCount = $state<number | null>(null);
   let todayRows = $state<CalendarAppointment[]>([]);
-  let upcomingRows = $state<VaccineRow[]>([]);
-  let overdueRows = $state<VaccineRow[]>([]);
-  let overdueAppointments = $state<CalendarAppointment[]>([]);
+  let upcomingRows = $state<DueVaccination[]>([]);
+  let overdueRows = $state<DueVaccination[]>([]);
+  let debts = $state<Receivable[]>([]);
+  let alerts = $state<InventoryAlerts | null>(null);
+  let vetName = $state('');
+  let month = $state({ newOwners: 0, revenue: 0, collections: 0 });
   let status = $state<StartupStatus | null>(null);
   let loading = $state(true);
   let failed = $state(false);
   let busy = $state(false);
   let refresh = $state(0);
-  let dialog = $state<'owner' | 'appointment' | null>(null);
+  let dialog = $state<HomeDialog | null>(null);
 
   onMount(() => { const timer = setInterval(() => today = todayDate(), 60000); return () => clearInterval(timer); });
+  // Secondary widgets must never take the whole cockpit down.
+  const soft = <T,>(promise: Promise<T>, fallback: T): Promise<T> => promise.catch(() => fallback);
   $effect(() => {
     const day = today; refresh;
     let cancelled = false;
@@ -38,24 +48,22 @@
         if (cancelled) return;
         status = startup; ownersCount = ownerRows.length;
         if (!startup.ready || ownerRows.length === 0) return;
-        const yesterday = addDateDays(day, -1);
-        const [todayAppts, due, lateVaccines, pastAppts] = await Promise.all([
+        const monthStart = `${day.slice(0, 8)}01`;
+        const [todayAppts, due, late, prefs, receivables, stock, summary, allOwners] = await Promise.all([
           appointments.today(day), vaccinations.dueBetween(day, addDateDays(day, 7)), vaccinations.overdue(day),
-          appointments.between('0001-01-01', yesterday)
+          soft(settings.getAll(), {} as Record<string, string>), soft(billing.receivables(), [] as Receivable[]),
+          soft(inventory.alerts(day), null as InventoryAlerts | null),
+          soft(billing.dailySummary(monthStart, day), null), soft(owners.list({ limit: 5000 }), [])
         ]);
-        const overdueAppts = pastAppts.filter(row => row.appointment.status === 'planned');
-        const allVaccines = [...due, ...lateVaccines];
-        const phones = new Map<number, string | null>();
-        await Promise.all([...new Set(allVaccines.map(row => row.vaccination.patientId))].map(async id => {
-          const pet = await patients.get(id); const owner = await owners.get(pet.ownerId);
-          phones.set(id, owner.phone ?? owner.phoneRaw);
-        }));
-        if (!cancelled) {
-          todayRows = todayAppts;
-          upcomingRows = due.map(row => ({ ...row, phone: phones.get(row.vaccination.patientId) ?? null }));
-          overdueRows = lateVaccines.map(row => ({ ...row, phone: phones.get(row.vaccination.patientId) ?? null }));
-          overdueAppointments = overdueAppts;
-        }
+        if (cancelled) return;
+        todayRows = todayAppts; upcomingRows = due; overdueRows = late;
+        vetName = prefs.vet_name?.trim() ?? '';
+        debts = receivables.filter(row => row.balanceMinor > 0).sort((a, b) => b.balanceMinor - a.balanceMinor);
+        alerts = stock;
+        month = {
+          newOwners: allOwners.filter(owner => owner.createdAt.slice(0, 10) >= monthStart).length,
+          revenue: summary?.chargesMinor ?? 0, collections: summary?.collectionsMinor ?? 0
+        };
       } catch { if (!cancelled) failed = true; }
       finally { if (!cancelled) loading = false; }
     })();
@@ -67,8 +75,14 @@
   };
   const startupMessage = $derived(status && (status.ready === false || status.code === 'backup_failed')
     ? startupMessages[status.code ?? ''] ?? tr.homeStartupOther : '');
-  const overdueCount = $derived(overdueRows.length + overdueAppointments.length);
-  function focusSearch() { document.querySelector<HTMLInputElement>('.window-search input[type="search"]')?.focus(); }
+  const greeting = $derived.by(() => {
+    const hour = new Date().getHours();
+    const base = hour < 12 ? tr.cockpitMorning : hour < 18 ? tr.cockpitDay : tr.cockpitEvening;
+    return vetName ? `${base}, ${vetName}` : base;
+  });
+  const summaryLine = $derived(
+    `${todayRows.length ? tr.cockpitSummaryAppointments.replace('{n}', String(todayRows.length)) : tr.cockpitSummaryNoAppointments}, ${
+      overdueRows.length ? tr.cockpitSummaryOverdue.replace('{n}', String(overdueRows.length)) : tr.cockpitSummaryClear}`);
   async function setDone(id: number) {
     if (busy) return;
     busy = true;
@@ -76,20 +90,11 @@
     catch { failed = true; }
     finally { busy = false; }
   }
+  const ready = $derived(!loading && !failed && status?.ready === true && (ownersCount ?? 0) > 0);
 </script>
 
-<div class="grid gap-8">
-  <PageHeader title={tr.homeDate} subtitle={formatAgendaDate(today)} icon={House}>
-    {#snippet actions()}
-      {#if !loading && ownersCount !== null && ownersCount > 0 && status?.ready}
-        <Button size="sm" variant="secondary" onclick={() => dialog = 'owner'}><UserRoundPlus size={16} aria-hidden="true" />{tr.homeNewOwner}</Button>
-        <Button size="sm" onclick={() => dialog = 'appointment'}><Plus size={16} aria-hidden="true" />{tr.homeAddAppointment}</Button>
-        <Button size="sm" variant="secondary" onclick={focusSearch}><Search size={16} aria-hidden="true" />{tr.homeFindPatient}</Button>
-      {:else if !loading && ownersCount === 0 && status?.ready}
-        <Button onclick={() => dialog = 'owner'}><UserRoundPlus size={16} aria-hidden="true" />{tr.homeNewOwner}</Button>
-      {/if}
-    {/snippet}
-  </PageHeader>
+<div class="grid gap-6">
+  <PageHeader title={ready ? greeting : tr.homeDate} subtitle={ready ? `${formatAgendaDate(today)} · ${summaryLine}` : formatAgendaDate(today)} icon={House} />
 
   {#if loading}<p role="status" class="text-fg-muted">{tr.loading}</p>
   {:else if status?.ready === false}<Card><p role="alert" class="text-fg-muted">{startupMessage}</p></Card>
@@ -100,41 +105,18 @@
     </EmptyState></Card>
   {:else}
     {#if status?.code === 'backup_failed'}<Card><p role="status" class="text-fg-muted">{startupMessage}</p></Card>{/if}
-    <div class="grid gap-4 md:grid-cols-3">
-      <StatTile icon={CalendarDays} value={todayRows.length} label={tr.homeAppointments} hint={formatAgendaDate(today)} />
-      <StatTile icon={Syringe} value={upcomingRows.length} label={tr.homeUpcomingVaccines} hint={tr.upcoming} />
-      <StatTile icon={TriangleAlert} tone="highlight" value={overdueCount} label={tr.homeOverdue} hint={tr.homeOverdueHint} />
-    </div>
-    <div class="grid gap-5 xl:grid-cols-2">
-      <section aria-labelledby="today-appointments"><Card title={tr.homeAppointments} icon={CalendarDays} count={todayRows.length} tone="accent" headingId="today-appointments">
-        {#snippet actions()}<a class="type-caption text-accent underline" href="/agenda">{tr.homeAll}</a>{/snippet}
-        {#if !todayRows.length}<p class="text-fg-muted">{tr.homeNoAppointments}</p>
-        {:else}<ul class="divide-y divide-border">{#each todayRows.slice(0, 5) as row (row.appointment.id)}<li class="flex flex-wrap items-center gap-3 py-3">
-          <span class="w-12 tabular-nums text-fg-muted">{row.appointment.startsTime ?? tr.agendaAllDay}</span><div class="min-w-0 flex-1"><p class="font-medium break-words">{row.appointment.title}</p><p class="type-caption text-fg-muted">{row.patientName ?? ''}{row.patientName && row.ownerName ? ' · ' : ''}{row.ownerName ?? ''}</p></div>
-          {#if row.appointment.status === 'planned'}<Button size="sm" variant="secondary" disabled={busy} onclick={() => setDone(row.appointment.id)}>{tr.appointmentDone}</Button>{:else}<Badge variant="success">{tr.appointmentDone}</Badge>{/if}
-        </li>{/each}</ul>{/if}
-      </Card></section>
-
-      <section aria-labelledby="upcoming-vaccines"><Card title={tr.homeUpcomingVaccines} icon={Syringe} count={upcomingRows.length} tone="accent" headingId="upcoming-vaccines">
-        {#snippet actions()}<a class="type-caption text-accent underline" href="/vaccines">{tr.homeAll}</a>{/snippet}
-        {#if !upcomingRows.length}<p class="text-fg-muted">{tr.homeNoVaccines}</p>
-        {:else}<ul class="divide-y divide-border">{#each upcomingRows.slice(0, 5) as row (row.vaccination.id)}<li class="flex flex-wrap items-center gap-x-4 gap-y-1 py-3"><div class="min-w-28 flex-1"><p class="font-medium">{row.patientName}</p><p class="type-caption text-fg-muted">{row.ownerName}{row.phone ? ` · ${formatPhone(row.phone)}` : ''}</p></div><span class="min-w-24 flex-1">{row.vaccination.vaccineName}</span><span class="type-caption tabular-nums">{formatDate(row.vaccination.nextDueOn)}</span></li>{/each}</ul>{/if}
-      </Card></section>
-
-      <section aria-labelledby="overdue-items" class="xl:col-span-2"><Card title={tr.homeOverdue} icon={TriangleAlert} count={overdueCount} tone="highlight" headingId="overdue-items">
-        {#snippet actions()}<a class="type-caption text-accent underline" href="/agenda">{tr.homeAll}</a>{/snippet}
-        {#if overdueCount === 0}<p class="text-fg-muted">{tr.homeNoOverdue}</p>
-        {:else}<ul class="divide-y divide-border">
-          {#each overdueRows.slice(0, 5) as row (row.vaccination.id)}<li class="flex flex-wrap items-center gap-3 py-3"><Badge variant="highlight">{tr.vaccination}</Badge><div class="min-w-0 flex-1"><p class="font-medium">{row.patientName} · {row.vaccination.vaccineName}</p><p class="type-caption text-fg-muted">{row.ownerName}{row.phone ? ` · ${formatPhone(row.phone)}` : ''}</p></div><span class="type-caption tabular-nums text-highlight">{formatDate(row.vaccination.nextDueOn)}</span></li>{/each}
-          {#each overdueAppointments.slice(0, Math.max(0, 5 - Math.min(5, overdueRows.length))) as row (row.appointment.id)}<li class="flex flex-wrap items-center gap-3 py-3"><Badge variant="highlight">{tr.appointment}</Badge><div class="min-w-0 flex-1"><p class="font-medium">{row.appointment.title}</p><p class="type-caption text-fg-muted">{row.patientName ?? ''}{row.patientName && row.ownerName ? ' · ' : ''}{row.ownerName ?? ''}</p></div><span class="type-caption tabular-nums text-highlight">{formatDate(row.appointment.startsOn)}</span></li>{/each}
-        </ul>{/if}
-      </Card></section>
+    <QuickActions onaction={action => dialog = action} />
+    <div class="grid items-start gap-5 min-[1100px]:grid-cols-2">
+      <div class="grid gap-5">
+        <TodayCard rows={todayRows} {busy} ondone={setDone} onadd={() => dialog = 'appointment'} />
+        <UpcomingVaccinesCard rows={upcomingRows} />
+      </div>
+      <div class="grid gap-5">
+        <AttentionCard overdue={overdueRows} {debts} {alerts} />
+        <MonthStats newOwners={month.newOwners} revenueMinor={month.revenue} collectionsMinor={month.collections} />
+      </div>
     </div>
   {/if}
 </div>
 
-<Dialog bind:open={() => dialog !== null, value => { if (!value) dialog = null; }} title={dialog === 'owner' ? tr.newOwner : tr.agendaDialogTitle} description={dialog === 'owner' ? tr.ownerFormDescription : tr.appointmentFormDescription}>
-  {#if dialog === 'owner'}<OwnerForm onsaved={() => { dialog = null; refresh++; }} oncancel={() => dialog = null} />
-  {:else if dialog === 'appointment'}<AppointmentForm date={today} onsaved={() => { dialog = null; refresh++; }} oncancel={() => dialog = null} />{/if}
-  {#snippet footer()}{/snippet}
-</Dialog>
+<ActionDialogs bind:dialog date={today} onchanged={() => refresh++} />
