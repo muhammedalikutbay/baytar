@@ -34,6 +34,7 @@ export interface CommandMap {
   app_info: { args: Record<string, never>; result: AppInfo };
   open_data_folder: { args: Record<string, never>; result: null };
   open_whatsapp: { args: { url: string }; result: null };
+  dose_calculate: { args: { input: DoseInput }; result: DoseResult };
   import_candidates: { args: Record<string, never>; result: ImportCandidate[] };
   import_prepare: { args: { path: string }; result: PreparedImport };
   import_execute: { args: { token: string }; result: ImportReport };
@@ -58,6 +59,16 @@ export interface CommandMap {
 
 export interface BackupInfo { path: string; createdAt: string; kind: 'daily' | 'manual' | 'pre-migration' | 'pre-restore' | 'pre-import' | 'pre-update'; sizeBytes: number }
 export interface AppInfo { version: string; dataFolder: string; backupsFolder: string; databaseSizeBytes: number }
+export interface DoseInput {
+  weightKg: number;
+  mgPerKgMin: number;
+  mgPerKgMax: number | null;
+  concentrationMgPerMl: number | null;
+  strengthMgPerUnit: number | null;
+}
+export interface DoseRange { min: number; max: number | null }
+export type DoseWarning = 'verySmallVolume' | 'impracticalUnitCount';
+export interface DoseResult { mg: DoseRange; ml: DoseRange | null; units: DoseRange | null; warnings: DoseWarning[] }
 
 export interface ImportCandidate { path: string; fileName: string; sizeBytes: number; modifiedAt: string | null; location: string }
 export interface ImportCounts { owners: number; patients: number; todos: number }

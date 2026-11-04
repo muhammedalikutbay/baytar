@@ -420,6 +420,20 @@ fn vaccinations_overdue(
     state.with(|conn| vaccinations::overdue(conn, &today))
 }
 #[tauri::command]
+fn dose_calculate(
+    input: baytar_core::dose::DoseInput,
+) -> Result<baytar_core::dose::DoseResult, CommandError> {
+    baytar_core::dose::calculate(&input).map_err(|error| CommandError {
+        kind: ErrorKind::Invalid,
+        field: match &error {
+            baytar_core::dose::DoseError::Invalid { field, .. } => Some((*field).into()),
+            baytar_core::dose::DoseError::OutOfRange => None,
+        },
+        message: error.to_string(),
+    })
+}
+
+#[tauri::command]
 fn medication_get(state: State<'_, AppDatabase>, id: i64) -> Result<Medication, CommandError> {
     state.with(|conn| medications::get(conn, id))
 }
@@ -621,6 +635,7 @@ pub fn run() {
             vaccinations_due_between,
             vaccinations_overdue,
             medication_get,
+            dose_calculate,
             medication_create,
             medication_update,
             medication_delete,

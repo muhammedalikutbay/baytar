@@ -36,6 +36,14 @@ export function whatsappPhone(value: string | null | undefined): string | null {
   return /^90[1-9]\d{9}$/.test(digits) ? digits : null;
 }
 
+export function formatUnits(value: number): string {
+  const scaled = value * 4;
+  const rounded = Number.isFinite(scaled) ? Math.round(scaled) / 4 : value;
+  const whole = Math.floor(rounded);
+  const fraction = ['', '¼', '½', '¾'][Math.round((rounded - whole) * 4)] ?? '';
+  return `${whole || !fraction ? formatNumber(whole, 0) : ''}${fraction}`;
+}
+
 export function formatPhone(value: string | null | undefined): string {
   if (!value) return '';
   let digits = value.replace(/\D/g, '');
@@ -83,8 +91,8 @@ export function parseDecimal(value: string): number | null {
   return Number(value.trim().replace(',', '.'));
 }
 
-export function formatNumber(value: number): string {
-  return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 6 }).format(value);
+export function formatNumber(value: number, maximumFractionDigits = 6): string {
+  return new Intl.NumberFormat('tr-TR', { maximumFractionDigits }).format(value);
 }
 
 export function formatMonth(value: string): string {

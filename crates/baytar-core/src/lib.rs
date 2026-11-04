@@ -2,6 +2,7 @@
 
 pub mod backup;
 pub mod db;
+pub mod dose;
 pub mod legacy;
 pub mod model;
 pub mod repo;
