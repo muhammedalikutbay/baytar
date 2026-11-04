@@ -1,12 +1,12 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { Wallet, Receipt, Users, List } from '@lucide/svelte';
-  import { PageHeader, Card, StatTile, Badge, Button, EmptyState, Select, DateInput, Checkbox, Dialog } from '$lib/components/ui';
+  import { PageHeader, Card, StatTile, Badge, Button, EmptyState, Select, DateInput, Checkbox, Dialog, buttonStyles } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { formatDate, formatMoney, todayDate, daysUntil, whatsappPhone } from '$lib/format';
   import * as billing from '$lib/api/billing';
   import * as owners from '$lib/api/owners';
-  import { openWhatsapp } from '$lib/api/settings';
+  import { sendWhatsapp } from '$lib/whatsapp';
   import type { Service, Receivable, DailySummary, Owner } from '$lib/api/types';
   import AccountCard from '$lib/components/billing/AccountCard.svelte';
   import Statement from '$lib/components/billing/Statement.svelte';
@@ -71,7 +71,7 @@
     const phone=whatsappPhone(row.phone);if(!phone || busy)return;
     busy=true;actionError='';
     const message=tr.billingReminderText.replace('{owner}',row.ownerName).replace('{amount}',formatMoney(row.balanceMinor));
-    try{await openWhatsapp(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`);}catch{actionError=tr.actionError;}finally{busy=false;}
+    try{await sendWhatsapp(phone, message);}catch{actionError=tr.actionError;}finally{busy=false;}
   }
   async function serviceAction(service:Service,restore=false,toggle=false){
     if(busy)return;busy=true;actionError='';
@@ -100,7 +100,7 @@
       {#if !debts.length}<EmptyState icon={Wallet} title={tr.billingNoReceivables} description={tr.billingNoReceivablesHint}>{#snippet action()}<Button onclick={()=>choose('charge')}>{tr.billingAddCharge}</Button>{/snippet}</EmptyState>{:else}
         <div class="mb-4 max-w-xs"><Select label={tr.billingSort} bind:value={sort} options={[{value:'amount',label:tr.billingByAmount},{value:'age',label:tr.billingByAge}]} /></div>
         <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="type-caption text-fg-muted"><tr><th class="p-3">{tr.billingOwner}</th><th class="p-3 text-right">{tr.billingBalance}</th><th class="p-3">{tr.billingOldestDebt}</th><th class="p-3">{tr.billingLastPayment}</th><th class="p-3">{tr.billingReminder}</th></tr></thead><tbody>
-          {#each sorted as row (row.ownerId)}<tr class="border-t border-border"><td class="p-3"><a href={`/accounts?ownerId=${row.ownerId}`} class="font-medium text-accent underline">{row.ownerName}</a></td><td class="whitespace-nowrap p-3 text-right font-semibold tabular-nums text-highlight">{formatMoney(row.balanceMinor)}</td><td class="whitespace-nowrap p-3">{formatDate(row.oldestUnpaidOn)}<p class="type-caption text-fg-muted">{tr.billingAge}: {Math.max(0,-(daysUntil(row.oldestUnpaidOn) ?? 0))} {tr.billingDays}</p></td><td class="whitespace-nowrap p-3">{row.lastPaymentOn?formatDate(row.lastPaymentOn):'—'}</td><td class="p-3"><Button variant="ghost" size="sm" disabled={!whatsappPhone(row.phone)||busy} onclick={()=>reminder(row)}>{tr.billingReminder}</Button></td></tr>{/each}
+          {#each sorted as row (row.ownerId)}<tr class="border-t border-border"><td class="p-3"><a href={`/accounts?ownerId=${row.ownerId}`} class="font-medium text-accent underline">{row.ownerName}</a></td><td class="whitespace-nowrap p-3 text-right font-semibold tabular-nums text-highlight">{formatMoney(row.balanceMinor)}</td><td class="whitespace-nowrap p-3">{formatDate(row.oldestUnpaidOn)}<p class="type-caption text-fg-muted">{tr.billingAge}: {Math.max(0,-(daysUntil(row.oldestUnpaidOn) ?? 0))} {tr.billingDays}</p></td><td class="whitespace-nowrap p-3">{row.lastPaymentOn?formatDate(row.lastPaymentOn):'—'}</td><td class="p-3">{#if whatsappPhone(row.phone)}<Button variant="ghost" size="sm" disabled={busy} onclick={()=>reminder(row)}>{tr.billingReminder}</Button>{:else}<a class={buttonStyles('ghost', 'sm')} href={'/patients/owner?id=' + row.ownerId}>{tr.whatsappAddPhone}</a>{/if}</td></tr>{/each}
         </tbody></table></div>
       {/if}
     </Card>

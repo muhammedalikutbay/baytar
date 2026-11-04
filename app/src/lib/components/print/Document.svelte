@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tr } from '$lib/i18n/tr';
   import { formatDate, formatPhone, formatNumber, formatMoney } from '$lib/format';
-  import { safeClinicLogo } from '$lib/api/settings';
+  import Logo from '$lib/components/brand/Logo.svelte';
   import { documentTitles, type PrintDocument } from './documents';
   import Prescriptions from './Prescriptions.svelte';
   let { data }: { data: PrintDocument } = $props();
@@ -14,7 +14,7 @@
   });
 </script>
 <header class="clinic-header">
-  {#if safeClinicLogo(clinic.clinic_logo)}<img src={safeClinicLogo(clinic.clinic_logo)} alt={tr.documentsLogo} />{/if}
+  <Logo size={72} logo={clinic.clinic_logo} />
   <div>
     {#if clinic.clinic_name}<h2>{clinic.clinic_name}</h2>{/if}
     <p>{clinic.vet_name}{clinic.clinic_title ? ` · ${clinic.clinic_title}` : ''}</p>

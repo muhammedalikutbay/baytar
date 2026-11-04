@@ -1,4 +1,9 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { getAll } from '$lib/api/settings';
+  import { parseWhatsappMode, whatsappModeLabel, type WhatsappMode } from '$lib/whatsapp';
+  let whatsappMode = $state<WhatsappMode>('auto');
+  onMount(() => { void getAll().then(values => whatsappMode = parseWhatsappMode(values.whatsapp_mode)).catch(() => {}); });
   import { BellRing, Syringe, CalendarDays, Wallet, ClipboardCheck, CircleCheck, Hourglass } from '@lucide/svelte';
   import { PageHeader, Card, Button, Select, Checkbox, Dialog, StatTile, buttonStyles } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
@@ -73,6 +78,7 @@
   <PageHeader title={tr.remindersTitle} subtitle={tr.remindersDescription} icon={BellRing}>
     {#snippet actions()}<Button variant="secondary" onclick={() => templatesOpen = true}>{tr.remindersEditTemplates}</Button>{/snippet}
   </PageHeader>
+  <aside class="rounded-md border border-border bg-surface-muted p-3 text-sm text-fg-muted"><p>{tr.whatsappExplanation}</p><p class="mt-1">{tr.whatsappCurrentMode}: {whatsappModeLabel[whatsappMode]} · <a class="text-accent underline" href="/settings#whatsapp">{tr.whatsappChangeSettings}</a></p></aside>
 
   {#if failed && !overview}
     <Card><p role="alert" class="text-danger">{tr.loadError}</p><div class="mt-3"><Button variant="secondary" onclick={() => refresh++}>{tr.retry}</Button></div></Card>

@@ -20,6 +20,7 @@ const KEYS: &[&str] = &[
     "clinic_tax_office",
     "clinic_tax_no",
     "clinic_logo",
+    "whatsapp_mode",
     "update_check_enabled",
     "inventory_deduct_default",
     "reminder_template_vaccine",
@@ -41,7 +42,10 @@ fn internal() -> String {
 pub fn settings_get_all(state: State<'_, AppDatabase>) -> Result<BTreeMap<String, String>, String> {
     let guard = state.database.lock().map_err(|_| internal())?;
     let db = guard.as_ref().ok_or_else(internal)?;
-    let mut values = BTreeMap::from([("update_check_enabled".to_string(), "1".to_string())]);
+    let mut values = BTreeMap::from([
+        ("update_check_enabled".to_string(), "1".to_string()),
+        ("whatsapp_mode".to_string(), "auto".to_string()),
+    ]);
     let mut statement = db
         .conn()
         .prepare("SELECT key, value FROM settings")
@@ -67,6 +71,7 @@ pub fn settings_set(
     value: String,
 ) -> Result<(), String> {
     if !KEYS.contains(&key.as_str())
+        || (key == "whatsapp_mode" && !["auto", "app", "web"].contains(&value.as_str()))
         || (key == "update_check_enabled" && !["1", "0"].contains(&value.as_str()))
     {
         return Err("Invalid setting.".into());
@@ -197,10 +202,35 @@ pub fn open_data_folder(app: tauri::AppHandle) -> Result<(), String> {
         .map_err(|_| internal())
 }
 
-/// Opens a WhatsApp chat link in the default browser. Only `https://wa.me/` links are allowed.
+/// Accept only chat URLs produced by the frontend, never arbitrary schemes or hosts.
+fn valid_whatsapp_url(url: &str) -> bool {
+    let Some(rest) = url
+        .strip_prefix("https://wa.me/")
+        .or_else(|| url.strip_prefix("https://web.whatsapp.com/send?phone="))
+        .or_else(|| url.strip_prefix("whatsapp://send?phone="))
+    else {
+        return false;
+    };
+    let separator = if url.starts_with("https://wa.me/") {
+        "?text="
+    } else {
+        "&text="
+    };
+    let Some((phone, text)) = rest.split_once(separator) else {
+        return false;
+    };
+    (7..=15).contains(&phone.len())
+        && !phone.starts_with('0')
+        && phone.bytes().all(|b| b.is_ascii_digit())
+        && text
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b"-_.!~*'()%".contains(&b))
+}
+
+/// Opens a validated WhatsApp chat in the selected application.
 #[tauri::command]
 pub fn open_whatsapp(app: tauri::AppHandle, url: String) -> Result<(), String> {
-    if !url.starts_with("https://wa.me/") {
+    if !valid_whatsapp_url(&url) {
         return Err(internal());
     }
     app.opener()
@@ -211,6 +241,36 @@ pub fn open_whatsapp(app: tauri::AppHandle, url: String) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn whatsapp_chat_urls_are_strictly_scoped() {
+        for prefix in [
+            "https://wa.me/",
+            "https://web.whatsapp.com/send?phone=",
+            "whatsapp://send?phone=",
+        ] {
+            let separator = if prefix == "https://wa.me/" {
+                "?text="
+            } else {
+                "&text="
+            };
+            assert!(valid_whatsapp_url(&format!(
+                "{prefix}905551234567{separator}Hello%20world"
+            )));
+        }
+        for url in [
+            "http://wa.me/905551234567?text=x",
+            "https://wa.me.evil/905551234567?text=x",
+            "https://web.whatsapp.com/send/905551234567?text=x",
+            "whatsapp://call?phone=905551234567",
+            "https://wa.me/+905551234567?text=x",
+            "https://wa.me/905551234567?text=x&redirect=evil",
+            "https://wa.me/905551234567?text=x\n",
+            "https://wa.me/?text=x",
+        ] {
+            assert!(!valid_whatsapp_url(url), "{url}");
+        }
+    }
 
     #[test]
     fn pre_update_backup_preserves_current_database_and_returns_metadata() {

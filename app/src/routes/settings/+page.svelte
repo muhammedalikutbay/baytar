@@ -1,8 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { ExternalLink, Settings2, Moon, Stethoscope, ShieldCheck, Import, RefreshCw, Info } from '@lucide/svelte';
+  import { ExternalLink, Settings2, Moon, Stethoscope, ShieldCheck, Import, RefreshCw, Info, Upload, MessageCircle } from '@lucide/svelte';
   import { PageHeader, IconChip, Card, EmailInput } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
+  import { applyBranding } from '$lib/branding.svelte';
+  import { whatsappPhone } from '$lib/format';
+  import { sendWhatsapp, parseWhatsappMode, whatsappModes, whatsappModeLabel, type WhatsappMode } from '$lib/whatsapp';
   import { theme } from '$lib/theme.svelte';
   import { updater } from '$lib/updater.svelte';
   import * as api from '$lib/api/settings';
@@ -15,6 +18,24 @@
   import Dialog from '$lib/components/ui/Dialog.svelte';
   import { buttonStyles } from '$lib/components/ui/button';
 
+  let logoInput: HTMLInputElement;
+  let whatsappMode = $state<WhatsappMode>('auto');
+  let savedPhone = $state('');
+  let whatsappBusy = $state(false);
+  const modeHints = { auto: tr.whatsappAutoHint, app: tr.whatsappAppHint, web: tr.whatsappWebHint };
+  async function setWhatsappMode(mode: WhatsappMode) {
+    whatsappBusy = true;
+    try { await api.set('whatsapp_mode', mode); whatsappMode = mode; error = ''; }
+    catch { error = tr.settingsError; }
+    finally { whatsappBusy = false; }
+  }
+  async function testWhatsapp() {
+    const phone = whatsappPhone(savedPhone); if (!phone || whatsappBusy) return;
+    whatsappBusy = true;
+    try { await sendWhatsapp(phone, tr.whatsappTestText, whatsappMode); error = ''; }
+    catch { error = tr.remindersWhatsAppError; }
+    finally { whatsappBusy = false; }
+  }
   let clinic = $state({ ...api.emptyClinic });
   let logoBusy = $state(false);
   let clinicBusy = $state(false);
@@ -31,24 +52,27 @@
   async function load() {
     try {
       const [values, rows, appInfo] = await Promise.all([api.getAll(), api.backups(), api.info()]);
-      clinic = api.clinicProfile(values); clinicReady = true;
+      clinic = api.clinicProfile(values); clinicReady = true; savedPhone = clinic.clinic_phone; whatsappMode = parseWhatsappMode(values.whatsapp_mode);
       updateEnabled = (values.update_check_enabled ?? '1') !== '0'; backups = rows; info = appInfo;
     } catch { error = tr.settingsError; }
   }
   async function saveClinic() {
     if (clinicBusy || logoBusy || !clinicReady) return;
     clinicBusy = true; toast = '';
-    try { await Promise.all(Object.entries(clinic).map(([key, value]) => api.set(key, value))); toast = tr.settingsSaved; error = ''; }
+    try { await Promise.all(Object.entries(clinic).map(([key, value]) => api.set(key, value))); applyBranding(clinic); savedPhone = clinic.clinic_phone; toast = tr.settingsSaved; error = ''; }
     catch { error = tr.settingsError; }
     finally { clinicBusy = false; }
   }
   async function selectLogo(event: Event) {
     const input = event.currentTarget as HTMLInputElement;
-    const file = input.files?.[0]; if (!file) return;
+    const file = input.files?.[0]; if (file) await prepareLogo(file); input.value = '';
+  }
+  async function prepareLogo(file: File) {
+    if (logoBusy || clinicBusy || !clinicReady) return;
     logoBusy = true; toast = ''; error = '';
     try { clinic.clinic_logo = await api.prepareClinicLogo(file); }
     catch { error = tr.documentsLogoError; }
-    finally { logoBusy = false; input.value = ''; }
+    finally { logoBusy = false; }
   }
   async function backupNow() { busy = true; try { await api.createBackup(); backups = await api.backups(); toast = tr.settingsSaved; error = ''; } catch { error = tr.settingsBackupError; } finally { busy = false; } }
   async function exportBackup() { try { if (await api.exportBackup()) { toast = tr.settingsBackupExported; error = ''; } } catch { error = tr.settingsBackupError; } }
@@ -80,14 +104,34 @@
       <EmailInput label={tr.email} bind:value={clinic.clinic_email} />
       <label class="grid gap-1 text-sm sm:col-span-2">{tr.settingsAddress}<textarea class="min-h-22 rounded-md border border-border-control bg-surface p-3 text-fg" bind:value={clinic.clinic_address}></textarea></label>
       <div class="grid gap-3 sm:col-span-2">
-        <label class="grid gap-2 text-sm">{tr.documentsLogo}<input type="file" accept="image/png,image/jpeg,image/webp" disabled={logoBusy} onchange={selectLogo} /></label>
+        <span class="text-sm font-medium">{tr.documentsLogo}</span>
+        <input bind:this={logoInput} type="file" class="hidden" accept="image/png,image/jpeg,image/webp" disabled={logoBusy} onchange={selectLogo} />
+        <div class="flex flex-wrap items-center gap-4">
+          <button type="button" class="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-control bg-surface-muted" aria-label={tr.brandingDrop} disabled={logoBusy} onclick={() => logoInput.click()} ondragover={e => e.preventDefault()} ondrop={e => { e.preventDefault(); const file = e.dataTransfer?.files[0]; if (file) void prepareLogo(file); }}>
+            {#if api.safeClinicLogo(clinic.clinic_logo)}<img src={api.safeClinicLogo(clinic.clinic_logo)} alt={tr.documentsLogo} class="size-24 object-contain" />{:else}<Upload size={24} class="text-fg-muted" />{/if}
+          </button>
+          <div class="grid gap-2"><div class="flex flex-wrap gap-2">
+            <button type="button" class={buttonStyles('secondary')} disabled={logoBusy} onclick={() => logoInput.click()}><Upload size={16} />{clinic.clinic_logo ? tr.brandingChange : tr.brandingUpload}</button>
+            {#if clinic.clinic_logo}<button type="button" disabled={logoBusy} class={buttonStyles('ghost')} onclick={() => clinic.clinic_logo = ''}>{tr.brandingRemove}</button>{/if}
+          </div><p class="text-sm text-fg-muted">{tr.brandingDrop}</p></div>
+        </div>
         <p class="text-sm text-fg-muted">{tr.documentsLogoHint}</p>
-        {#if api.safeClinicLogo(clinic.clinic_logo)}<img src={api.safeClinicLogo(clinic.clinic_logo)} alt={tr.documentsLogo} class="h-20 w-36 rounded-sm border border-border bg-surface object-contain" /><button type="button" disabled={logoBusy} class={buttonStyles('secondary')} onclick={() => clinic.clinic_logo = ''}>{tr.documentsRemoveLogo}</button>{/if}
       </div>
       <div class="sm:col-span-2"><button class={buttonStyles('primary')} type="submit" disabled={logoBusy || clinicBusy || !clinicReady}>{clinicBusy || logoBusy ? tr.loading : tr.save}</button></div>
       </fieldset>
     </form>
   </Card>
+  <section id="whatsapp">
+    <Card title={tr.whatsappTitle} icon={MessageCircle}>
+      <fieldset class="grid gap-3" disabled={!clinicReady || whatsappBusy}>
+        <legend class="mb-2 text-sm font-medium">{tr.whatsappCurrentMode}</legend>
+        {#each whatsappModes as mode}<label class="flex min-h-11 items-start gap-3"><input type="radio" name="whatsapp-mode" value={mode} checked={whatsappMode === mode} onchange={() => void setWhatsappMode(mode)} class="mt-1 accent-ink" /><span><span class="block font-medium">{whatsappModeLabel[mode]}</span><span class="text-sm text-fg-muted">{modeHints[mode]}</span></span></label>{/each}
+      </fieldset>
+      <h3 class="mt-4 font-medium">{tr.whatsappHow}</h3><p class="mt-1 text-sm text-fg-muted">{tr.whatsappExplanation}</p><p class="mt-2 text-sm text-fg-muted">{tr.whatsappInstallHint}</p>
+      <button type="button" class={buttonStyles('secondary') + ' mt-4'} disabled={!clinicReady || !whatsappPhone(savedPhone) || whatsappBusy} onclick={() => void testWhatsapp()}>{tr.whatsappTest}</button>
+      {#if !whatsappPhone(savedPhone)}<p class="mt-2 text-sm text-fg-muted">{tr.whatsappPhoneHint}</p>{/if}
+    </Card>
+  </section>
   <LockCard />
   <VisitTemplatesCard />
   <ReminderTemplatesCard />

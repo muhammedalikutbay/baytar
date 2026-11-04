@@ -1,7 +1,8 @@
 ﻿<script lang="ts">
   import { Syringe, TriangleAlert, CalendarDays } from '@lucide/svelte';
-  import { isTauri } from '@tauri-apps/api/core';
-  import { openWhatsapp } from '$lib/api/settings';
+  import { goto } from '$app/navigation';
+  import { get as getPatient } from '$lib/api/patients';
+  import { sendWhatsapp } from '$lib/whatsapp';
   import { PageHeader, Card, Button, Badge, Dialog, Select, StatTile } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
   import { todayDate, dateAfterDays, dateAfterMonths, daysUntil, formatDate, whatsappPhone, parseDate } from '$lib/format';
@@ -37,12 +38,15 @@
       .catch(() => { if (!cancelled) failed = true; }).finally(() => { if (!cancelled) loading = false; });
     return () => { cancelled = true; };
   });
+  async function addPhone(row: VaccineDue) {
+    try { const patient = await getPatient(row.patientId); await goto('/patients/owner?id=' + patient.ownerId); }
+    catch { reminderError = true; }
+  }
   async function reminder(row: VaccineDue) {
     const phone = whatsappPhone(row.phone); if (!phone) return;
     reminderError = false;
     const message = tr.vaccineReminder.replace('{owner}', row.ownerName).replace('{patient}', row.patientName).replace('{vaccine}', row.vaccineName).replace('{date}', formatDate(row.dueOn));
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-    try { if (isTauri()) await openWhatsapp(url); else window.open(url, '_blank', 'noopener,noreferrer'); }
+    try { await sendWhatsapp(phone, message); }
     catch { reminderError = true; }
   }
   function saved() { dialog = null; postponing = null; refresh++; }
@@ -79,7 +83,7 @@
             <div class="flex flex-wrap gap-2">
               <Button size="sm" variant="secondary" onclick={() => dialog = { mode: 'give', date: today, row }}>{tr.vaccinationDone}</Button>
               <Button size="sm" variant="ghost" onclick={() => row.vaccineTypeId ? postponing = row : dialog = { mode: 'plan', date: row.dueOn, row }}>{tr.vaccinePostpone}</Button>
-              <Button size="sm" variant="ghost" disabled={!whatsappPhone(row.phone)} onclick={() => reminder(row)}>{tr.vaccineWhatsApp}</Button>
+              {#if whatsappPhone(row.phone)}<Button size="sm" variant="ghost" onclick={() => reminder(row)}>{tr.vaccineWhatsApp}</Button>{:else}<Button size="sm" variant="ghost" onclick={() => void addPhone(row)}>{tr.whatsappAddPhone}</Button>{/if}
             </div>
           </li>
         {/each}</ul>{/if}
