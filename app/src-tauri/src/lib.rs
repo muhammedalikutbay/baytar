@@ -48,6 +48,17 @@ use serde::Serialize;
 use std::sync::Mutex;
 use tauri::{Manager, State};
 
+/// The folder holding the database, backups and import work files. `BAYTAR_DATA_DIR`
+/// overrides the platform default, so tests and portable setups never touch real records.
+pub(crate) fn data_dir<R: tauri::Runtime>(
+    path: &tauri::path::PathResolver<R>,
+) -> tauri::Result<std::path::PathBuf> {
+    match std::env::var_os("BAYTAR_DATA_DIR") {
+        Some(dir) if !dir.is_empty() => Ok(std::path::PathBuf::from(dir)),
+        _ => path.app_data_dir(),
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "snake_case")]
 enum ErrorKind {
@@ -599,7 +610,7 @@ pub fn run() {
         .plugin(tauri_plugin_process::init())
         .setup(|app| {
             import::initialize(app)?;
-            let state = match app.path().app_data_dir() {
+            let state = match data_dir(app.path()) {
                 Ok(dir) => AppDatabase::initialize(&dir),
                 Err(_) => AppDatabase::failed(None),
             };

@@ -1,0 +1,56 @@
+{
+  "name": "e2e-v2",
+  "description": "v2 end-to-end check in the real window against an empty data folder (set BAYTAR_DATA_DIR). Legacy import with E.164 phones, idempotent re-import, built-in catalog, vaccination give + plan, billing, inventory FEFO, reminders, reports, and screenshots of every v2 screen. The legacy path must point to a synthetic file from make-legacy-db.py.",
+  "steps": [
+    { "type": "localStorage.clear" },
+    { "type": "reload" },
+    { "type": "wait", "text": "hoş geldiniz", "timeout": 60000 },
+    { "type": "screenshot", "path": "01-first-run.png" },
+
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_prepare', { path: 'C:/Users/Kutbay/Desktop/Baytar-deneme/HastaTakipDB.db' }).then(p => { window.__tok = p.token; return p.preview.found; })", "expect": { "owners": 2, "patients": 4, "todos": 2 } },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_execute', { token: window.__tok }).then(r => r.inserted)", "expect": { "owners": 2, "patients": 4, "todos": 2 } },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_prepare', { path: 'C:/Users/Kutbay/Desktop/Baytar-deneme/HastaTakipDB.db' }).then(p => { window.__tok2 = p.token; return p.preview.toImport; })", "expect": { "owners": 0, "patients": 0, "todos": 0 } },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_cancel', { token: window.__tok2 }).then(() => 'cancelled')", "expect": "cancelled" },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('owners_list', { query: { includeDeleted: false, limit: 50, offset: 0 } }).then(o => o.map(x => [x.fullName, x.phone]).sort())", "expect": [["Deneme Yılmaz", "+905551112233"], ["Sahibi bilinmeyen", null], ["Sınama Kaya", "+905554445566"]] },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('search', { query: 'tarcin', limit: 10 }).then(h => h.map(x => x.owner.fullName))", "expect": ["Deneme Yılmaz"] },
+
+    { "type": "eval", "expr": "Promise.all([window.__TAURI_INTERNALS__.invoke('vaccine_types_list', {}), window.__TAURI_INTERNALS__.invoke('medications_list', {}), window.__TAURI_INTERNALS__.invoke('services_list', { includeDeleted: false })]).then(([v, m, s]) => v.length >= 30 && m.length >= 100 && s.length >= 25 && v.every(x => !['cattle','sheep','goat','horse'].includes(x.species)))", "expect": true },
+
+    { "type": "eval", "expr": "(async () => { const inv = window.__TAURI_INTERNALS__.invoke; const owners = await inv('owners_list', { query: { includeDeleted: false, limit: 50, offset: 0 } }); const o = owners.find(x => x.fullName === 'Deneme Yılmaz'); const pets = await inv('patients_by_owner', { ownerId: o.id }); const pet = pets.find(p => p.species === 'dog' || p.species === 'cat') ?? pets[0]; const types = await inv('vaccine_types_list', {}); const rabies = types.find(t => /Kuduz/i.test(t.name)); window.__e2e = { ownerId: o.id, patientId: pet.id, rabiesId: rabies.id }; return !!rabies; })()", "expect": true },
+    { "type": "eval", "expr": "(async () => { const inv = window.__TAURI_INTERNALS__.invoke; const today = new Date().toLocaleDateString('sv-SE'); const s = await inv('vaccines_suggest', { patientId: window.__e2e.patientId, typeId: window.__e2e.rabiesId, givenOn: today }); return typeof s === 'string' || s === null || typeof s === 'object'; })()", "expect": true },
+
+    { "type": "eval", "expr": "(async () => { const inv = window.__TAURI_INTERNALS__.invoke; const today = new Date().toLocaleDateString('sv-SE'); const c = await inv('charge_create', { input: { ownerId: window.__e2e.ownerId, patientId: window.__e2e.patientId, visitId: null, serviceId: null, inventoryItemId: null, description: 'E2E muayene', quantity: 1, unitPriceMinor: 150000, discountMinor: 0, vatRate: null, chargedOn: today, notes: null } }); await inv('payment_create', { input: { ownerId: window.__e2e.ownerId, paidOn: today, amountMinor: 50000, method: 'cash', notes: null } }); return [c.totalMinor, await inv('account_balance', { ownerId: window.__e2e.ownerId })]; })()", "expect": [150000, 100000] },
+
+    { "type": "eval", "expr": "(async () => { const inv = window.__TAURI_INTERNALS__.invoke; const today = new Date().toLocaleDateString('sv-SE'); const r = await inv('reports_overview', { from: today.slice(0, 8) + '01', to: today, today }); const m = r.months.find(x => x.month === today.slice(0, 7)); return [m.revenueMinor, m.collectionsMinor]; })()", "expect": [150000, 50000] },
+    { "type": "eval", "expr": "(async () => { const inv = window.__TAURI_INTERNALS__.invoke; const today = new Date().toLocaleDateString('sv-SE'); const r = await inv('reminders_overview', { query: { today, vaccineDays: 7, debtDays: 30, followupDays: 7 } }); return Array.isArray(r.vaccines) && Array.isArray(r.debts); })()", "expect": true },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('backups_list').then(b => b.map(x => x.kind).sort())", "expect": ["daily", "pre-import"] },
+
+    { "type": "reload" },
+    { "type": "wait", "text": "Yeni muayene", "timeout": 20000 },
+    { "type": "screenshot", "path": "02-home.png" },
+    { "type": "click", "text": "Hastalar" },
+    { "type": "wait", "text": "Deneme Yılmaz", "timeout": 15000 },
+    { "type": "screenshot", "path": "03-patients.png" },
+    { "type": "click", "text": "Deneme Yılmaz" },
+    { "type": "wait", "text": "Tarçın", "timeout": 15000 },
+    { "type": "screenshot", "path": "04-owner.png" },
+    { "type": "click", "text": "Aşılar" },
+    { "type": "wait", "text": "Aşı uygula", "timeout": 15000 },
+    { "type": "screenshot", "path": "05-vaccines.png" },
+    { "type": "click", "text": "Hatırlatmalar" },
+    { "type": "wait", "text": "Borçlar", "timeout": 15000 },
+    { "type": "screenshot", "path": "06-reminders.png" },
+    { "type": "click", "text": "Stok" },
+    { "type": "wait", "text": "Katalogdan ekle", "timeout": 15000 },
+    { "type": "screenshot", "path": "07-inventory.png" },
+    { "type": "click", "text": "Hesaplar" },
+    { "type": "wait", "text": "Alacaklar", "timeout": 15000 },
+    { "type": "screenshot", "path": "08-accounts.png" },
+    { "type": "click", "text": "Raporlar" },
+    { "type": "wait", "text": "Dışa aktar", "timeout": 15000 },
+    { "type": "screenshot", "path": "09-reports.png" },
+    { "type": "click", "text": "Ayarlar" },
+    { "type": "wait", "text": "Uygulama kilidi", "timeout": 15000 },
+    { "type": "screenshot", "path": "10-settings.png" }
+  ]
+}

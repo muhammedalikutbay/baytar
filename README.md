@@ -16,15 +16,18 @@ Baytar began as a project for a relative who works as a freelance veterinarian w
 
 ## Features
 
-- Owners and patients, with search that ignores Turkish letter case and accents.
-- Visit records with prescriptions and weight history.
-- Vaccination tracking with due and overdue lists and WhatsApp reminder links.
-- A medication list you maintain, with a dose calculator for arithmetic only; no dose data is bundled.
-- An agenda with recurring reminders.
-- Automatic daily backups, restore and export.
-- Lossless import from PatientsCare.
-- Light and dark themes.
-- Automatic updates from GitHub Releases, with a backup taken before every update (you can turn the check off).
+- **Patients:** owners and pets (dogs, cats, birds, rabbits, rodents, ferrets, reptiles and any other animal), photos and files, allergy/behaviour alerts, Turkish-aware search.
+- **Visits:** SOAP-style records with vitals (weight, temperature, heart and respiratory rate, body condition score), reusable templates, prescriptions and weight history.
+- **Vaccines:** give and plan vaccinations from one page, schedules from a built-in catalog, due and overdue lists, calendar, WhatsApp reminders.
+- **Built-in catalog:** common pet vaccines, medicines (brands sold in Turkey and generics) and services; every entry is editable. The dose calculator only does arithmetic on doses you confirm.
+- **Accounts:** price list, charges per visit, payments, owner statements, receivables with debt age, daily cash summary.
+- **Stock:** items, lots and expiry dates, first-expiring-first-out use, low-stock and expiry warnings.
+- **Reminders centre:** vaccines, appointments, debts and follow-ups in one list, editable message templates, contact log.
+- **Reports:** monthly visits, patients, revenue and collections, species mix, top diagnoses and medicines, vaccine coverage; CSV export that opens cleanly in Excel.
+- **Documents:** printable vaccination card, prescription, visit summary and account statement with your clinic header.
+- **Agenda** with recurring appointments, an optional **PIN lock**, light and dark themes.
+- **Safety:** automatic daily backups, restore, a backup before every migration, import and update; lossless import from PatientsCare.
+- Automatic updates from GitHub Releases (you can turn the check off).
 
 ## Screenshots
 
@@ -128,15 +131,18 @@ Baytar, kliniği olmadan serbest veteriner hekim olarak çalışan bir yakınım
 
 ### Özellikler
 
-- Türkçe harflerde büyük-küçük harf ve aksan farkını göz ardı ederek sahip ve hasta arama.
-- Reçete ve kilo geçmişi içeren muayene kayıtları.
-- Yaklaşan ve gecikmiş aşı listeleri ile WhatsApp hatırlatma bağlantıları.
-- Kendi oluşturduğunuz ilaç listesi ve yalnızca aritmetik yapan doz hesaplayıcı; hazır doz verisi içermez.
-- Tekrarlayan hatırlatmalar içeren ajanda.
-- Otomatik günlük yedekleme, geri yükleme ve dışa aktarma.
-- PatientsCare'den kayıpsız veri aktarımı.
-- Açık ve koyu tema.
-- GitHub Releases üzerinden otomatik güncelleme; her güncellemeden önce yedek alınır (denetim kapatılabilir).
+- **Hastalar:** sahipler ve evcil hayvanlar (köpek, kedi, kuş, tavşan, kemirgen, gelincik, sürüngen ve diğer), fotoğraf ve dosyalar, alerji/davranış uyarıları, Türkçe harflere duyarlı arama.
+- **Muayene:** SOAP düzeninde kayıt, vital bulgular (kilo, ateş, nabız, solunum, vücut kondisyonu), muayene şablonları, reçete ve kilo geçmişi.
+- **Aşılar:** tek sayfadan aşı uygulama ve planlama, hazır katalogdan aşı takvimi, yaklaşan ve geciken listeler, takvim, WhatsApp hatırlatması.
+- **Hazır katalog:** yaygın pet aşıları, ilaçlar (Türkiye'de satılan markalar ve jenerikler) ve hizmetler; hepsi düzenlenebilir. Doz hesaplayıcı yalnızca hekimin onayladığı değerlerle hesap yapar.
+- **Hesaplar:** fiyat listesi, muayeneye ücret, tahsilat, sahip ekstresi, borç yaşıyla alacaklar, günlük kasa özeti.
+- **Stok:** kalemler, parti ve son kullanma tarihleri, önce son kullanma tarihi yaklaşanı kullanma, düşük stok ve SKT uyarıları.
+- **Hatırlatma merkezi:** aşı, randevu, borç ve kontroller tek listede, düzenlenebilir mesaj şablonları, iletişim kaydı.
+- **Raporlar:** aylık muayene, hasta, ciro ve tahsilat, tür dağılımı, en sık tanılar ve ilaçlar, aşı kapsaması; Excel'de düzgün açılan CSV dışa aktarma.
+- **Belgeler:** klinik başlığıyla yazdırılabilir aşı karnesi, reçete, muayene özeti ve hesap ekstresi.
+- Tekrarlayan randevulu **ajanda**, isteğe bağlı **PIN kilidi**, açık ve koyu tema.
+- **Güvenlik:** otomatik günlük yedek, geri yükleme; her migrasyon, içe aktarma ve güncellemeden önce yedek; PatientsCare'den kayıpsız aktarım.
+- GitHub Releases üzerinden otomatik güncelleme (denetim kapatılabilir).
 
 ### Ekran görüntüleri
 

@@ -29,7 +29,7 @@ const KEYS: &[&str] = &[
 ];
 
 fn paths(app: &tauri::AppHandle) -> Result<(PathBuf, PathBuf, PathBuf), String> {
-    let data = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    let data = crate::data_dir(app.path()).map_err(|e| e.to_string())?;
     let db = data.join("baytar.db");
     Ok((data.clone(), db, backup::backups_dir(&data)))
 }

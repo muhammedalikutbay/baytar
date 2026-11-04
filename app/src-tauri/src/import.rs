@@ -20,7 +20,7 @@ pub struct ImportState {
 }
 
 pub fn initialize(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    let work = app.path().app_data_dir()?.join("import-work");
+    let work = crate::data_dir(app.path())?.join("import-work");
     if work.exists() {
         fs::remove_dir_all(&work)?;
     }
@@ -175,9 +175,7 @@ pub async fn import_prepare(
     path: String,
 ) -> Result<Prepared, CommandError> {
     let token = uuid::Uuid::new_v4().to_string();
-    let work = app
-        .path()
-        .app_data_dir()
+    let work = crate::data_dir(app.path())
         .map_err(|_| CommandError::internal())?
         .join("import-work")
         .join(&token);
@@ -216,9 +214,7 @@ pub async fn import_execute(
     let item = prepared
         .get(&token)
         .ok_or_else(|| failure("import_expired", true))?;
-    let backups = app
-        .path()
-        .app_data_dir()
+    let backups = crate::data_dir(app.path())
         .map_err(|_| CommandError::internal())?
         .join("backups");
     let mut guard = database

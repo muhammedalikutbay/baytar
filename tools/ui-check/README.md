@@ -14,9 +14,15 @@ node tools/ui-check/run.mjs --scenario e2e-import --exe <target>/debug/baytar-ap
 Options: `--scenario <name>` (file in `scenarios/`), `--port` (default 9333), `--exe <path>` (otherwise
 `npm run tauri dev`), `--startup-timeout <seconds>`. Exit code 0 = pass, 1 = a step failed (`failure.png` saved).
 
-The tool isolates the WebView profile, but the app still uses the normal app data folder
-(`%APPDATA%\com.kutbay.baytar`). Run scenarios that import or write data only against an empty folder on a
-development machine, never on a machine with real records. The `e2e-import` scenario expects an empty folder and
+The tool isolates the WebView profile. Point the app at an empty data folder with the `BAYTAR_DATA_DIR`
+environment variable so a scenario never touches real records in `%APPDATA%\com.kutbay.baytar`:
+
+```powershell
+$env:BAYTAR_DATA_DIR = "$env:TEMPaytar-e2e"; node tools/ui-check/run.mjs --scenario e2e-v2 --exe <target>/debug/baytar-app.exe
+```
+
+`e2e-v2` covers the v2 features (import with E.164 phones, catalog, vaccines, billing, reports, reminders and a
+screenshot of every screen). The `e2e-import` scenario expects an empty folder and
 the synthetic file path written in the scenario; edit the path for your machine.
 
 Step types: `wait` (`selector`/`text`), `click`, `eval` (`expr`, optional `expect`, promises awaited), `screenshot`,
