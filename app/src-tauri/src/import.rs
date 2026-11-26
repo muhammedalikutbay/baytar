@@ -56,20 +56,21 @@ pub struct Candidate {
     location: String,
 }
 fn excluded(path: &Path, metadata: &fs::Metadata) -> bool {
-    if path
+    let dotted = path
         .file_name()
-        .is_some_and(|n| n.to_string_lossy().starts_with('.'))
-        || metadata.is_symlink()
-    {
-        return true;
-    }
-    #[cfg(windows)]
-    {
-        use std::os::windows::fs::MetadataExt;
-        if metadata.file_attributes() & (2 | 4 | 1024) != 0 {
-            return true;
-        }
-    }
+        .is_some_and(|n| n.to_string_lossy().starts_with('.'));
+    dotted || metadata.is_symlink() || hidden_or_system(metadata)
+}
+
+/// Hidden, system and reparse-point entries on Windows; other systems use the dot-file rule only.
+#[cfg(windows)]
+fn hidden_or_system(metadata: &fs::Metadata) -> bool {
+    use std::os::windows::fs::MetadataExt;
+    metadata.file_attributes() & (2 | 4 | 1024) != 0
+}
+
+#[cfg(not(windows))]
+fn hidden_or_system(_metadata: &fs::Metadata) -> bool {
     false
 }
 fn scan(
