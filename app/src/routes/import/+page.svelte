@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   import { onMount } from 'svelte';
   import { beforeNavigate } from '$app/navigation';
   import { isTauri } from '@tauri-apps/api/core';
@@ -77,7 +79,7 @@
         {#each files as file}
           <label class="flex cursor-pointer items-start gap-3 rounded-md border border-border-control p-4 has-[:checked]:bg-surface-muted">
             <input class="mt-1 accent-ink" type="radio" name="legacy-file" value={file.path} bind:group={selected} disabled={busy} />
-            <span class="min-w-0"><span class="font-medium">{file.fileName}</span><span class="block break-all text-fg-muted">{file.location}</span><span class="type-caption text-fg-muted">{file.modifiedAt ? new Date(file.modifiedAt).toLocaleDateString('tr-TR') : tr.importNoValue} · {(file.sizeBytes / 1024).toLocaleString('tr-TR', { maximumFractionDigits: 1 })} KB</span></span>
+            <span class="min-w-0"><span class="font-medium">{file.fileName}</span><span class="block break-all text-fg-muted">{file.location}</span><span class="type-caption text-fg-muted">{file.modifiedAt ? new Date(file.modifiedAt).toLocaleDateString(intlLocale()) : tr.importNoValue} · {(file.sizeBytes / 1024).toLocaleString(intlLocale(), { maximumFractionDigits: 1 })} KB</span></span>
           </label>
         {/each}
       </div>
@@ -89,7 +91,7 @@
       {#if noNew}<p class="my-6">{repeated ? tr.importNoNew : tr.importEmpty}</p>{:else}
         <Counts counts={preview.toImport} />
         <h3 class="type-section">{tr.importAutomatic}</h3>
-        <p class="mt-2 text-fg-muted">{tr.importPhones} {preview.phonesAdjusted.toLocaleString('tr-TR')}</p><p class="mb-6 text-fg-muted">{tr.importDates}</p>
+        <p class="mt-2 text-fg-muted">{tr.importPhones} {preview.phonesAdjusted.toLocaleString(intlLocale())}</p><p class="mb-6 text-fg-muted">{tr.importDates}</p>
         <Findings {preview} />
       {/if}
       {#if !noNew && Object.values(preview.alreadyImported).some(n => n > 0)}<h3 class="type-section mt-6">{tr.importAlready}</h3><Counts counts={preview.alreadyImported} />{/if}

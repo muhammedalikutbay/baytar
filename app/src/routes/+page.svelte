@@ -18,6 +18,7 @@
   import AttentionCard from '$lib/components/home/AttentionCard.svelte';
   import UpcomingVaccinesCard from '$lib/components/home/UpcomingVaccinesCard.svelte';
   import MonthStats from '$lib/components/home/MonthStats.svelte';
+  import LanguageSwitch from '$lib/components/settings/LanguageSwitch.svelte';
 
   let today = $state(todayDate());
   let ownersCount = $state<number | null>(null);
@@ -102,7 +103,7 @@
   {:else if ownersCount === 0}
     <Card class="p-0 sm:p-0"><EmptyState icon={House} title={tr.homeWelcome} description={tr.homeWelcomeDescription}>
       {#snippet action()}<div class="flex flex-wrap justify-center gap-3"><a href="/import" class={buttonStyles()}>{tr.homeImport}</a><Button variant="secondary" onclick={() => dialog = 'owner'}>{tr.homeAddOwner}</Button></div>{/snippet}
-    </EmptyState></Card>
+    </EmptyState><div class="px-5 pb-6"><LanguageSwitch /></div></Card>
   {:else}
     {#if status?.code === 'backup_failed'}<Card><p role="status" class="text-fg-muted">{startupMessage}</p></Card>{/if}
     <QuickActions onaction={action => dialog = action} />

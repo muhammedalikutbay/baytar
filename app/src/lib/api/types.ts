@@ -73,7 +73,7 @@ export interface CommandMap {
   import_prepare: { args: { path: string }; result: PreparedImport };
   import_execute: { args: { token: string }; result: ImportReport };
   import_cancel: { args: { token: string }; result: null };
-  import_save_report: { args: { tokenOrRunId: string; path: string }; result: null };
+  import_save_report: { args: { tokenOrRunId: string; path: string; labels: import('$lib/i18n/export').ImportReportLabels }; result: null };
   startup_status: { args: Record<string, never>; result: StartupStatus };
   owners_list: { args: { query: ListQuery }; result: Owner[] };
   owner_get: { args: { id: number }; result: Owner };
@@ -394,8 +394,8 @@ export interface ReportOverview {
 export type ExportTable = 'owners' | 'patients' | 'visits' | 'vaccinations' | 'prescriptions' | 'charges' | 'payments' | 'inventory';
 export interface CommandMap {
   reports_overview: { args: { from: string; to: string; today: string }; result: ReportOverview };
-  reports_export_csv: { args: { table: ExportTable; path: string }; result: string };
-  reports_export_all: { args: { dir: string; today: string }; result: string[] };
+  reports_export_csv: { args: { table: ExportTable; path: string; headers: string[] }; result: string };
+  reports_export_all: { args: { dir: string; today: string; headers: Record<ExportTable, string[]> }; result: string[] };
 }
 export type ReminderKind = 'vaccine' | 'appointment' | 'debt' | 'followup';
 export type ContactChannel = 'whatsapp' | 'phone' | 'other';

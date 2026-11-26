@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   import { formatMonth } from '$lib/format';
   import { tr } from '$lib/i18n/tr';
 
@@ -14,7 +16,7 @@
   const barW = $derived(Math.min(40, Math.max(1, (slot - gap * 2) / series.length - 1)));
   const groupW = $derived(series.length * (barW + 1) - 1);
   const step = $derived(Math.ceil(months.length / 12));
-  const short = (month: string) => new Intl.DateTimeFormat('tr-TR', { month: 'short', timeZone: 'UTC' }).format(new Date(month + '-01T00:00:00Z'));
+  const short = (month: string) => new Intl.DateTimeFormat(intlLocale(), { month: 'short', timeZone: 'UTC' }).format(new Date(month + '-01T00:00:00Z'));
 </script>
 
 <div>

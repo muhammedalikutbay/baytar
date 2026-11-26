@@ -10,6 +10,9 @@ use tauri::{Manager, State};
 use tauri_plugin_opener::OpenerExt;
 
 const KEYS: &[&str] = &[
+    "ui_locale",
+    "currency",
+    "phone_default_country",
     "clinic_name",
     "vet_name",
     "clinic_phone",
@@ -73,6 +76,10 @@ pub fn settings_set(
     if !KEYS.contains(&key.as_str())
         || (key == "whatsapp_mode" && !["auto", "app", "web"].contains(&value.as_str()))
         || (key == "update_check_enabled" && !["1", "0"].contains(&value.as_str()))
+        || (key == "ui_locale" && !["tr", "en", "de", "es", "fr"].contains(&value.as_str()))
+        || (key == "currency" && !["TRY", "EUR", "USD", "GBP", "CHF"].contains(&value.as_str()))
+        || (key == "phone_default_country"
+            && !(value.len() == 2 && value.bytes().all(|b| b.is_ascii_uppercase())))
     {
         return Err("Invalid setting.".into());
     }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Package, ScanLine, TurkishLira, ClipboardList, Hash, StickyNote } from '@lucide/svelte';
+  import { Package, ScanLine, ClipboardList, Hash, StickyNote } from '@lucide/svelte';
   import { untrack } from 'svelte';
   import { Button, Input, Select, NumberInput, MoneyInput, DateInput, Textarea, Checkbox, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
@@ -39,7 +39,7 @@
       <Input icon={ScanLine} label={tr.inventoryLotNo} bind:value={lotNo} />
       <DateInput label={tr.inventoryExpiry} bind:value={expiresOn} />
       <DateInput label={tr.inventoryReceivedOn} bind:value={receivedOn} />
-      <MoneyInput icon={TurkishLira} label={tr.inventoryCost} bind:value={cost} />
+      <MoneyInput label={tr.inventoryCost} bind:value={cost} />
     {/if}
     {#if mode === 'consume'}<Select icon={ClipboardList} label={tr.inventoryMovementReason} bind:value={reason} options={[{ value: 'use', label: tr.inventoryUse }, { value: 'sale', label: tr.inventorySale }]} />{/if}
     <NumberInput icon={Hash} label={mode === 'adjust' ? tr.inventoryDelta : tr.inventoryQuantity} bind:value={quantity} required min={mode === 'adjust' ? undefined : mode === 'lot' ? 0 : Number.MIN_VALUE} unit={item.unit} />

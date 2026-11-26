@@ -235,7 +235,7 @@ function mock(command: keyof CommandMap, args: CommandMap[keyof CommandMap]['arg
       const { tokenOrRunId } = args as { tokenOrRunId: string };
       const report = importReports.get(tokenOrRunId) ?? importPrepared.get(tokenOrRunId) ?? fail('invalid', 'import_expired');
       const content = [tr.importTitle, tr.importOldSafe, ...('backupFile' in report ? [tr.importBackup + ': ' + report.backupFile] : []), ...(['owners', 'patients', 'todos'] as const).map(k => tr[({ owners: 'importOwners', patients: 'importPatients', todos: 'importTodos' } as const)[k]] + ': ' + report.toImport[k]), ...report.issues.map(i => tr[importIssueKeys[i.kind]] + ': ' + (i.raw ?? tr.importNoValue))].join('\n');
-      const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' })); const link = document.createElement('a'); link.href = url; link.download = 'baytar-aktarma-raporu.txt'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); return null;
+      const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' })); const link = document.createElement('a'); link.href = url; link.download = tr.importReportFilename; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); return null;
     }
     case 'startup_status': return { ready: true, error: null, code: null, foundVersion: null, supportedVersion: null };
     case 'owners_list': {

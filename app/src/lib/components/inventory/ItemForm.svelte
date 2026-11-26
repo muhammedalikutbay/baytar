@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Package, List, Ruler, TurkishLira, TriangleAlert, StickyNote } from '@lucide/svelte';
+  import { Package, List, Ruler, TriangleAlert, StickyNote } from '@lucide/svelte';
   import { untrack } from 'svelte';
   import { Button, Input, Select, NumberInput, MoneyInput, Textarea, Checkbox, RequiredNote } from '$lib/components/ui';
   import { validateForm } from '$lib/validation';
@@ -27,7 +27,7 @@
     <Input icon={Package} label={tr.inventoryName} bind:value={name} required />
     <Select icon={List} label={tr.inventoryKind} bind:value={kind} options={kindOptions} disabled={!!initial?.medicationId || !!initial?.vaccineTypeId} />
     <Input icon={Ruler} label={tr.inventoryUnit} bind:value={unit} required />
-    <MoneyInput icon={TurkishLira} label={tr.inventoryPrice} bind:value={price} />
+    <MoneyInput label={tr.inventoryPrice} bind:value={price} />
     <NumberInput icon={TriangleAlert} label={tr.inventoryReorder} bind:value={reorder} min={0} unit={unit} />
     <Checkbox label={tr.inventoryActive} bind:checked={active} />
     <Textarea icon={StickyNote} label={tr.inventoryNotes} bind:value={notes} />

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TurkishLira, Wallet, StickyNote } from '@lucide/svelte';
+  import { Wallet, StickyNote } from '@lucide/svelte';
   import { untrack } from 'svelte';
   import { Button, Dialog, MoneyInput, DateInput, Select, Textarea, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
@@ -43,7 +43,7 @@
   <RequiredNote />
     <fieldset disabled={busy} class="grid min-w-0 gap-4">
       <p class="text-fg-muted">{tr.billingBalance}: <span class="tabular-nums">{formatMoney(balance)}</span></p>
-      <MoneyInput icon={TurkishLira} label={tr.billingAmount} bind:value={amount} required />
+      <MoneyInput label={tr.billingAmount} bind:value={amount} required />
       <DateInput label={tr.date} bind:value={date} required />
       <Select icon={Wallet} label={tr.billingMethod} bind:value={method} options={methodOptions} />
       <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />

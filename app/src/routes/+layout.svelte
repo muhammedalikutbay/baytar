@@ -12,9 +12,11 @@
   import TitleBar from '$lib/components/layout/TitleBar.svelte';
   import { lock } from '$lib/lock.svelte';
   import LockScreen from '$lib/components/lock/LockScreen.svelte';
+  import { loadRegion } from '$lib/i18n/region.svelte';
 
   let { children }: { children: Snippet } = $props();
   let version = $state<string | null>(null);
+  let regionReady = $state(false);
   const extraTitles: Record<string, string> = { '/import': tr.importTitle, '/design': tr.galleryTitle };
   const pathname = $derived(page.url.pathname.replace(/\/$/, '') || '/');
   const title = $derived(page.status >= 400 ? (page.status === 404 ? tr.notFoundTitle : tr.errorTitle)
@@ -23,6 +25,7 @@
       ?? (pathname === '/' ? tr.home : tr.appName));
 
   onMount(() => {
+    void loadRegion().then(reloading => { if (!reloading) regionReady = true; });
     if (pathname === '/print') return;
     const disposeTheme = theme.init();
     const disposeUpdater = updater.init();
@@ -45,7 +48,9 @@
   <link rel="alternate icon" href="/favicon.ico" />
 </svelte:head>
 
-{#if pathname === '/print'}
+{#if !regionReady}
+  <p role="status" class="p-6 text-fg-muted">{tr.loading}</p>
+{:else if pathname === '/print'}
   {@render children()}
 {:else}
 <a href="#main-content" class="skip-link">{tr.skipToContent}</a>

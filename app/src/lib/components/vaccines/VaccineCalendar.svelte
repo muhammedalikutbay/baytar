@@ -1,4 +1,6 @@
 ﻿<script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   import { CalendarDays, ChevronLeft, ChevronRight } from '@lucide/svelte';
   import { Card, Button } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
@@ -17,7 +19,7 @@
     const offset = (first.getUTCDay() + 6) % 7;
     return Array.from({ length: Math.ceil((offset + Number(end.slice(-2))) / 7) * 7 }, (_, i) => dateAfterDays(month, i - offset));
   });
-  const weekdays = Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat('tr-TR', { weekday: 'short', timeZone: 'UTC' }).format(parseDate(dateAfterDays('2026-01-05', i))!));
+  const weekdays = Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(intlLocale(), { weekday: 'short', timeZone: 'UTC' }).format(parseDate(dateAfterDays('2026-01-05', i))!));
   $effect(() => {
     const from = month, to = end; refresh; retry;
     let cancelled = false;

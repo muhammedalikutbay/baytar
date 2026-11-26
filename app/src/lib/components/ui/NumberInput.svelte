@@ -5,16 +5,18 @@
   import Input from './Input.svelte';
   import { parseDecimal } from '$lib/validation';
   import { tr } from '$lib/i18n/tr';
+  import { intlLocale } from '$lib/i18n';
   import type { LucideIcon } from '@lucide/svelte';
   let { icon, value = $bindable(null), valid = $bindable(true), label, required = false, error, min, max, step = 'any', unit, ...rest }:
     Omit<HTMLInputAttributes, 'value' | 'min' | 'max' | 'step'> & { icon?: LucideIcon; value?: number | null; valid?: boolean; label: string; hint?: string; error?: string; min?: number; max?: number; step?: number | 'any'; unit?: string } = $props();
-  let text = $state(untrack(() => value === null ? '' : String(value).replace('.', ',')));
+  const decimal = new Intl.NumberFormat(intlLocale()).formatToParts(1.1).find(part => part.type === 'decimal')?.value ?? '.';
+  let text = $state(untrack(() => value === null ? '' : String(value).replace('.', decimal)));
   let lastBound = untrack(() => value);
   let ref = $state<HTMLInputElement | null>(null);
   let touched = $state(false);
   $effect(() => {
     if (!Object.is(value, lastBound)) {
-      text = value === null ? '' : String(value).replace('.', ',');
+      text = value === null ? '' : String(value).replace('.', decimal);
       lastBound = value;
     }
   });

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Stethoscope, List, TurkishLira, Percent, StickyNote } from '@lucide/svelte';
+  import { Stethoscope, List, Percent, StickyNote } from '@lucide/svelte';
   import { untrack } from 'svelte';
   import { Button, Input, MoneyInput, NumberInput, Select, Checkbox, Textarea, RequiredNote } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
@@ -29,7 +29,7 @@
   <fieldset disabled={busy} class="grid min-w-0 gap-4">
     <Input icon={Stethoscope} label={tr.billingServiceName} bind:value={name} required />
     <Select icon={List} label={tr.billingCategory} bind:value={category} options={categoryOptions} />
-    <MoneyInput icon={TurkishLira} label={tr.billingUnitPrice} bind:value={price} />
+    <MoneyInput label={tr.billingUnitPrice} bind:value={price} />
     <NumberInput icon={Percent} label={tr.billingVat} bind:value={vat} min={0} max={100} step={1} />
     <Checkbox label={tr.billingActive} bind:checked={active} />
     <Textarea icon={StickyNote} label={tr.notes} bind:value={notes} />

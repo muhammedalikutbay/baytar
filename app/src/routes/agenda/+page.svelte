@@ -1,4 +1,6 @@
 ﻿<script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   import { browser } from '$app/environment';
   import { addMonths } from '$lib/components/agenda/calendar';
   import { onMount } from 'svelte';
@@ -31,7 +33,7 @@
   const from = $derived(view === 'month' ? gridStart : view === 'week' ? monday : date);
   const to = $derived(addDateDays(from, view === 'month' ? 41 : view === 'list' ? 29 : view === 'week' ? 6 : 0));
   const days = $derived(Array.from({ length: view === 'month' ? 42 : view === 'list' ? 30 : view === 'day' ? 1 : 7 }, (_, index) => addDateDays(from, index)));
-  const weekdays = Array.from({length:7}, (_, i) => new Intl.DateTimeFormat('tr-TR', {weekday:'short', timeZone:'UTC'}).format(parseDate(addDateDays('2026-11-02', i))!));
+  const weekdays = Array.from({length:7}, (_, i) => new Intl.DateTimeFormat(intlLocale(), {weekday:'short', timeZone:'UTC'}).format(parseDate(addDateDays('2026-11-02', i))!));
   onMount(() => {
     try { const stored = localStorage.getItem('baytar.agenda.view'); if (views.some(v => v.value === stored)) view = stored as View; } catch { /* Storage may be unavailable. */ }
     viewReady = true;
@@ -68,7 +70,7 @@
     <div class="flex flex-wrap items-center gap-2"><Button variant="secondary" onclick={() => move(-1)}>{tr.previous}</Button><Button variant="secondary" onclick={() => date = localDate()}>{tr.agendaToday}</Button><Button variant="secondary" onclick={() => move(1)}>{tr.next}</Button></div>
     <div role="group" aria-label={tr.agenda} class="flex flex-wrap gap-2">{#each views as mode}<Button variant="secondary" aria-pressed={view === mode.value} class={view === mode.value ? 'text-accent underline' : ''} onclick={() => view = mode.value}>{mode.label}</Button>{/each}</div>
   </div>
-  <h2 class="type-title tabular-nums" aria-live="polite">{view === 'month' ? new Intl.DateTimeFormat('tr-TR', {month:'long', year:'numeric', timeZone:'UTC'}).format(parseDate(date)!) : view === 'day' ? formatAgendaDate(date) : `${formatDate(from)} – ${formatDate(to)}`}</h2>
+  <h2 class="type-title tabular-nums" aria-live="polite">{view === 'month' ? new Intl.DateTimeFormat(intlLocale(), {month:'long', year:'numeric', timeZone:'UTC'}).format(parseDate(date)!) : view === 'day' ? formatAgendaDate(date) : `${formatDate(from)} – ${formatDate(to)}`}</h2>
   {#if actionError}<p role="alert" class="text-danger">{actionError}</p>{/if}
   {#if loading}<p role="status">{tr.loading}</p>
   {:else if failed}<Card><p role="alert" class="text-danger">{tr.loadError}</p><Button variant="secondary" class="mt-4" onclick={() => refresh++}>{tr.retry}</Button></Card>

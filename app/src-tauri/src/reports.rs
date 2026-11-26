@@ -9,6 +9,7 @@ use baytar_core::{
     },
 };
 use std::{
+    collections::BTreeMap,
     fs,
     path::{Path, PathBuf},
 };
@@ -73,9 +74,10 @@ pub fn reports_export_csv(
     state: State<'_, AppDatabase>,
     table: ExportTable,
     path: String,
+    headers: Vec<String>,
 ) -> Result<String, CommandError> {
     let target = csv_target(&path)?;
-    let bytes = state.with(|c| export::export_csv(c, table))?;
+    let bytes = state.with(|c| export::export_csv(c, table, &headers))?;
     write(&target, &bytes)?;
     Ok(target.to_string_lossy().into_owned())
 }
@@ -86,6 +88,7 @@ pub fn reports_export_all(
     state: State<'_, AppDatabase>,
     dir: String,
     today: String,
+    headers: BTreeMap<String, Vec<String>>,
 ) -> Result<Vec<String>, CommandError> {
     let dir = PathBuf::from(dir);
     if !dir.is_dir() {
@@ -96,7 +99,10 @@ pub fn reports_export_all(
     }
     let mut written = Vec::new();
     for table in ExportTable::ALL {
-        let bytes = state.with(|c| export::export_csv(c, table))?;
+        let labels = headers
+            .get(table.stem())
+            .ok_or_else(|| invalid("headers", "missing table labels"))?;
+        let bytes = state.with(|c| export::export_csv(c, table, labels))?;
         let path = folder_target(&dir, table, &today);
         write(&path, &bytes)?;
         written.push(path.to_string_lossy().into_owned());
