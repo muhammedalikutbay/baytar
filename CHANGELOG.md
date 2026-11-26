@@ -3,6 +3,12 @@
 All notable changes to Baytar. Versions follow [Semantic Versioning](https://semver.org/); before 1.0 a minor
 version may change the database schema (Baytar migrates it automatically and backs it up first).
 
+## 0.5.1 — 2026-11-27
+
+### Changed
+- In-app updates are active: release builds are now signed, and Baytar offers newer versions when it starts
+  (Settings → Updates checks on demand). The database is backed up before an update is installed.
+
 ## 0.5.0 — 2026-11-26
 
 ### Added
