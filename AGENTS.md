@@ -5,8 +5,8 @@ owners, patients, visits, vaccinations, medications with a dose calculator, and 
 Runs on Windows, macOS and Linux. Data stays on the vet's computer. It replaces PatientsCare, a
 Windows Forms app (tag `v0.1-winforms`, branch `legacy`) whose SQLite data must be imported without loss.
 
-Planning notes (Turkish) live in the owner's Obsidian vault:
-`C:\Users\Kutbay\Desktop\ObsidianVault\Projeler\PatientsCare\AI\02-plan.md`.
+Planning notes in Turkish live in the maintainer's private notes; the public plan is `docs/v2-plan.md` and
+the task history is in `.beads/`.
 
 ## Stack
 - Tauri 2 shell, Rust backend, SvelteKit (static adapter) + Svelte 5 + TypeScript + Vite frontend in `app/`.
@@ -29,9 +29,9 @@ tools/                build and check scripts
   lives in one place (`app/src/lib/i18n/tr.ts`) so another language can be added later.
 - Data safety comes first. Never write to a legacy PatientsCare database: copy it first. Every schema
   migration takes a backup first and runs in a transaction. Nothing is hard-deleted from the UI (`deleted_at`).
-- Real veterinary data is personal data. It lives in `C:\Users\Kutbay\Desktop\Baytar-veri\` and never enters
+- Real veterinary data is personal data. It lives outside the repository and never enters
   git, test fixtures, logs or AI prompts. Fixtures are synthetic.
-- `main` is the only long-lived branch. Workers run in git worktrees (`C:\Users\Kutbay\Desktop\Baytar-wt\<issue>`,
+- `main` is the only long-lived branch. Workers run in git worktrees next to the repository (`../Baytar-wt/<issue>`,
   branch `task/<issue>`), make one commit, and touch only the files their task names. The orchestrator
   reviews, rebases and fast-forwards into `main`.
 - Task tracking is Beads (`bd`, prefix `bay`). Only the orchestrator writes to Beads. Workers never run `bd`.

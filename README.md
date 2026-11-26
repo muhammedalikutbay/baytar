@@ -1,8 +1,12 @@
 # Baytar
 
 [![CI](https://github.com/muhammedalikutbay/baytar/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/muhammedalikutbay/baytar/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/muhammedalikutbay/baytar)](https://github.com/muhammedalikutbay/baytar/releases/latest)
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE)
 
-Free, offline veterinary practice software for independent veterinarians. Keep owners, patients, visits, vaccinations, medications and appointments on your own computer.
+Free, open-source, offline practice software for independent veterinarians and small pet clinics. Patients, visits, vaccinations, stock, accounts and reminders in one desktop app for Windows, macOS and Linux. Your records stay on your own computer.
+
+**[Download the latest version](https://github.com/muhammedalikutbay/baytar/releases/latest)** · [Türkçe](#türkçe)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/home-dark.png">
@@ -12,11 +16,14 @@ Free, offline veterinary practice software for independent veterinarians. Keep o
 
 ## Why Baytar
 
-Baytar began as a project for a relative who works as a freelance veterinarian without a clinic. Existing Turkish tools are cloud-based and paid. Baytar is free, works offline and keeps practice data on the veterinarian's own computer. *Baytar* is the Ottoman Turkish word for veterinarian.
+Baytar began as a project for a relative who works as a freelance veterinarian without a clinic. Most practice software is a paid cloud subscription. Baytar is free, works without an internet connection and keeps practice data on the veterinarian's own computer, while offering the features vets expect from professional tools. *Baytar* is the Ottoman Turkish word for veterinarian.
+
+The interface is in Turkish. The built-in vaccine and medicine catalog follows products sold in Turkey and can be edited freely.
 
 ## Features
 
-- **Patients:** owners and pets (dogs, cats, birds, rabbits, rodents, ferrets, reptiles and any other animal), photos and files, allergy/behaviour alerts, Turkish-aware search.
+- **Patients:** owners and pets (dogs, cats, birds, rabbits, rodents, ferrets, reptiles and any other animal), photos and files, allergy/behaviour alerts, Turkish-aware search. Patients are picked from an owner list that adapts to the size of the practice.
+- **Validated input:** international phone numbers (+90 by default), e-mail, Turkish ID and tax numbers, microchip numbers, amounts and times.
 - **Visits:** SOAP-style records with vitals (weight, temperature, heart and respiratory rate, body condition score), reusable templates, prescriptions and weight history.
 - **Vaccines:** give and plan vaccinations from one page, schedules from a built-in catalog, due and overdue lists, calendar, WhatsApp reminders.
 - **Built-in catalog:** common pet vaccines, medicines (brands sold in Turkey and generics) and services; every entry is editable. The dose calculator only does arithmetic on doses you confirm.
@@ -27,21 +34,22 @@ Baytar began as a project for a relative who works as a freelance veterinarian w
 - **Documents:** printable vaccination card, prescription, visit summary and account statement with your clinic header.
 - **Agenda** with recurring appointments, an optional **PIN lock**, light and dark themes.
 - **Safety:** automatic daily backups, restore, a backup before every migration, import and update; lossless import from PatientsCare.
-- Automatic updates from GitHub Releases (you can turn the check off).
+- Update check against GitHub Releases, with a backup before every update (you can turn the check off).
 
 ## Screenshots
 
-| Light theme | Light theme |
+| | |
 |---|---|
-| ![Patients list](docs/screenshots/patients-light.png)<br>Search owners and patients. | ![Patient card](docs/screenshots/patient-light.png)<br>Patient details, visit history and weight history. |
-| ![Vaccination tracking](docs/screenshots/vaccines-light.png)<br>Upcoming and overdue vaccinations. | ![Agenda](docs/screenshots/agenda-light.png)<br>Appointments and reminders. |
-| ![Medications](docs/screenshots/medications-light.png)<br>Your medication list and dose calculator. | ![PatientsCare import](docs/screenshots/import-light.png)<br>Review the import before confirming it. |
+| ![Patient page](docs/screenshots/patient-light.png)<br>Patient page: upcoming items, weight trend, history, vaccines, appointments and files. | ![Owner page](docs/screenshots/owner-light.png)<br>Owner page: pets first, contact actions, account and statement. |
+| ![Vaccines](docs/screenshots/vaccines-light.png)<br>Give and plan vaccinations, calendar, due and overdue lists. | ![Agenda](docs/screenshots/agenda-light.png)<br>Day, week, month and list views. |
+| ![Reminders](docs/screenshots/reminders-dark.png)<br>Reminders centre with WhatsApp messages. | ![Accounts](docs/screenshots/accounts-light.png)<br>Receivables with debt age, cash summary, price list. |
+| ![Stock](docs/screenshots/inventory-light.png)<br>Stock with lots, expiry dates and warnings. | ![Reports](docs/screenshots/reports-dark.png)<br>Monthly reports and CSV export. |
 
-Dark theme is available throughout the app; the home screen above follows your system color preference.
+Every screen has a light and a dark theme; the app follows the system setting until you pick one. More captures are in [docs/screenshots](docs/screenshots/).
 
 ## Download and install
 
-Download the latest installer from [GitHub Releases](https://github.com/muhammedalikutbay/baytar/releases).
+Download the installer for your system from the [latest release](https://github.com/muhammedalikutbay/baytar/releases/latest).
 
 - **Windows:** Run the per-user `*-setup.exe`; administrator access is not required. Unsigned builds may show Microsoft SmartScreen. Select **More info**, then **Run anyway** if you trust the release you downloaded.
 - **macOS:** Open the DMG and move Baytar to Applications. For an unsigned build's first launch, right-click the app and choose **Open**.
@@ -57,13 +65,15 @@ Baytar stores its SQLite database on your computer:
 
 Backups are in the `backups` folder inside that directory. The automatic retention policy keeps daily backups for the 14 newest dates and one backup per week for the 8 most recent weeks. Manual and safety backups are separate from this daily-backup retention. You can create, restore and export backups in the app.
 
-No account, no server, no telemetry; the only network call is the optional update check.
+Set the `BAYTAR_DATA_DIR` environment variable to keep the data in another folder, for example on an external drive.
+
+No account, no server, no telemetry. The network is used only for the optional update check and when you choose to open WhatsApp.
 
 ## Moving from PatientsCare
 
 The import wizard has four steps: select the old database, review a preview, confirm the import, and inspect the result. Baytar copies and reads the source file; it never changes the old PatientsCare file. It takes a backup of the Baytar database before importing.
 
-Known values are normalized where possible, including restoring a lost leading zero on recognized Turkish mobile numbers and parsing supported date formats. Unrecognized or malformed values are preserved in notes and reported for review. The import is designed to retain records without silently discarding unknown data.
+Known values are normalized where possible, including converting recognized Turkish numbers to the international format (+90) and parsing supported date formats. Unrecognized or malformed values are preserved in notes and reported for review. The import is designed to retain records without silently discarding unknown data.
 
 ## Development
 
@@ -107,7 +117,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for issues, branches, code style and data
 
 ## History
 
-Baytar started in January 2025 as PatientsCare, a Windows Forms app (tag [`v0.1-winforms`](https://github.com/muhammedalikutbay/baytar/tree/v0.1-winforms)). It was rewritten in 2026 with Tauri and Rust for Windows, macOS and Linux.
+Baytar started in January 2025 as PatientsCare, a Windows Forms app (tag [`v0.1-winforms`](https://github.com/muhammedalikutbay/baytar/tree/v0.1-winforms)). It was rewritten in 2026 with Tauri and Rust for Windows, macOS and Linux and grew into a full practice tool. The maintainer planned and reviewed the rewrite; AI coding agents wrote much of the implementation. The plan is in [docs/v2-plan.md](docs/v2-plan.md) and the task history in `.beads/`. Release notes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
@@ -117,7 +127,9 @@ Baytar is licensed under [GPL-3.0](LICENSE). PatientsCare through `v0.1-winforms
 
 ### Baytar
 
-Bağımsız veteriner hekimler için ücretsiz ve çevrimdışı çalışan bir muayenehane yazılımı. Sahip, hasta, muayene, aşı, ilaç ve randevu kayıtlarınızı kendi bilgisayarınızda tutun.
+Serbest çalışan veteriner hekimler ve küçük pet klinikleri için ücretsiz, açık kaynaklı ve internet olmadan çalışan muayenehane yazılımı. Hasta, muayene, aşı, stok, hesap ve hatırlatmalar Windows, macOS ve Linux'ta tek bir masaüstü uygulamasında. Kayıtlarınız kendi bilgisayarınızda kalır.
+
+**[En güncel sürümü indirin](https://github.com/muhammedalikutbay/baytar/releases/latest)**
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/home-dark.png">
@@ -127,11 +139,12 @@ Bağımsız veteriner hekimler için ücretsiz ve çevrimdışı çalışan bir 
 
 ### Neden Baytar?
 
-Baytar, kliniği olmadan serbest veteriner hekim olarak çalışan bir yakınımız için başladı. Türkiye'deki mevcut araçlar bulut tabanlı ve ücretli. Baytar ücretsizdir, çevrimdışı çalışır ve mesleki verileri veteriner hekimin kendi bilgisayarında saklar. *Baytar*, Osmanlı Türkçesinde veteriner anlamına gelir.
+Baytar, kliniği olmadan serbest veteriner hekim olarak çalışan bir yakınımız için başladı. Muayenehane yazılımlarının çoğu ücretli bulut aboneliğidir. Baytar ücretsizdir, internet olmadan çalışır ve verileri hekimin kendi bilgisayarında saklar; bunu yaparken profesyonel yazılımlardan beklenen özellikleri sunar. *Baytar*, Osmanlı Türkçesinde veteriner hekim anlamına gelir.
 
 ### Özellikler
 
-- **Hastalar:** sahipler ve evcil hayvanlar (köpek, kedi, kuş, tavşan, kemirgen, gelincik, sürüngen ve diğer), fotoğraf ve dosyalar, alerji/davranış uyarıları, Türkçe harflere duyarlı arama.
+- **Hastalar:** sahipler ve evcil hayvanlar (köpek, kedi, kuş, tavşan, kemirgen, gelincik, sürüngen ve diğer), fotoğraf ve dosyalar, alerji/davranış uyarıları, Türkçe harflere duyarlı arama. Hasta, kayıt sayısına göre uyum sağlayan sahip listesinden seçilir.
+- **Doğrulamalı alanlar:** uluslararası telefon numarası (varsayılan +90), e-posta, TC kimlik ve vergi numarası, mikroçip, tutar ve saat.
 - **Muayene:** SOAP düzeninde kayıt, vital bulgular (kilo, ateş, nabız, solunum, vücut kondisyonu), muayene şablonları, reçete ve kilo geçmişi.
 - **Aşılar:** tek sayfadan aşı uygulama ve planlama, hazır katalogdan aşı takvimi, yaklaşan ve geciken listeler, takvim, WhatsApp hatırlatması.
 - **Hazır katalog:** yaygın pet aşıları, ilaçlar (Türkiye'de satılan markalar ve jenerikler) ve hizmetler; hepsi düzenlenebilir. Doz hesaplayıcı yalnızca hekimin onayladığı değerlerle hesap yapar.
@@ -142,21 +155,22 @@ Baytar, kliniği olmadan serbest veteriner hekim olarak çalışan bir yakınım
 - **Belgeler:** klinik başlığıyla yazdırılabilir aşı karnesi, reçete, muayene özeti ve hesap ekstresi.
 - Tekrarlayan randevulu **ajanda**, isteğe bağlı **PIN kilidi**, açık ve koyu tema.
 - **Güvenlik:** otomatik günlük yedek, geri yükleme; her migrasyon, içe aktarma ve güncellemeden önce yedek; PatientsCare'den kayıpsız aktarım.
-- GitHub Releases üzerinden otomatik güncelleme (denetim kapatılabilir).
+- GitHub Releases üzerinden güncelleme denetimi; her güncellemeden önce yedek alınır (denetim kapatılabilir).
 
 ### Ekran görüntüleri
 
-| Açık tema | Açık tema |
+| | |
 |---|---|
-| ![Hasta listesi](docs/screenshots/patients-light.png)<br>Sahip ve hasta arama. | ![Hasta kartı](docs/screenshots/patient-light.png)<br>Hasta bilgileri, muayene ve kilo geçmişi. |
-| ![Aşı takibi](docs/screenshots/vaccines-light.png)<br>Yaklaşan ve gecikmiş aşılar. | ![Ajanda](docs/screenshots/agenda-light.png)<br>Randevu ve hatırlatmalar. |
-| ![İlaçlar](docs/screenshots/medications-light.png)<br>İlaç listeniz ve doz hesaplayıcı. | ![PatientsCare aktarımı](docs/screenshots/import-light.png)<br>Aktarımı onaylamadan önce inceleyin. |
+| ![Hasta sayfası](docs/screenshots/patient-light.png)<br>Hasta sayfası: yaklaşanlar, kilo eğrisi, geçmiş, aşılar, randevular ve dosyalar. | ![Sahip sayfası](docs/screenshots/owner-light.png)<br>Sahip sayfası: önce hayvanlar, iletişim, hesap ve ekstre. |
+| ![Aşılar](docs/screenshots/vaccines-light.png)<br>Aşı uygulama ve planlama, takvim, yaklaşan ve geciken aşılar. | ![Ajanda](docs/screenshots/agenda-light.png)<br>Gün, hafta, ay ve liste görünümleri. |
+| ![Hatırlatmalar](docs/screenshots/reminders-dark.png)<br>WhatsApp mesajlarıyla hatırlatma merkezi. | ![Hesaplar](docs/screenshots/accounts-light.png)<br>Borç yaşıyla alacaklar, kasa ve fiyat listesi. |
+| ![Stok](docs/screenshots/inventory-light.png)<br>Parti ve son kullanma tarihli stok, uyarılar. | ![Raporlar](docs/screenshots/reports-dark.png)<br>Aylık raporlar ve CSV dışa aktarma. |
 
-Uygulamanın tamamında koyu tema da kullanılabilir. Yukarıdaki ana ekran, sisteminizin renk tercihine göre gösterilir.
+Her ekranın açık ve koyu teması var; uygulama siz seçene kadar sistem ayarını izler. Diğer görüntüler [docs/screenshots](docs/screenshots/) klasöründe.
 
 ### İndirme ve kurulum
 
-En güncel kurulum dosyasını [GitHub Releases](https://github.com/muhammedalikutbay/baytar/releases) sayfasından indirin.
+Sisteminize uygun kurulum dosyasını [en güncel sürüm](https://github.com/muhammedalikutbay/baytar/releases/latest) sayfasından indirin.
 
 - **Windows:** Kullanıcı hesabınıza kurulum yapan `*-setup.exe` dosyasını çalıştırın; yönetici izni gerekmez. İmzalanmamış sürümlerde Microsoft SmartScreen uyarısı çıkabilir. İndirdiğiniz sürüme güveniyorsanız **More info** ve ardından **Run anyway** seçeneklerini kullanın.
 - **macOS:** DMG dosyasını açıp Baytar'ı Applications klasörüne taşıyın. İmzalanmamış sürümü ilk kez açarken uygulamaya sağ tıklayıp **Open** seçin.
@@ -172,13 +186,15 @@ Baytar, SQLite veritabanını bilgisayarınızda saklar:
 
 Yedekler bu klasörün içindeki `backups` dizinindedir. Otomatik saklama politikası, en yeni 14 tarihe ait günlük yedekleri ve son 8 haftanın her biri için bir yedeği tutar. Elle alınan ve güvenlik amaçlı yedekler bu günlük yedek politikasından ayrıdır. Uygulamadan yedek oluşturabilir, geri yükleyebilir ve dışa aktarabilirsiniz.
 
-Hesap yok, sunucu yok, telemetri yok; tek ağ bağlantısı isteğe bağlı güncelleme kontrolüdür.
+Verileri başka bir klasörde, örneğin harici diskte tutmak için `BAYTAR_DATA_DIR` ortam değişkenini ayarlayın.
+
+Hesap yok, sunucu yok, telemetri yok. İnternet yalnızca isteğe bağlı güncelleme denetiminde ve WhatsApp'ı açtığınızda kullanılır.
 
 ### PatientsCare'den geçiş
 
 Aktarım sihirbazı dört adımdan oluşur: eski veritabanını seçme, önizlemeyi inceleme, aktarımı onaylama ve sonucu görme. Baytar kaynak dosyanın bir kopyasını okuyup aktarır; eski PatientsCare dosyasını değiştirmez. Aktarımdan önce Baytar veritabanının yedeğini alır.
 
-Bilinen değerler mümkün olduğunda düzeltilir; örneğin tanınan Türkiye cep telefonu numaralarına kaybolan baştaki sıfır eklenir ve desteklenen tarih biçimleri okunur. Tanınmayan veya bozuk değerler notlarda korunur ve inceleme için raporlanır. Amaç, bilinmeyen verileri sessizce silmeden kayıtları korumaktır.
+Bilinen değerler mümkün olduğunda düzeltilir; örneğin tanınan Türkiye numaraları uluslararası biçime (+90) çevrilir ve desteklenen tarih biçimleri okunur. Tanınmayan veya bozuk değerler notlarda korunur ve inceleme için raporlanır. Amaç, bilinmeyen verileri sessizce silmeden kayıtları korumaktır.
 
 ### Geliştirme
 
@@ -222,7 +238,7 @@ Sorun bildirme, dallar, kod biçemi ve veri güvenliği için [CONTRIBUTING.md](
 
 ### Geçmiş
 
-Baytar, Ocak 2025'te PatientsCare adıyla bir Windows Forms uygulaması olarak başladı ([`v0.1-winforms`](https://github.com/muhammedalikutbay/baytar/tree/v0.1-winforms) etiketi). 2026'da Tauri ve Rust ile Windows, macOS ve Linux için yeniden yazıldı.
+Baytar, Ocak 2025'te PatientsCare adıyla bir Windows Forms uygulaması olarak başladı ([`v0.1-winforms`](https://github.com/muhammedalikutbay/baytar/tree/v0.1-winforms) etiketi). 2026'da Tauri ve Rust ile Windows, macOS ve Linux için yeniden yazıldı ve kapsamlı bir muayenehane aracına dönüştü. Yeniden yazımı geliştirici planlayıp denetledi; uygulamanın büyük kısmını yapay zekâ kodlama ajanları yazdı. Plan [docs/v2-plan.md](docs/v2-plan.md), görev geçmişi `.beads/` klasöründe. Sürüm notları [CHANGELOG.md](CHANGELOG.md) dosyasında.
 
 ### Lisans
 

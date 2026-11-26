@@ -7,9 +7,9 @@
     { "type": "wait", "text": "hoş geldiniz", "timeout": 60000 },
     { "type": "screenshot", "path": "01-first-run.png" },
 
-    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_prepare', { path: 'C:/Users/Kutbay/Desktop/Baytar-deneme/HastaTakipDB.db' }).then(p => { window.__tok = p.token; return p.preview.found; })", "expect": { "owners": 2, "patients": 4, "todos": 2 } },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_prepare', { path: 'LEGACY_DB' }).then(p => { window.__tok = p.token; return p.preview.found; })", "expect": { "owners": 2, "patients": 4, "todos": 2 } },
     { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_execute', { token: window.__tok }).then(r => r.inserted)", "expect": { "owners": 2, "patients": 4, "todos": 2 } },
-    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_prepare', { path: 'C:/Users/Kutbay/Desktop/Baytar-deneme/HastaTakipDB.db' }).then(p => { window.__tok2 = p.token; return p.preview.toImport; })", "expect": { "owners": 0, "patients": 0, "todos": 0 } },
+    { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_prepare', { path: 'LEGACY_DB' }).then(p => { window.__tok2 = p.token; return p.preview.toImport; })", "expect": { "owners": 0, "patients": 0, "todos": 0 } },
     { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('import_cancel', { token: window.__tok2 }).then(() => 'cancelled')", "expect": "cancelled" },
     { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('owners_list', { query: { includeDeleted: false, limit: 50, offset: 0 } }).then(o => o.map(x => [x.fullName, x.phone]).sort())", "expect": [["Deneme Yılmaz", "+905551112233"], ["Sahibi bilinmeyen", null], ["Sınama Kaya", "+905554445566"]] },
     { "type": "eval", "expr": "window.__TAURI_INTERNALS__.invoke('search', { query: 'tarcin', limit: 10 }).then(h => h.map(x => x.owner.fullName))", "expect": ["Deneme Yılmaz"] },

@@ -72,7 +72,7 @@ export const tr = {
   appointmentUpcoming: 'Yaklaşan randevular', appointmentPast: 'Son geçmiş randevular', appointmentNoUpcoming: 'Yaklaşan randevu yok.',
   agendaDayEmpty: 'Bu gün için randevu yok.', agendaEmptyHint: 'Bir randevu veya hatırlatma ekleyerek gününüzü planlayın.',
   appointmentDateInvalid: 'Geçerli bir tarih seçin.', appointmentNumberInvalid: 'Geçerli bir pozitif tam sayı girin.',
-  appointmentSampleVisit: 'Evde kontrol muayenesi', appointmentSampleReminder: 'Çiftlik ziyareti için malzemeleri hazırla',
+  appointmentSampleVisit: 'Evde kontrol muayenesi', appointmentSampleReminder: 'Aşı buzdolabının sıcaklığını kontrol et',
   appointmentSampleVaccine: 'Aşı kontrolü',
   addVisit: 'Muayene ekle', editVisit: 'Muayeneyi düzenle', visit: 'Muayene',
   visitFormDescription: 'Muayene bulgularını ve reçeteyi kaydedin.',

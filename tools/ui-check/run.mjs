@@ -19,6 +19,7 @@ function parseArgs(argv) {
     else if (k === '--scenario') a.scenario = v();
     else if (k === '--exe') a.exe = v();
     else if (k === '--startup-timeout') a.startupTimeout = Number(v()) * 1000;
+    else if (k === '--legacy-db') a.legacyDb = v();
     else if (k === '--help' || k === '-h') a.help = true;
     else throw new Error(`unknown argument: ${k}`);
   }
@@ -153,13 +154,15 @@ function killTree(pid) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
-    log('usage: node tools/ui-check/run.mjs [--scenario smoke] [--port 9333] [--exe <path>] [--startup-timeout <seconds>]');
+    log('usage: node tools/ui-check/run.mjs [--scenario smoke] [--port 9333] [--exe <path>] [--startup-timeout <seconds>] [--legacy-db <synthetic PatientsCare file>]');
     return 0;
   }
   const name = args.scenario.endsWith('.json') ? args.scenario : `${args.scenario}.json`;
   const scenarioPath = resolve(here, 'scenarios', name);
   if (!existsSync(scenarioPath)) throw new Error(`scenario not found: ${scenarioPath}`);
-  const scenario = JSON.parse(readFileSync(scenarioPath, 'utf8'));
+  // LEGACY_DB in a scenario stands for the synthetic legacy file given with --legacy-db.
+  const scenarioText = readFileSync(scenarioPath, 'utf8').replaceAll('LEGACY_DB', (args.legacyDb ?? 'LEGACY_DB').replaceAll('\\', '/'));
+  const scenario = JSON.parse(scenarioText);
 
   if (await findPageTarget(args.port)) {
     throw new Error(`port ${args.port} is already served by a debuggable WebView; pick another --port`);
