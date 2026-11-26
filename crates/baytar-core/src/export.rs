@@ -1,4 +1,4 @@
-//! CSV export of the clinic's tables for Turkish Excel: UTF-8 with a BOM, `;` separator,
+//! CSV export of the clinic's tables with frontend-localised headers: UTF-8 with a BOM, `;` separator,
 //! CRLF line ends, ISO dates, decimal comma. Soft-deleted rows are skipped. Row contents are
 //! only ever written to the returned bytes; nothing here logs them.
 use crate::repo::{invalid, Result};
@@ -56,7 +56,7 @@ enum Kind {
 }
 
 struct Spec {
-    columns: &'static [(&'static str, Kind)],
+    columns: &'static [Kind],
     sql: &'static str,
 }
 
@@ -66,56 +66,19 @@ const M: Kind = Kind::Money;
 fn spec(table: ExportTable) -> Spec {
     match table {
         ExportTable::Owners => Spec {
-            columns: &[
-                ("No", T),
-                ("Ad soyad", T),
-                ("Telefon", T),
-                ("Telefon 2", T),
-                ("E-posta", T),
-                ("Adres", T),
-                ("İl", T),
-                ("İlçe", T),
-                ("Not", T),
-                ("Kayıt tarihi", T),
-            ],
+            columns: &[T, T, T, T, T, T, T, T, T, T],
             sql: "SELECT id, full_name, phone, phone_alt, email, address, city, district, notes, \
                   substr(created_at, 1, 10) FROM owners WHERE deleted_at IS NULL ORDER BY id",
         },
         ExportTable::Patients => Spec {
-            columns: &[
-                ("No", T),
-                ("Sahip", T),
-                ("Ad", T),
-                ("Tür", T),
-                ("Irk", T),
-                ("Cinsiyet", T),
-                ("Kısır", T),
-                ("Doğum tarihi", T),
-                ("Renk", T),
-                ("Mikroçip", T),
-                ("Ölüm tarihi", T),
-                ("Not", T),
-            ],
+            columns: &[T, T, T, T, T, T, T, T, T, T, T, T],
             sql: "SELECT p.id, o.full_name, p.name, p.species, p.breed, p.sex, p.neutered, \
                   p.birth_date, p.color, p.microchip, p.deceased_on, p.notes \
                   FROM patients p LEFT JOIN owners o ON o.id = p.owner_id \
                   WHERE p.deleted_at IS NULL ORDER BY p.id",
         },
         ExportTable::Visits => Spec {
-            columns: &[
-                ("No", T),
-                ("Tarih", T),
-                ("Saat", T),
-                ("Hasta", T),
-                ("Sahip", T),
-                ("Şikayet", T),
-                ("Bulgular", T),
-                ("Tanı", T),
-                ("Tedavi", T),
-                ("Kilo (kg)", T),
-                ("Ateş (°C)", T),
-                ("Not", T),
-            ],
+            columns: &[T, T, T, T, T, T, T, T, T, T, T, T],
             sql:
                 "SELECT v.id, v.visit_on, v.visit_time, p.name, o.full_name, v.reason, v.findings, \
                   v.diagnosis, v.treatment, v.weight_kg, v.temperature_c, v.notes \
@@ -124,16 +87,7 @@ fn spec(table: ExportTable) -> Spec {
                   WHERE v.deleted_at IS NULL ORDER BY v.visit_on, v.id",
         },
         ExportTable::Vaccinations => Spec {
-            columns: &[
-                ("No", T),
-                ("Uygulama tarihi", T),
-                ("Sonraki tarih", T),
-                ("Aşı", T),
-                ("Seri no", T),
-                ("Hasta", T),
-                ("Sahip", T),
-                ("Not", T),
-            ],
+            columns: &[T, T, T, T, T, T, T, T],
             sql: "SELECT x.id, x.given_on, x.next_due_on, x.vaccine_name, x.batch_no, p.name, \
                   o.full_name, x.notes \
                   FROM vaccinations x LEFT JOIN patients p ON p.id = x.patient_id \
@@ -141,19 +95,7 @@ fn spec(table: ExportTable) -> Spec {
                   WHERE x.deleted_at IS NULL ORDER BY x.given_on, x.id",
         },
         ExportTable::Prescriptions => Spec {
-            columns: &[
-                ("No", T),
-                ("Muayene tarihi", T),
-                ("Hasta", T),
-                ("Sahip", T),
-                ("İlaç", T),
-                ("Doz (mg)", T),
-                ("Doz (ml)", T),
-                ("Doz notu", T),
-                ("Sıklık", T),
-                ("Süre (gün)", T),
-                ("Not", T),
-            ],
+            columns: &[T, T, T, T, T, T, T, T, T, T, T],
             sql: "SELECT i.id, v.visit_on, p.name, o.full_name, i.medication_name, i.dose_mg, \
                   i.dose_ml, i.dose_text, i.frequency, i.duration_days, i.notes \
                   FROM prescription_items i LEFT JOIN visits v ON v.id = i.visit_id \
@@ -162,19 +104,7 @@ fn spec(table: ExportTable) -> Spec {
                   WHERE i.deleted_at IS NULL ORDER BY v.visit_on, i.id",
         },
         ExportTable::Charges => Spec {
-            columns: &[
-                ("No", T),
-                ("Tarih", T),
-                ("Sahip", T),
-                ("Hasta", T),
-                ("Açıklama", T),
-                ("Miktar", T),
-                ("Birim fiyat", M),
-                ("İndirim", M),
-                ("KDV %", T),
-                ("Toplam", M),
-                ("Not", T),
-            ],
+            columns: &[T, T, T, T, T, T, M, M, T, M, T],
             sql: "SELECT c.id, c.charged_on, o.full_name, p.name, c.description, c.quantity, \
                   c.unit_price_minor, c.discount_minor, c.vat_rate, c.total_minor, c.notes \
                   FROM charges c LEFT JOIN owners o ON o.id = c.owner_id \
@@ -182,30 +112,13 @@ fn spec(table: ExportTable) -> Spec {
                   WHERE c.deleted_at IS NULL ORDER BY c.charged_on, c.id",
         },
         ExportTable::Payments => Spec {
-            columns: &[
-                ("No", T),
-                ("Tarih", T),
-                ("Sahip", T),
-                ("Tutar", M),
-                ("Yöntem", T),
-                ("Not", T),
-            ],
+            columns: &[T, T, T, M, T, T],
             sql: "SELECT y.id, y.paid_on, o.full_name, y.amount_minor, y.method, y.notes \
                   FROM payments y LEFT JOIN owners o ON o.id = y.owner_id \
                   WHERE y.deleted_at IS NULL ORDER BY y.paid_on, y.id",
         },
         ExportTable::Inventory => Spec {
-            columns: &[
-                ("No", T),
-                ("Ad", T),
-                ("Tür", T),
-                ("Birim", T),
-                ("Stok", T),
-                ("Satış fiyatı", M),
-                ("Sipariş seviyesi", T),
-                ("Aktif", T),
-                ("Not", T),
-            ],
+            columns: &[T, T, T, T, T, M, T, T, T],
             sql: "SELECT i.id, i.name, i.kind, i.unit, \
                   (SELECT COALESCE(SUM(l.quantity), 0) FROM inventory_lots l \
                       WHERE l.item_id = i.id AND l.deleted_at IS NULL), \
@@ -271,10 +184,16 @@ fn cell(value: Value, kind: Kind) -> String {
 }
 
 /// Whole table as UTF-8 bytes with a BOM. Reads the connection only.
-pub fn export_csv(conn: &Connection, table: ExportTable) -> Result<Vec<u8>> {
+pub fn export_csv(conn: &Connection, table: ExportTable, headers: &[String]) -> Result<Vec<u8>> {
     let spec = spec(table);
+    if headers.len() != spec.columns.len() || headers.iter().any(|label| label.trim().is_empty()) {
+        return Err(invalid(
+            "headers",
+            "must provide one non-empty label per column",
+        ));
+    }
     let mut out = String::from(BOM);
-    out.push_str(&csv_line(spec.columns.iter().map(|(name, _)| *name)));
+    out.push_str(&csv_line(headers));
     let mut stmt = conn.prepare(spec.sql)?;
     if stmt.column_count() != spec.columns.len() {
         return Err(invalid("table", "export definition is inconsistent"));
@@ -282,7 +201,7 @@ pub fn export_csv(conn: &Connection, table: ExportTable) -> Result<Vec<u8>> {
     let mut rows = stmt.query([])?;
     while let Some(row) = rows.next()? {
         let mut fields = Vec::with_capacity(spec.columns.len());
-        for (index, (_, kind)) in spec.columns.iter().enumerate() {
+        for (index, kind) in spec.columns.iter().enumerate() {
             fields.push(cell(row.get::<_, Value>(index)?, *kind));
         }
         out.push_str(&csv_line(fields));
@@ -358,13 +277,20 @@ second line'),
     }
 
     fn text(db: &Database, table: ExportTable) -> String {
-        String::from_utf8(export_csv(db.conn(), table).unwrap()).unwrap()
+        let mut headers: Vec<String> = (1..=spec(table).columns.len())
+            .map(|index| format!("Column {index}"))
+            .collect();
+        headers[0] = "ID".into();
+        if table == ExportTable::Owners {
+            headers[1] = "Full name".into();
+        }
+        String::from_utf8(export_csv(db.conn(), table, &headers).unwrap()).unwrap()
     }
 
     #[test]
     fn owners_export_has_bom_header_and_skips_deleted_rows() {
         let csv = text(&seeded(), ExportTable::Owners);
-        assert!(csv.starts_with("\u{feff}No;Ad soyad;"));
+        assert!(csv.starts_with("\u{feff}ID;Full name;"));
         assert!(csv.contains("1;Çağrı Şimşek;+905321112233;"));
         assert!(csv.contains("\"Not; \"\"quoted\"\"\nsecond line\""));
         assert!(!csv.contains("Deleted Owner"));
@@ -396,5 +322,20 @@ second line'),
         for table in ExportTable::ALL {
             assert_eq!(text(&db, table).matches("\r\n").count(), 1, "{table:?}");
         }
+    }
+
+    #[test]
+    fn export_validates_and_escapes_localised_headers() {
+        let db = Database::open_in_memory().unwrap();
+        assert!(export_csv(db.conn(), ExportTable::Owners, &[]).is_err());
+        let mut headers = vec!["Label".to_string(); 10];
+        headers[0] = " ".into();
+        assert!(export_csv(db.conn(), ExportTable::Owners, &headers).is_err());
+        headers[0] = "Identifiant; numéro".into();
+        headers[1] = "=Name".into();
+        let csv = String::from_utf8(export_csv(db.conn(), ExportTable::Owners, &headers).unwrap())
+            .unwrap();
+        assert!(csv.starts_with("\u{feff}\"Identifiant; numéro\";'=Name;"));
+        assert_eq!(csv.matches("\r\n").count(), 1);
     }
 }

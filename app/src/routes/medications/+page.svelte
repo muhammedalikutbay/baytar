@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   import { Pill, Search } from '@lucide/svelte';
   import { PageHeader, Button, Card, Dialog, EmptyState, Input, Toast, Select, Badge } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
@@ -13,8 +15,8 @@
   let loading = $state(true), loadError = $state(false), actionError = $state(false), refresh = $state(0);
   let open = $state(false), editing = $state<Medication | undefined>();
   let busy = $state<number[]>([]), deleted = $state<{ id: number; name: string; open: boolean }[]>([]);
-  const categories = $derived([...new Set(rows.map(m => m.category).filter(c => c !== null))].sort((a,b) => categoryLabels[a].localeCompare(categoryLabels[b], 'tr')));
-  const speciesOptions = $derived([...new Set(rows.flatMap(m => (m.targetSpecies ?? '').split(/[,;|]/).map(s => s.trim()).filter(Boolean)))].sort((a,b) => a.localeCompare(b,'tr')));
+  const categories = $derived([...new Set(rows.map(m => m.category).filter(c => c !== null))].sort((a,b) => categoryLabels[a].localeCompare(categoryLabels[b], intlLocale())));
+  const speciesOptions = $derived([...new Set(rows.flatMap(m => (m.targetSpecies ?? '').split(/[,;|]/).map(s => s.trim()).filter(Boolean)))].sort((a,b) => a.localeCompare(b,intlLocale())));
   const visible = $derived(rows.filter(m => (!query.trim() || fold(m.name + ' ' + (m.activeIngredient ?? '')).includes(fold(query)))
     && (!category || m.category === category) && (!species || (m.targetSpecies ?? '').split(/[,;|]/).some(s => s.trim() === species))
     && (statusFilter === 'all' || (statusFilter === 'inactive' ? !!m.deletedAt : !m.deletedAt))));

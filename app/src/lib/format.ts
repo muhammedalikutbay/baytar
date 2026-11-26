@@ -1,11 +1,13 @@
+import { intlLocale } from '$lib/i18n';
 import { parsePhoneNumberFromString } from 'libphonenumber-js/min';
 import { toE164 } from './validation';
 export { toE164, parseDecimal } from './validation';
+import { region } from '$lib/i18n/region.svelte';
 import { tr } from '$lib/i18n/tr';
 
-/** Format integer minor units (kuruş) for display; a missing amount shows as a dash. */
+/** Format integer minor units for display; a missing amount shows as a dash. */
 export function formatMoney(minor: number | null | undefined): string {
-  return minor == null ? '—' : new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(minor / 100);
+  return minor == null ? '—' : new Intl.NumberFormat(intlLocale(), { style: 'currency', currency: region.currency }).format(minor / 100);
 }
 
 export function todayDate(): string {
@@ -77,8 +79,8 @@ export function addDateDays(value: string, days: number): string {
 export function formatAgendaDate(value: string): string {
   const date = parseDate(value);
   if (!date) return value;
-  const weekday = new Intl.DateTimeFormat('tr-TR', { weekday: 'long', timeZone: 'UTC' }).format(date);
-  return `${weekday[0].toLocaleUpperCase('tr-TR') + weekday.slice(1)}, ${formatDate(value)}`;
+  const weekday = new Intl.DateTimeFormat(intlLocale(), { weekday: 'long', timeZone: 'UTC' }).format(date);
+  return `${weekday[0].toLocaleUpperCase(intlLocale()) + weekday.slice(1)}, ${formatDate(value)}`;
 }
 
 export function isValidDate(value: string): boolean { return parseDate(value) !== null; }
@@ -89,20 +91,20 @@ export function localToday(): string {
 }
 
 export function formatNumber(value: number, maximumFractionDigits = 6): string {
-  return new Intl.NumberFormat('tr-TR', { maximumFractionDigits }).format(value);
+  return new Intl.NumberFormat(intlLocale(), { maximumFractionDigits }).format(value);
 }
 
 export function formatMonth(value: string): string {
   const date = parseDate(value);
   if (!date) return value;
-  const month = new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date);
-  return month.charAt(0).toLocaleUpperCase('tr-TR') + month.slice(1);
+  const month = new Intl.DateTimeFormat(intlLocale(), { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date);
+  return month.charAt(0).toLocaleUpperCase(intlLocale()) + month.slice(1);
 }
 
 export function formatDate(value: string | null | undefined): string {
   if (!value) return '';
   const date = parseDate(value);
-  return date ? new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date) : value;
+  return date ? new Intl.DateTimeFormat(intlLocale(), { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date) : value;
 }
 
 export function formatAge(value: string | null | undefined, estimate = false, today = new Date()): string {

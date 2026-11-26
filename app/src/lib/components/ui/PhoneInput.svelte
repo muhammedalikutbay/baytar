@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   // Validated Input wrapper; bind value/valid, with native attributes forwarded to the control.
   import { untrack, tick } from 'svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
@@ -6,10 +8,11 @@
   import Input from './Input.svelte';
   import { toE164 } from '$lib/validation';
   import { tr } from '$lib/i18n/tr';
+  import { region } from '$lib/i18n/region.svelte';
   const uid = $props.id();
   let { value = $bindable(''), valid = $bindable(true), label, required = false, error, id = uid, ...rest }:
     Omit<HTMLInputAttributes, 'value'> & { value?: string; valid?: boolean; label: string; error?: string } = $props();
-  let country = $state<CountryCode>('TR');
+  let country = $state<CountryCode>(untrack(() => region.phoneCountry));
   let text = $state('');
   let accepted = '';
   let lastBound = '';
@@ -19,10 +22,9 @@
   let open = $state(false);
   let query = $state('');
   let touched = $state(false);
-  const names = new Intl.DisplayNames('tr', { type: 'region' });
-  const common: CountryCode[] = ['TR', 'DE', 'NL', 'GB', 'FR', 'AZ', 'CY', 'US'];
-  const countries = [...common, ...getCountries().filter(c => !common.includes(c)).sort((a, b) => (names.of(a) ?? a).localeCompare(names.of(b) ?? b, 'tr'))];
-  const filtered = $derived(countries.filter(c => `${names.of(c)} ${c} +${getCountryCallingCode(c)}`.toLocaleLowerCase('tr').includes(query.toLocaleLowerCase('tr'))));
+  const names = new Intl.DisplayNames(intlLocale(), { type: 'region' });
+  const countries = [untrack(() => region.phoneCountry), ...getCountries().filter(c => c !== untrack(() => region.phoneCountry)).sort((a, b) => (names.of(a) ?? a).localeCompare(names.of(b) ?? b, intlLocale()))];
+  const filtered = $derived(countries.filter(c => `${names.of(c)} ${c} +${getCountryCallingCode(c)}`.toLocaleLowerCase(intlLocale()).includes(query.toLocaleLowerCase(intlLocale()))));
   const flag = (c: string) => [...c].map(letter => String.fromCodePoint(127397 + letter.charCodeAt(0))).join('');
   // Works on the full international number; the field shows it without the dial code (the button shows that),
   // so a Turkish number reads "555 111 22 33" next to "+90", never with the trunk 0.

@@ -3,7 +3,7 @@ use baytar_core::legacy::{
     import::{self, ImportPreview, ImportReport, PreparedImport},
     LegacyError,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{
     collections::{HashMap, HashSet},
     fs,
@@ -244,58 +244,67 @@ pub async fn import_cancel(
     Ok(())
 }
 
-fn report_text(value: &serde_json::Value) -> String {
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ReportLabels {
+    heading: String,
+    source: String,
+    safe: String,
+    counts: HashMap<String, String>,
+    count_summary: String,
+    backup: String,
+    issues: String,
+    issue_labels: HashMap<String, String>,
+    unknown_issue: String,
+}
+
+fn report_text(value: &serde_json::Value, labels: &ReportLabels) -> String {
     let mut out = format!(
-        "PatientsCare → Baytar\nDosya: {}\nEski dosyanız değiştirilmez.\n",
-        value["sourceName"].as_str().unwrap_or_default()
+        "{}\n{}\n{}\n",
+        labels.heading,
+        labels
+            .source
+            .replace("{name}", value["sourceName"].as_str().unwrap_or_default()),
+        labels.safe
     );
-    for (key, label) in [
-        ("found", "Dosyadaki kayıtlar"),
-        ("toImport", "Aktarılacak kayıtlar"),
-        ("inserted", "Aktarılan kayıtlar"),
-        ("alreadyImported", "Daha önce aktarılan kayıtlar"),
-    ] {
+    for key in ["found", "toImport", "inserted", "alreadyImported"] {
         if let Some(c) = value.get(key) {
-            out.push_str(&format!(
-                "{label}: {} sahip, {} hayvan, {} hatırlatma\n",
-                c["owners"], c["patients"], c["todos"]
-            ));
+            let summary = labels
+                .count_summary
+                .replace("{owners}", &c["owners"].to_string())
+                .replace("{patients}", &c["patients"].to_string())
+                .replace("{todos}", &c["todos"].to_string())
+                .replace(
+                    "{label}",
+                    labels
+                        .counts
+                        .get(key)
+                        .map(String::as_str)
+                        .unwrap_or_default(),
+                );
+            out.push_str(&summary);
+            out.push('\n');
         }
     }
     if let Some(backup) = value["backupFile"].as_str() {
-        out.push_str(&format!("Aktarma öncesi yedek: {backup}\n"));
+        out.push_str(&labels.backup.replace("{path}", backup));
+        out.push('\n');
     }
-    out.push_str("\nDikkat gerektiren kayıtlar (eski değerler korunur):\n");
+    out.push_str(&format!("\n{}\n", labels.issues));
     if let Some(issues) = value["issues"].as_array() {
         for issue in issues {
+            let kind = issue["kind"].as_str().unwrap_or_default();
+            let label = labels
+                .issue_labels
+                .get(kind)
+                .unwrap_or(&labels.unknown_issue);
             out.push_str(&format!(
                 "{} #{} · {} · {} · {}\n",
-                issue["table"],
-                issue["sourceId"],
-                issue["field"],
-                issue_label(issue["kind"].as_str().unwrap_or_default()),
-                issue["raw"]
+                issue["table"], issue["sourceId"], issue["field"], label, issue["raw"]
             ));
         }
     }
     out
-}
-fn issue_label(kind: &str) -> &str {
-    match kind {
-        "phoneUnparsed" => "Telefon okunamadı",
-        "dateUnparsed" => "Tarih okunamadı",
-        "speciesUnrecognized" => "Tür diğer olarak saklandı",
-        "sexUnrecognized" => "Cinsiyet bilinmiyor",
-        "missingName" => "Ad eksik",
-        "unusableId" => "Kayıt numarası yenilendi",
-        "orphanPatient" => "Hayvanın sahibi bulunamadı",
-        "orphanTodo" => "Hatırlatmanın sahibi bulunamadı",
-        "duplicateOwner" => "Benzer sahip",
-        "ownerMismatch" => "Sahip bilgileri farklı",
-        "danglingPatientLink" => "Bağlı hayvan bulunamadı",
-        "danglingOwnerLink" => "Bağlı sahip bulunamadı",
-        _ => kind,
-    }
 }
 #[tauri::command]
 pub async fn import_save_report(
@@ -303,6 +312,7 @@ pub async fn import_save_report(
     database: State<'_, AppDatabase>,
     token_or_run_id: String,
     path: String,
+    labels: ReportLabels,
 ) -> Result<(), CommandError> {
     if !Path::new(&path)
         .extension()
@@ -341,7 +351,7 @@ pub async fn import_save_report(
             .map_err(|_| failure("import_expired", true))?;
         serde_json::from_str(&json).map_err(|_| CommandError::internal())?
     };
-    fs::write(path, report_text(&value)).map_err(|_| failure("report_save_failed", false))
+    fs::write(path, report_text(&value, &labels)).map_err(|_| failure("report_save_failed", false))
 }
 
 #[cfg(test)]
@@ -401,9 +411,17 @@ mod tests {
         assert_eq!(preview.to_import.owners, 1);
         let report = import::execute(&prepared, &mut db, &root.path().join("backups")).unwrap();
         let value = serde_json::to_value(&report).unwrap();
-        let text = report_text(&value);
+        let labels: ReportLabels = serde_json::from_value(serde_json::json!({
+            "heading": "PatientsCare → Baytar", "source": "File: {name}", "safe": "Original file unchanged.",
+            "counts": {"found": "Found", "toImport": "To import", "inserted": "Imported", "alreadyImported": "Already imported"},
+            "countSummary": "{label}: {owners} owners, {patients} patients, {todos} reminders",
+            "backup": "Backup: {path}", "issues": "Review these records:",
+            "issueLabels": {"phoneUnparsed": "Unrecognised phone number"}, "unknownIssue": "Unrecognised finding"
+        })).unwrap();
+        let text = report_text(&value, &labels);
         assert!(text.contains("unknown phone"));
-        assert!(text.contains("Telefon okunamadı"));
+        assert!(text.contains("Unrecognised phone number"));
+        assert!(text.contains("Imported: 1 owners, 0 patients, 0 reminders"));
         assert!(text.contains(&report.backup_file));
         assert!(root
             .path()

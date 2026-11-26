@@ -18,10 +18,11 @@ Free, open-source, offline practice software for independent veterinarians and s
 
 Baytar began as a project for a relative who works as a freelance veterinarian without a clinic. Most practice software is a paid cloud subscription. Baytar is free, works without an internet connection and keeps practice data on the veterinarian's own computer, while offering the features vets expect from professional tools. *Baytar* is the Ottoman Turkish word for veterinarian.
 
-The interface is in Turkish. The built-in vaccine and medicine catalog follows products sold in Turkey and can be edited freely.
+The built-in vaccine and medicine catalog follows products sold in Turkey and can be edited freely.
 
 ## Features
 
+- Interface in Turkish, English, German, Spanish and French; configurable currency and phone region.
 - **Patients:** owners and pets (dogs, cats, birds, rabbits, rodents, ferrets, reptiles and any other animal), photos and files, allergy/behaviour alerts, Turkish-aware search. Patients are picked from an owner list that adapts to the size of the practice.
 - **Validated input:** international phone numbers (+90 by default), e-mail, Turkish ID and tax numbers, microchip numbers, amounts and times.
 - **Visits:** SOAP-style records with vitals (weight, temperature, heart and respiratory rate, body condition score), reusable templates, prescriptions and weight history.
@@ -143,6 +144,7 @@ Baytar, kliniği olmadan serbest veteriner hekim olarak çalışan bir yakınım
 
 ### Özellikler
 
+- Türkçe, İngilizce, Almanca, İspanyolca ve Fransızca arayüz; ayarlanabilir para birimi ve telefon bölgesi.
 - **Hastalar:** sahipler ve evcil hayvanlar (köpek, kedi, kuş, tavşan, kemirgen, gelincik, sürüngen ve diğer), fotoğraf ve dosyalar, alerji/davranış uyarıları, Türkçe harflere duyarlı arama. Hasta, kayıt sayısına göre uyum sağlayan sahip listesinden seçilir.
 - **Doğrulamalı alanlar:** uluslararası telefon numarası (varsayılan +90), e-posta, TC kimlik ve vergi numarası, mikroçip, tutar ve saat.
 - **Muayene:** SOAP düzeninde kayıt, vital bulgular (kilo, ateş, nabız, solunum, vücut kondisyonu), muayene şablonları, reçete ve kilo geçmişi.

@@ -1,4 +1,19 @@
-export const tr = {
+import { locale } from './index';
+import { en } from './locales/en';
+
+export const trSource = {
+  settingsRegion: 'Dil ve bölge', settingsLanguage: 'Dil', settingsCurrency: 'Para birimi',
+  settingsPhoneCountry: 'Varsayılan telefon ülkesi',
+  settingsRegionHint: 'Dil değişikliği pencereyi yeniden başlatır. Hazır aşı ve ilaç kataloğundaki adlar girildiği gibi kalır; marka adları uluslararasıdır.',
+  settingsCurrencyHint: 'Para birimi mevcut tutarları dönüştürmez; yalnızca gösterimi değiştirir.',
+  csvRecordId: 'No', csvCreatedOn: 'Kayıt tarihi', csvVisitOn: 'Muayene tarihi',
+  importReportHeading: 'PatientsCare → Baytar', importReportSource: 'Dosya: {name}',
+  importReportFilename: 'baytar-aktarma-raporu.txt',
+  importReportFound: 'Dosyadaki kayıtlar', importReportToImport: 'Aktarılacak kayıtlar',
+  importReportInserted: 'Aktarılan kayıtlar', importReportAlready: 'Daha önce aktarılan kayıtlar',
+  importReportCounts: '{label}: {owners} sahip, {patients} hayvan, {todos} hatırlatma',
+  importReportBackup: 'Aktarma öncesi yedek: {path}',
+  importReportIssues: 'Dikkat gerektiren kayıtlar (eski değerler korunur):', importReportUnknownIssue: 'Tanınmayan bulgu',
   appointmentClinicTask: 'Hastasız kayıt (klinik işi)', appointmentControl: 'Kontrol',
   appointmentDurationCustom: 'Özel süre', appointmentRepeatNone: 'Yok', appointmentRepeatWeekly: 'Her hafta',
   appointmentRepeatMonthly: 'Her ay', appointmentRepeatYearly: 'Her yıl', appointmentRepeatDays: 'N günde bir',
@@ -108,7 +123,7 @@ export const tr = {
   doseTitle: 'Doz hesaplayıcı', doseMedication: 'İlaç', doseManual: 'Değerleri elle gir',
   doseFromLine: 'Doz hesapla', doseApply: 'Satıra aktar',
   doseWeight: 'Ağırlık (kg)', doseWeightDate: 'Son tartım', doseNoWeight: 'Kayıtlı tartım yok; ağırlığı girin.',
-  doseWeightError: '0’dan büyük, en çok 1.500 kg bir ağırlık girin.',
+  doseWeightError: '0’dan büyük, en çok 1500 kg bir ağırlık girin.',
   dosePositiveError: '0’dan büyük, sonlu bir sayı girin.', doseRangeError: 'En çok değeri en az değerinden küçük olamaz.',
   dosePrompt: 'Hesaplamak için ağırlık ve en az mg/kg değerini girin.',
   doseError: 'Hesaplama tamamlanamadı. Değerleri kontrol edip yeniden deneyin.',
@@ -621,9 +636,14 @@ export const tr = {
   directoryPetCount: '{count} hasta', directoryAge: '{age} yaş', directoryLabel: 'Sahip ve hastalar',
   gallerySelection: 'Aranabilir seçimler', galleryVaccineRabies: 'Kuduz aşısı', galleryVaccineMixed: 'Karma aşı',
   city: 'İl', district: 'İlçe', nationalId: 'TCKN / VKN',
-} as const satisfies Record<string, string>;
+} satisfies Record<string, string>;
 
-export type TranslationKey = keyof typeof tr;
+export type TranslationKey = keyof typeof trSource;
+
+// Workers' locale files are discovered automatically when their changes are merged.
+const modules = import.meta.glob<Record<string, Partial<Record<TranslationKey, string>>>>('./locales/*.ts', { eager: true });
+const active = locale === 'tr' ? trSource : modules[`./locales/${locale}.ts`]?.[locale] ?? {};
+export const tr: Record<TranslationKey, string> = { ...en, ...Object.fromEntries(Object.entries(active).filter(([, value]) => typeof value === 'string' && value.trim())) } as Record<TranslationKey, string>;
 
 export function t<K extends TranslationKey>(key: K): (typeof tr)[K] {
   return tr[key];

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
@@ -19,8 +21,10 @@
   import { validateForm } from '$lib/validation';
   import Dialog from '$lib/components/ui/Dialog.svelte';
   import { buttonStyles } from '$lib/components/ui/button';
+  import LanguageRegion from '$lib/components/settings/LanguageRegion.svelte';
 
   const sections = [
+    {value:'region',label:tr.settingsRegion},
     {value:'clinic',label:tr.settingsNavClinic}, {value:'appearance',label:tr.settingsNavAppearance},
     {value:'security',label:tr.settingsNavSecurity}, {value:'templates',label:tr.clinicalTemplates},
     {value:'reminders',label:tr.remindersTemplatesTitle}, {value:'whatsapp',label:tr.whatsappTitle},
@@ -89,7 +93,7 @@
   async function restore() { if (!restoreTarget) return; busy = true; try { await api.restoreBackup(restoreTarget.path); restoreTarget = null; restoreDialogOpen = false; window.location.reload(); } catch { error = tr.settingsRestoreError; } finally { busy = false; } }
   async function setUpdates(event: Event) { updateEnabled = (event.currentTarget as HTMLInputElement).checked; try { await api.set('update_check_enabled', updateEnabled ? '1' : '0'); } catch { error = tr.settingsError; } }
   const kinds: Record<BackupInfo['kind'], string> = { daily: tr.settingsDaily, manual: tr.settingsManual, 'pre-update': tr.settingsPreUpdate, 'pre-import': tr.settingsPreImport, 'pre-restore': tr.settingsPreRestore, 'pre-migration': tr.settingsPreMigration };
-  const date = (value: string) => new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+  const date = (value: string) => new Intl.DateTimeFormat(intlLocale(), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
   const size = (bytes: number) => bytes < 1048576 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1048576).toFixed(1)} MB`;
 </script>
 
@@ -106,6 +110,7 @@
     </nav>
     <div class="settings-select"><Select label={tr.settingsSection} value={activeSection} options={sections} onchange={event => void goto('?section=' + event.currentTarget.value, {noScroll:true, keepFocus:true})} /></div>
     <div class="min-w-0">
+  <section id="region" hidden={activeSection !== 'region'}><LanguageRegion /></section>
   <section id="appearance" hidden={activeSection !== 'appearance'} class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface p-5 sm:p-6">
     <div class="flex items-center gap-3"><IconChip icon={Moon} tone="neutral" size="sm" /><div><h2 class="type-section">{tr.theme}</h2><p class="text-sm text-fg-muted">{theme.preference === 'system' ? tr.themeFollowSystem : tr.themeManual}</p></div></div>
     <button class="type-caption min-h-7 text-accent underline underline-offset-4" onclick={() => theme.set('system')}>{tr.useSystemTheme}</button>

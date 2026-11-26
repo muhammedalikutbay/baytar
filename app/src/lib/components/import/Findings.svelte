@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   import type { ImportPreview } from '$lib/api/types';
   import { tr, importIssueKeys } from '$lib/i18n/tr';
   let { preview }: { preview: ImportPreview } = $props();
@@ -11,7 +13,7 @@
     {@const issues = preview.issues.filter(issue => issue.kind === kind)}
     {#if issues.length}
       <details class="rounded-md border border-border p-4">
-        <summary class="cursor-pointer font-medium">{tr[key]} · {issues.length.toLocaleString('tr-TR')}</summary>
+        <summary class="cursor-pointer font-medium">{tr[key]} · {issues.length.toLocaleString(intlLocale())}</summary>
         <ul class="mt-3 max-h-64 space-y-2 overflow-auto">
           {#each issues as issue}<li class="break-words"><span class="type-caption text-fg-muted">{tr.importRecord} {issue.sourceId} · </span>{issue.raw ?? tr.importNoValue}</li>{/each}
         </ul>

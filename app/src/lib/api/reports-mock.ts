@@ -40,7 +40,8 @@ export function createReportsMock() {
         coverage: empty ? { patients: 0, rabiesCovered: 0, coreCovered: 0 } : { patients: 84, rabiesCovered: 61, coreCovered: 52 } };
     }) as Handler,
     reports_export_csv: ((args: CommandMap['reports_export_csv']['args']) => {
-      download(args.path, 'No;Ad\r\n1;Örnek kayıt\r\n');
+      const escape = (value: string) => '"' + value.replaceAll('"', '""') + '"';
+      download(args.path, args.headers.map(escape).join(';') + '\r\n');
       return args.path;
     }) as Handler,
     reports_export_all: ((args: CommandMap['reports_export_all']['args']) => tables.map(t => `baytar-${t}-${args.today}.csv`)) as Handler

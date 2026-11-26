@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   import { untrack } from 'svelte';
   import { Card, Combobox, Checkbox, Button, NumberInput } from '$lib/components/ui';
   import RecordPicker from '$lib/components/pickers/RecordPicker.svelte';
@@ -103,7 +105,7 @@
     return format(value.min) + (value.max === null ? '' : '–' + format(value.max));
   }
   function exact(value: DoseRange): string {
-    const format = (v: number) => new Intl.NumberFormat('tr-TR', { maximumSignificantDigits: 21, useGrouping: false }).format(v);
+    const format = (v: number) => new Intl.NumberFormat(intlLocale(), { maximumSignificantDigits: 21, useGrouping: false }).format(v);
     return format(value.min) + (value.max === null ? '' : '–' + format(value.max));
   }
   const roundsToZero = $derived(result && [result.mg, result.ml, result.units].some((r, index) => r && (r.min < (index === 2 ? 0.125 : 0.005))));

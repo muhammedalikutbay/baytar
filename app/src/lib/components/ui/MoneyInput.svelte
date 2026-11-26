@@ -1,14 +1,19 @@
 <script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   // Validated Input wrapper; bind value/valid, with native attributes forwarded to the control.
   import { untrack } from 'svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
   import Input from './Input.svelte';
   import { parseDecimal } from '$lib/validation';
   import { tr } from '$lib/i18n/tr';
-  import { TurkishLira, type LucideIcon } from '@lucide/svelte';
-  let { icon = TurkishLira, value = $bindable(null), valid = $bindable(true), label, required = false, error, ...rest }:
+  import { region } from '$lib/i18n/region.svelte';
+  import { TurkishLira, Euro, DollarSign, PoundSterling, SwissFranc, type LucideIcon } from '@lucide/svelte';
+  const currencyIcons = { TRY: TurkishLira, EUR: Euro, USD: DollarSign, GBP: PoundSterling, CHF: SwissFranc };
+  let { icon, value = $bindable(null), valid = $bindable(true), label, required = false, error, ...rest }:
     Omit<HTMLInputAttributes, 'value'> & { icon?: LucideIcon; value?: number | null; valid?: boolean; label: string; error?: string } = $props();
-  const format = (n: number | null) => n === null ? '' : new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n / 100);
+  const format = (n: number | null) => n === null ? '' : new Intl.NumberFormat(intlLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n / 100);
+  const decimal = new Intl.NumberFormat(intlLocale()).formatToParts(1.1).find(part => part.type === 'decimal')?.value ?? '.';
   let text = $state(untrack(() => format(value)));
   let editing = $state(false);
   let touched = $state(false);
@@ -26,7 +31,7 @@
   }
 </script>
 <div class="relative">
-  <Input {...rest} {icon} {label} {required} inputmode="decimal" bind:ref value={text} oninput={input}
-    onfocus={() => { editing = true; text = value === null ? '' : (value / 100).toFixed(2).replace('.', ','); }}
+  <Input {...rest} icon={icon ?? currencyIcons[region.currency]} {label} {required} inputmode="decimal" bind:ref value={text} oninput={input}
+    onfocus={() => { editing = true; text = value === null ? '' : (value / 100).toFixed(2).replace('.', decimal); }}
     onblur={() => { editing = false; touched = true; text = format(value); }} error={error || (touched ? message : '')} />
 </div>

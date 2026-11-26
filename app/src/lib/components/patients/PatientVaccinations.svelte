@@ -1,4 +1,6 @@
 ﻿<script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   import PrintButton from '$lib/components/print/PrintButton.svelte';
   import { page } from '$app/state';
   import { Syringe, CalendarDays } from '@lucide/svelte';
@@ -23,14 +25,14 @@
   const schedules = $derived.by(() => {
     const entries = types.filter(t => t.isActive && !t.deletedAt && (!t.species || t.species === patient?.species)).map(t => ({ typeId: t.id as number | null, name: t.name }));
     for (const r of [...records, ...due]) {
-      if (!entries.some(e => r.vaccineTypeId ? e.typeId === r.vaccineTypeId : e.name.toLocaleLowerCase('tr-TR') === r.vaccineName.toLocaleLowerCase('tr-TR'))) entries.push({ typeId: r.vaccineTypeId, name: r.vaccineName });
+      if (!entries.some(e => r.vaccineTypeId ? e.typeId === r.vaccineTypeId : e.name.toLocaleLowerCase(intlLocale()) === r.vaccineName.toLocaleLowerCase(intlLocale()))) entries.push({ typeId: r.vaccineTypeId, name: r.vaccineName });
     }
     return entries.map(entry => {
       const doses = records.filter(r => entry.typeId ? r.vaccineTypeId === entry.typeId : !r.vaccineTypeId && r.vaccineName === entry.name);
       const next = due.find(r => entry.typeId ? r.vaccineTypeId === entry.typeId : !r.vaccineTypeId && r.vaccineName === entry.name);
       const days = next ? daysUntil(next.dueOn) : null;
       return { ...entry, doses, next, days };
-    }).sort((a,b) => (a.next?.dueOn ?? '9999').localeCompare(b.next?.dueOn ?? '9999') || a.name.localeCompare(b.name, 'tr'));
+    }).sort((a,b) => (a.next?.dueOn ?? '9999').localeCompare(b.next?.dueOn ?? '9999') || a.name.localeCompare(b.name, intlLocale()));
   });
   $effect(() => {
     const id = patientId; refresh; revision;

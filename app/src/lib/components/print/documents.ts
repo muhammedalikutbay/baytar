@@ -9,6 +9,7 @@ import * as appointments from '$lib/api/appointments';
 import type { Owner, Patient, Visit, Vaccination, PrescriptionItem, Appointment } from '$lib/api/types';
 import { localToday } from '$lib/format';
 import { tr } from '$lib/i18n/tr';
+import { locale } from '$lib/i18n';
 
 export const documentTitles = {
   vaccination: tr.documentsVaccination, prescription: tr.prescription,
@@ -67,7 +68,7 @@ export async function loadDocument(kind: DocumentKind, id: number): Promise<Prin
 export const snapshotKey = (kind: DocumentKind, id: number) => `baytar-print-${kind}-${id}`;
 
 export async function openDocument(kind: DocumentKind, id: number): Promise<void> {
-  const url = `/print?doc=${kind}&id=${id}`;
+  const url = `/print?doc=${kind}&id=${id}&lang=${locale}`;
   if (!isTauri()) {
     // Reserve the tab during the click; transfer the in-memory mock's current data.
     const tab = window.open('about:blank', '_blank');

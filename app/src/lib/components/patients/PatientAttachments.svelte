@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   import { onMount } from 'svelte';
   import { isTauri } from '@tauri-apps/api/core';
   import { getCurrentWebview } from '@tauri-apps/api/webview';
@@ -84,7 +86,7 @@
         </button>
         <p class="break-words font-medium">{file.title ?? file.fileName}</p>
         <div class="flex flex-wrap gap-2"><Badge variant={file.deletedAt ? 'neutral' : 'accent'}>{kindLabels[file.kind]}</Badge>{#if file.deletedAt}<Badge>{tr.clinicalDeleted}</Badge>{/if}</div>
-        <p class="type-caption text-fg-muted tabular-nums">{formatDate(file.createdAt.slice(0,10))} · {(file.sizeBytes / 1024).toLocaleString('tr-TR', { maximumFractionDigits: 0 })} KB</p>
+        <p class="type-caption text-fg-muted tabular-nums">{formatDate(file.createdAt.slice(0,10))} · {(file.sizeBytes / 1024).toLocaleString(intlLocale(), { maximumFractionDigits: 0 })} KB</p>
         {#if file.visitId}<a class="type-caption text-accent underline" href={`/patients/pet?id=${patientId}&visit=${file.visitId}#visit-${file.visitId}`}>{tr.clinicalVisitLink} #{file.visitId}</a>{:else}<span class="type-caption text-fg-muted">{tr.clinicalPatientFile}</span>{/if}
         <div class="flex flex-wrap gap-1">
           {#if file.deletedAt}<Button variant="secondary" size="sm" disabled={busy} onclick={() => restore(file.id)}>{tr.clinicalRestore}</Button>

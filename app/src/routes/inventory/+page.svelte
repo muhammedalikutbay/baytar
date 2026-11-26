@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { intlLocale } from '$lib/i18n';
+
   import { Package, TriangleAlert, CalendarClock, CalendarX2 } from '@lucide/svelte';
   import { PageHeader, Button, Card, StatTile, Badge, Input, Select, Checkbox, Dialog, EmptyState, buttonStyles } from '$lib/components/ui';
   import { tr } from '$lib/i18n/tr';
@@ -17,7 +19,7 @@
       .catch(() => { if (!cancelled) error = true; }).finally(() => { if (!cancelled) loading = false; });
     return () => { cancelled = true; };
   });
-  const visible = $derived(rows.filter(i => (!kind || i.kind === kind) && (!warningsOnly || warnings(i).length > 0) && i.name.toLocaleLowerCase('tr-TR').includes(query.trim().toLocaleLowerCase('tr-TR'))));
+  const visible = $derived(rows.filter(i => (!kind || i.kind === kind) && (!warningsOnly || warnings(i).length > 0) && i.name.toLocaleLowerCase(intlLocale()).includes(query.trim().toLocaleLowerCase(intlLocale()))));
   function saved() { open = null; refresh++; }
 </script>
 <div class="grid gap-8">
