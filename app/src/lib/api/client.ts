@@ -1,4 +1,5 @@
 import { toE164 } from '$lib/validation';
+import { demo } from './demo-text';
 import { tr, importIssueKeys } from '$lib/i18n/tr';
 import { createBillingMock } from './billing-mock';
 import { createClinicalMock } from './clinical-mock';
@@ -121,8 +122,8 @@ function search(query: string, limit: number): SearchHit[] {
 const first = ownerCreate({ fullName: 'Çağrı Şimşek', phone: '+905321112233' });
 const second = ownerCreate({ fullName: 'İpek Öztürk', phone: '+905442223344' });
 const third = ownerCreate({ fullName: 'Ayşe Işık' });
-patientCreate({ ownerId: first.id, name: 'Pamuk', species: 'cat', breed: 'Ankara kedisi', sex: 'female', neutered: true, birthDate: '2022-04-12', color: 'Beyaz', microchip: '900108001234567' });
-patientCreate({ ownerId: first.id, name: 'Şimşek', species: 'dog', breed: 'Golden retriever', sex: 'male', neutered: false, birthDate: '2024-09-01', birthDateIsEstimate: true, color: 'Sarı' });
+patientCreate({ ownerId: first.id, name: 'Pamuk', species: 'cat', breed: demo.catBreed, sex: 'female', neutered: true, birthDate: '2022-04-12', color: demo.white, microchip: '900108001234567' });
+patientCreate({ ownerId: first.id, name: 'Şimşek', species: 'dog', breed: 'Golden retriever', sex: 'male', neutered: false, birthDate: '2024-09-01', birthDateIsEstimate: true, color: demo.golden });
 patientCreate({ ownerId: second.id, name: 'Boncuk', species: 'bird' });
 patientCreate({ ownerId: third.id, name: 'Fındık', species: 'rabbit' });
 
@@ -141,7 +142,7 @@ const demoDate = (offset: number) => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 };
 const demoTypes = clinical.call('vaccine_types_list', {}) as import('./types').VaccineType[];
-for (const [patientIndex, name, dueOffset] of [[0, 'Kuduz aşısı', -5], [0, 'İç parazit', 10], [1, 'Karma aşı', 25]] as const) {
+for (const [patientIndex, name, dueOffset] of [[0, demo.rabies, -5], [0, demo.internalParasite, 10], [1, demo.combined, 25]] as const) {
   const type = demoTypes.find(row => row.name === name)!;
   clinical.call('vaccination_create', { input: { patientId: patients[patientIndex].id, vaccineTypeId: type.id,
     vaccineName: type.name, givenOn: demoDate(dueOffset - 365), nextDueOn: demoDate(dueOffset) } });

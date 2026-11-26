@@ -1,0 +1,21 @@
+{
+  "name": "locale-smoke",
+  "description": "Switches the real window through every interface language with ?lang= and checks a few translated labels and the document language. Use an empty BAYTAR_DATA_DIR.",
+  "steps": [
+    { "type": "eval", "expr": "(() => { location.search = '?lang=en'; return true; })()", "expect": true },
+    { "type": "wait", "text": "Welcome to Baytar", "timeout": 30000 },
+    { "type": "eval", "expr": "[document.documentElement.lang, !!document.body.innerText.match(/Patients/)]", "expect": ["en", true] },
+    { "type": "screenshot", "path": "locale-en.png" },
+    { "type": "eval", "expr": "(() => { location.search = '?lang=de'; return true; })()", "expect": true },
+    { "type": "wait", "text": "Patienten", "timeout": 30000 },
+    { "type": "eval", "expr": "document.documentElement.lang", "expect": "de" },
+    { "type": "eval", "expr": "(() => { location.search = '?lang=es'; return true; })()", "expect": true },
+    { "type": "wait", "text": "Pacientes", "timeout": 30000 },
+    { "type": "eval", "expr": "(() => { location.search = '?lang=fr'; return true; })()", "expect": true },
+    { "type": "wait", "text": "Patients", "timeout": 30000 },
+    { "type": "eval", "expr": "document.documentElement.lang", "expect": "fr" },
+    { "type": "eval", "expr": "(() => { location.search = '?lang=tr'; return true; })()", "expect": true },
+    { "type": "wait", "text": "Hastalar", "timeout": 30000 },
+    { "type": "eval", "expr": "document.documentElement.lang", "expect": "tr" }
+  ]
+}

@@ -3,6 +3,15 @@
 All notable changes to Baytar. Versions follow [Semantic Versioning](https://semver.org/); before 1.0 a minor
 version may change the database schema (Baytar migrates it automatically and backs it up first).
 
+## 0.5.0 — 2026-11-26
+
+### Added
+- Interface languages: English, Turkish, German, Spanish and French. Baytar picks the system language on first start;
+  change it under Settings → Language and region or on the welcome screen.
+- Dates, numbers and country names follow the chosen language. Currency (TRY, EUR, USD, GBP, CHF) and the default
+  phone country are configurable.
+- CSV exports and the saved import report use the chosen language.
+
 ## 0.4.0 — 2026-11-26
 
 First public release of the rewrite.

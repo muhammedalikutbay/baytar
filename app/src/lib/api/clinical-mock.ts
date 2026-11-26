@@ -1,4 +1,5 @@
 import { seriesDates } from '$lib/components/agenda/calendar';
+import { demo } from './demo-text';
 import type { Audit, ApiError, Owner, Patient, Visit, NewVisit, VisitPatch, VaccineType, NewVaccineType, VaccineTypePatch, Vaccination, NewVaccination, VaccinationPatch, Medication, NewMedication, MedicationPatch, PrescriptionItem, NewPrescription, PrescriptionPatch, Appointment, NewAppointment, AppointmentPatch, LatestWeight, DueVaccination, CalendarAppointment, CommandMap } from './types';
 interface Context { patientGet(id: number): Patient; ownerGet(id: number): Owner; fail(kind: ApiError["kind"], message: string, field?: string): never; fold(value: string): string; now(): string }
 export function createClinicalMock(ctx: Context) {
@@ -173,14 +174,14 @@ function createSeries(base: NewAppointment, count: number, everyDays: number, ev
   catch (error) { appointments.splice(size); throw error; }
 }
 for (const [name, interval, species] of [
-  ['Karma aşı',365,'dog'], ['Kuduz aşısı',365,null], ['İç parazit',90,null], ['Dış parazit',30,null], ['Kedi karma aşısı',365,'cat'], ['Lösemi aşısı (FeLV)',365,'cat']
+  [demo.combined,365,'dog'], [demo.rabies,365,null], [demo.internalParasite,90,null], [demo.externalParasite,30,null], [demo.catCombined,365,'cat'], [demo.felv,365,'cat']
 ] as const) vaccine_typesCreate({ name, defaultIntervalDays: interval, species });
 // Synthetic examples use the same patient ids as the owner/patient browser fixture.
 const example = visitsCreate({ patientId: 4, visitOn: '2026-11-04', weightKg: 4.2 });
-const medicine = medicationsCreate({ name: 'Örnek antibiyotik', activeIngredient: 'Amoksisilin', form: 'tablet', strengthMgPerUnit: 50 });
+const medicine = medicationsCreate({ name: demo.antibiotic, activeIngredient: demo.amoxicillin, form: 'tablet', strengthMgPerUnit: 50 });
 prescriptionsCreate({ visitId: example.id, medicationId: medicine.id, medicationName: medicine.name, doseMg: 25 });
 vaccinationsCreate({ patientId: 4, vaccineTypeId: vaccine_types[4].id, vaccineName: vaccine_types[4].name, givenOn: '2026-11-04', nextDueOn: '2027-11-04' });
-appointmentsCreate({ patientId: 4, startsOn: '2026-11-05', startsTime: '09:00', title: 'Kontrol muayenesi', kind: 'visit' });
+appointmentsCreate({ patientId: 4, startsOn: '2026-11-05', startsTime: '09:00', title: demo.checkup, kind: 'visit' });
 
 return { has: (command: string) => command in handlers, call: (command: string, args: unknown) => handlers[command](args) };
 }

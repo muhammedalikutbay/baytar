@@ -133,9 +133,9 @@ Serbest çalışan veteriner hekimler ve küçük pet klinikleri için ücretsiz
 **[En güncel sürümü indirin](https://github.com/muhammedalikutbay/baytar/releases/latest)**
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/home-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/home-light.png">
-  <img alt="Baytar ana ekranı" src="docs/screenshots/home-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/tr/home-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/tr/home-light.png">
+  <img alt="Baytar ana ekranı" src="docs/screenshots/tr/home-light.png">
 </picture>
 
 ### Neden Baytar?
@@ -163,12 +163,12 @@ Baytar, kliniği olmadan serbest veteriner hekim olarak çalışan bir yakınım
 
 | | |
 |---|---|
-| ![Hasta sayfası](docs/screenshots/patient-light.png)<br>Hasta sayfası: yaklaşanlar, kilo eğrisi, geçmiş, aşılar, randevular ve dosyalar. | ![Sahip sayfası](docs/screenshots/owner-light.png)<br>Sahip sayfası: önce hayvanlar, iletişim, hesap ve ekstre. |
-| ![Aşılar](docs/screenshots/vaccines-light.png)<br>Aşı uygulama ve planlama, takvim, yaklaşan ve geciken aşılar. | ![Ajanda](docs/screenshots/agenda-light.png)<br>Gün, hafta, ay ve liste görünümleri. |
-| ![Hatırlatmalar](docs/screenshots/reminders-dark.png)<br>WhatsApp mesajlarıyla hatırlatma merkezi. | ![Hesaplar](docs/screenshots/accounts-light.png)<br>Borç yaşıyla alacaklar, kasa ve fiyat listesi. |
-| ![Stok](docs/screenshots/inventory-light.png)<br>Parti ve son kullanma tarihli stok, uyarılar. | ![Raporlar](docs/screenshots/reports-dark.png)<br>Aylık raporlar ve CSV dışa aktarma. |
+| ![Hasta sayfası](docs/screenshots/tr/patient-light.png)<br>Hasta sayfası: yaklaşanlar, kilo eğrisi, geçmiş, aşılar, randevular ve dosyalar. | ![Sahip sayfası](docs/screenshots/tr/owner-light.png)<br>Sahip sayfası: önce hayvanlar, iletişim, hesap ve ekstre. |
+| ![Aşılar](docs/screenshots/tr/vaccines-light.png)<br>Aşı uygulama ve planlama, takvim, yaklaşan ve geciken aşılar. | ![Ajanda](docs/screenshots/tr/agenda-light.png)<br>Gün, hafta, ay ve liste görünümleri. |
+| ![Hatırlatmalar](docs/screenshots/tr/reminders-dark.png)<br>WhatsApp mesajlarıyla hatırlatma merkezi. | ![Hesaplar](docs/screenshots/tr/accounts-light.png)<br>Borç yaşıyla alacaklar, kasa ve fiyat listesi. |
+| ![Stok](docs/screenshots/tr/inventory-light.png)<br>Parti ve son kullanma tarihli stok, uyarılar. | ![Raporlar](docs/screenshots/tr/reports-dark.png)<br>Aylık raporlar ve CSV dışa aktarma. |
 
-Her ekranın açık ve koyu teması var; uygulama siz seçene kadar sistem ayarını izler. Diğer görüntüler [docs/screenshots](docs/screenshots/) klasöründe.
+Her ekranın açık ve koyu teması var; uygulama siz seçene kadar sistem ayarını izler. Diğer görüntüler [docs/screenshots](docs/screenshots/tr/) klasöründe.
 
 ### İndirme ve kurulum
 
